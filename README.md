@@ -82,7 +82,7 @@ All in `css/tokens.css`. Components read tokens only, never raw colours or pixel
 | Type | `--font-body`, `--font-display`, `--font-data` (= `--font-mono`), weights `--w-normal` 400, `--w-medium` 510, `--w-semibold` 590. Body is 13px/1.5 |
 | Spacing (4px base) | `--space-1` 4 · `-2` 8 · `-3` 12 · `-4` 16 · `-5` 20 · `-6` 24 · `-8` 32 |
 | Radii | `--r-sm` 6 (chips, keys) · `--r` 8 (rows, fields) · `--r-lg` 10 (cards, popovers) · `--r-xl` 12 (panels, dialogs) · `--r-pill` |
-| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in`, `--ease-enter` with `--dur-enter` 250ms and `--ease-exit` with `--dur-exit` 200ms (Material 3 standard decelerate/accelerate, used by modals) |
+| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in`, `--ease-enter` with `--dur-enter` 180ms and `--ease-exit` with `--dur-exit` 200ms (Material 3 standard decelerate/accelerate, used by modals) |
 | Layers, low to high | `--z-sticky`, `--z-header`, `--z-drawer`, `--z-toast`, `--z-menu`, `--z-overlay` |
 | Icons | `--icon-sm` 14, `--icon-md` 16, `--icon-lg` 20 |
 | Layout | `--gutter-l`, `--gutter-r` (16px or the safe-area inset) |
@@ -123,7 +123,7 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `[data-layer-root]` | Mark the app shell so popover scrims stack inside it (see `portalNear`) |
 | `[data-floating]` | Put on a layer portalled to `<body>` so an open `Popover` doesn't treat clicks in it as outside |
 
-Every `<dialog>` opened with `showModal()` gets Material 3's enter and exit motion: a 24px slide down and a fade, 250ms in on the decelerate curve and 200ms out on the accelerate curve. Scroll containers that float (menus,
+Every `<dialog>` opened with `showModal()` fades in while scaling down from 120% (180ms, decelerate curve) and leaves by flying 24px down while shrinking to 80% and fading out (200ms, accelerate curve). Scroll containers that float (menus,
 popovers) can't host `.edge`; they paint it as background layers, as described in `css/effects.css`.
 
 ## Components

@@ -126,13 +126,13 @@
 @media (prefers-reduced-motion: reduce) { [data-spotlight] { background-color: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); } }
 
 /* ---------- modals ---------- */
-/* Every <dialog> opened with showModal() follows Material 3's enter and exit rules: it slides 24px down into place while
-   it and the backdrop fade in, over 250ms on the standard decelerate curve. Closing reverses it faster, over 200ms on the
-   standard accelerate curve. A transition takes the timing of the state it moves to, so the closed rules carry the exit
-   timing and the [open] rules the entrance timing. The overlay/display transitions with allow-discrete keep it on
-   screen until the exit finishes. */
+/* Every <dialog> opened with showModal() fades in while settling from 120% scale to its size, over 180ms on the standard
+   decelerate curve. Closing flies it 64px down while it shrinks to 80% and fades out over 200ms on the standard
+   accelerate curve. A transition takes the timing of the state it moves to, so the closed rules carry the exit timing
+   and the [open] rules the entrance timing; @starting-style gives the entrance its own start, separate from the exit's
+   end. The overlay/display transitions with allow-discrete keep it on screen until the exit finishes. */
 dialog {
-  opacity: 0; transform: translateY(-24px);
+  opacity: 0; transform: translateY(64px) scale(0.96);
   transition: opacity var(--dur-exit) var(--ease-exit), transform var(--dur-exit) var(--ease-exit),
     overlay var(--dur-exit) allow-discrete, display var(--dur-exit) allow-discrete;
 }
@@ -141,7 +141,7 @@ dialog[open] {
   transition-duration: var(--dur-enter);
   transition-timing-function: var(--ease-enter), var(--ease-enter), linear, linear;
 }
-@starting-style { dialog[open] { opacity: 0; transform: translateY(-24px); } }
+@starting-style { dialog[open] { opacity: 0; transform: scale(1.16); } }
 dialog::backdrop { opacity: 0; transition: opacity var(--dur-exit) var(--ease-exit), overlay var(--dur-exit) allow-discrete, display var(--dur-exit) allow-discrete; }
 dialog[open]::backdrop { opacity: 1; transition-duration: var(--dur-enter); transition-timing-function: var(--ease-enter), linear, linear; }
 @starting-style { dialog[open]::backdrop { opacity: 0; } }

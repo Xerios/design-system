@@ -102,8 +102,8 @@
   --ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
   /* Material 3's standard decelerate and accelerate curves with their durations (modals use them): entering decelerates
      into place, exiting accelerates away and takes less time. */
-  --ease-enter: cubic-bezier(0, 0, 0, 1); --dur-enter: 250ms;
-  --ease-exit: cubic-bezier(0.3, 0, 1, 1); --dur-exit: 200ms;
+  --ease-enter: cubic-bezier(0, 0, 0, 1); --dur-enter: 120ms;
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1); --dur-exit: 80ms;
 
   /* Layers, lowest to highest. */
   --z-sticky: 10; --z-header: 20; --z-drawer: 40; --z-toast: 50; --z-menu: 60; --z-overlay: 70;
