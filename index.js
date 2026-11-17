@@ -19,6 +19,7 @@ export { default as InfoTip } from './components/InfoTip.svelte';
 export { default as Md } from './components/Md.svelte';
 export { default as MoreButton } from './components/MoreButton.svelte';
 export { default as Toast } from './components/Toast.svelte';
+export { default as Dialogs } from './components/Dialogs.svelte';
 
 export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte';
 export { default as FileButton } from './components/inputs/FileButton.svelte';
@@ -36,7 +37,8 @@ export { default as ContextMenu } from './components/menu/ContextMenu.svelte';
 export { default as MenuList } from './components/menu/MenuList.svelte';
 
 export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu.svelte.js';
-export { portal, portalNear, backdropClose } from './lib/dom.js';
+export { alertDialog, confirmDialog, promptDialog } from './lib/dialogs.svelte.js';
+export { portal, portalNear, backdropClose, closeRequests } from './lib/dom.js';
 export { motion } from './lib/motion.js';
 export { scrollFade } from './lib/scroll-fade.js';
 export { validity } from './lib/validity.js';

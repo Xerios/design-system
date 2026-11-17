@@ -46,8 +46,8 @@
   .box:hover { background: var(--fill-3); }
   .box:focus-within { --edge-a: var(--accent); --edge-b: var(--accent-line); box-shadow: 0 0 0 var(--hairline) var(--accent-line), 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
   /* Invalid: see TextField. */
-  .box:has(:user-invalid, [aria-invalid="true"]) { --edge-a: var(--danger); --edge-b: var(--danger); }
-  .box:has(:user-invalid, [aria-invalid="true"]):focus-within { box-shadow: 0 0 0 var(--hairline) var(--danger), 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent); }
+  .box:has([aria-invalid="true"]) { --edge-a: var(--danger); --edge-b: var(--danger); }
+  .box:has([aria-invalid="true"]):focus-within { box-shadow: 0 0 0 var(--hairline) var(--danger), 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent); }
   textarea {
     display: block; width: 100%; min-height: 72px; max-height: 40vh; resize: vertical; field-sizing: content;
     padding: 10px 12px 12px; border: 0; border-radius: inherit; background: none; outline: none;

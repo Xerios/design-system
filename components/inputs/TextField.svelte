@@ -8,7 +8,7 @@
    * Text input with optional search icon, clear button and shortcut hint. `compact`: 28px, for toolbars (see SearchField).
    * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints work the same way:
    * pass `required`, `pattern`, `minlength`… (any other attribute goes to the <input>) and the browser's own message
-   * shows there once the field is left or its form is validated. See lib/validity.js, and lib/field-errors.svelte.js
+   * shows there once its form is validated (never just for leaving the field). See lib/validity.js, and lib/field-errors.svelte.js
    * for a form's worth of them.
    * info: what the field is for or how to fill it, behind an ⓘ next to the label (see InfoTip).
    */
@@ -74,10 +74,10 @@
   }
   .box:hover { background: var(--fill-3); }
   .box:focus-within { --edge-a: var(--accent); --edge-b: var(--accent-line); box-shadow: 0 0 0 var(--hairline) var(--accent-line), 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-  /* Invalid: a red edge, and a red ring while focused. :user-invalid is the browser's own state (a failed constraint
-     the user has had the chance to fix); aria-invalid covers a message that arrives without any typing, e.g. from the server. */
-  .box:has(:user-invalid, [aria-invalid="true"]) { --edge-a: var(--danger); --edge-b: var(--danger); }
-  .box:has(:user-invalid, [aria-invalid="true"]):focus-within { box-shadow: 0 0 0 var(--hairline) var(--danger), 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent); }
+  /* Invalid: a red edge, and a red ring while focused. Only once there is a message (aria-invalid), not the browser's
+     :user-invalid, which turns a field red as soon as it is left. */
+  .box:has([aria-invalid="true"]) { --edge-a: var(--danger); --edge-b: var(--danger); }
+  .box:has([aria-invalid="true"]):focus-within { box-shadow: 0 0 0 var(--hairline) var(--danger), 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent); }
   /* Compact (toolbars): shorter. */
   .compact { min-height: 28px; }
   .lead { display: inline-flex; color: var(--faint); }

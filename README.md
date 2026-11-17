@@ -35,8 +35,8 @@ the fonts and CSS.
    import '$ds/css/index.css';   // tokens, base, effects, atoms
    import './app.css';           // yours, after
    ```
-4. Mount the two singletons at the root if you use them: `<ContextMenu />` (any `contextMenu` attachment or
-   `MoreButton`) and `<Toast … />`.
+4. Mount the singletons at the root if you use them: `<ContextMenu />` (any `contextMenu` attachment or
+   `MoreButton`), `<Dialogs />` (`alertDialog`, `confirmDialog`, `promptDialog`) and `<Toast … />`.
 5. Import components by path, `import Select from '$ds/components/inputs/Select.svelte'`, or by name from the
    barrel, `import { Select, Icon } from '$ds'`.
 
@@ -53,7 +53,7 @@ css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .
 components/          generic components (table below)
 components/inputs/   form controls
 components/menu/     the context menu layer
-lib/                 dom.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, inline-md.js, spotlight.js
+lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, inline-md.js, spotlight.js
 fonts.js             bundles the two typefaces
 index.js             named exports of everything
 ```
@@ -101,7 +101,8 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 
 | Class / attribute | What it is |
 |---|---|
-| `.btn`, `.btn-primary`, `.btn-small` | Pill button: translucent secondary, solid indigo primary, 24px small |
+| `.btn`, `.btn-primary`, `.btn-small`, `.btn-danger` | Pill button: translucent secondary, solid indigo primary, 24px small, solid red for a destructive action |
+| `.dialog`, `.dialog.confirm`, `.dialog-head`, `.dialog-body`, `.dialog-foot` | Modal `<dialog>` panel (560px; 420px for a question) with a header, scrolling body and footer of actions; pair with `backdropClose` |
 | `.icon-btn` | 28px ghost circle for an icon; `aria-pressed` and `aria-expanded` are styled |
 | `.linklike` | A button that reads as a link |
 | `kbd` | Key cap |
@@ -153,6 +154,7 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `inputs/Slider` | Number in a range | `value` (bindable), `min`, `max`, `step`, `id`, `label`, `format` |
 | `inputs/FileButton` | File picker | `label`, `accept`, `multiple`, `onfiles` |
 | `menu/ContextMenu` | The menu layer; mount once | none |
+| `Dialogs` | The layer for `alertDialog`, `confirmDialog` and `promptDialog`; mount once | none |
 
 Option shape for `Select`, `Segmented`, `ButtonGroup` and `RadioGroup`: `{ value, label, icon?, hint? }`, plus `text`
 and `group` for `Select`, `done` for `Segmented`, `info` for `RadioGroup`.
@@ -185,6 +187,20 @@ Items: `{ label, action?, href?, hint?, checked?, disabled?, danger?, children? 
 Right-click, Shift+F10 and the Menu key open it; text fields keep the browser's menu. Always pair a context
 menu with a `MoreButton`, so nothing is reachable by right-click only.
 
+### Alert, confirm and prompt
+
+Promise-based stand-ins for the browser's, in a `.dialog.confirm` above whatever dialog is open (a form under it
+keeps its state). Mount `<Dialogs />` once; requests made while one shows wait their turn.
+
+```js
+await alertDialog({ title: 'Upload failed', body: 'The file is over 50 MB.' })
+if (await confirmDialog({ title: 'Discard changes?', confirmLabel: 'Discard', cancelLabel: 'Keep editing', danger: true })) close()
+const name = await promptDialog({ title: 'Rename', label: 'Name', value: old, validate: (v) => (v.trim() ? '' : 'Enter a name') })
+```
+
+A string is taken as the title. Esc, a backdrop click and cancel answer `undefined` / `false` / `null`. `danger`
+makes the confirm button red and starts the focus on cancel. A prompt's `validate` runs on confirm only.
+
 ### Toast
 
 ```js
@@ -205,12 +221,14 @@ export function hold(on) { clearTimeout(timer); if (!on && app.toast) timer = se
 | `portal`, `portalNear(from)` | Attachments that move a node to `<body>` or the nearest `[data-layer-root]` |
 | `topLayer(from)` | Attachment that shows a floating node in the top layer, above modal dialogs (inside the dialog around `from`, else `<body>`) |
 | `backdropClose(close)` | Handlers to spread on a `<dialog>`: closes on a true backdrop click only |
+| `closeRequests(request)` | Handlers to spread on a `<dialog>` that must ask before closing: Esc (however fast it is repeated) and other close requests call `request` instead of closing |
 | `motion(ms)` | Duration for Svelte transitions; 0 under reduced motion |
 | `scrollFade({ size? })` | Attachment: fades a scroll area's top and bottom edges while there is more to scroll |
-| `fieldErrors(validate)` | A form's error messages with blur-first timing: `{...form.field('name')}` on a text field, `{@attach form.group('name')}` on a wrapper, `form.validate()` on submit |
+| `fieldErrors(validate)` | A form's error messages with submit-first timing (nothing shows until `validate()`, then fields recheck on blur): `{...form.field('name')}` on a text field, `{@attach form.group('name')}` on a wrapper, `form.validate()` on submit |
 | `tooltip(text, { shortcut? })` | Attachment: tooltip on hover and keyboard focus, above dialogs too. Required on icon-only buttons and terse toggles |
 | `validity(error, report)` | Attachment: ties an `<input>` or `<textarea>` to the browser's constraint validation (what the `error` prop of the text fields uses) |
 | `contextMenu`, `menu`, `openMenu`, `openMenuFrom`, `closeMenu` | Context menu state and attachment |
+| `alertDialog`, `confirmDialog`, `promptDialog` | Promise-based alert, confirm and prompt, drawn by `<Dialogs />` |
 | `inlineMd(text)` | Parses inline markdown into parts (what `Md` renders) |
 | `spotlight(id, { timeout? })` | Waits for the element with that id (or the collapsed toggle whose `aria-controls` names it) to appear, reveals it (clicks the toggle, opens a closed `<details>` around it), scrolls to it and flashes it briefly. Call it right after opening what holds it. Resolves to the element or null |
 
