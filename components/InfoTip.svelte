@@ -9,10 +9,8 @@
    * The tip fades in and out with a small slide away from the ⓘ (instant under reduced motion).
    */
   import Icon from './Icon.svelte';
-  import { fade } from 'svelte/transition';
-  import { cubicOut } from 'svelte/easing';
   import { topLayer } from '../lib/dom.js';
-  import { motion } from '../lib/motion.js';
+  import { fade, motion, durations, easings } from '../lib/motion.js';
 
   let { label = 'More information', lines = [], pinnable = false } = $props();
   const uid = 'tip-' + Math.random().toString(36).slice(2, 8);
@@ -41,9 +39,9 @@
   /** Svelte transition for the tip: fades and slides 3px toward the side it opens on. Deferred a microtask so `place` has
    *  already set which side that is. */
   function pop(node) {
-    return () => {
+    return ({ direction }) => {
       const dy = node.dataset.arrow === 'down' ? 3 : -3;
-      return { duration: motion(140), easing: cubicOut, css: (t, u) => `opacity: ${t}; transform: translateY(${u * dy}px);` };
+      return { duration: motion(direction === 'out' ? durations.short2 : durations.short3), easing: easings.standard[direction === 'out' ? 'accelerate' : 'decelerate'], css: (t, u) => `opacity: ${t}; transform: translateY(${u * dy}px);` };
     };
   }
 
@@ -63,7 +61,7 @@
     document.addEventListener('pointerdown', down, true);
     document.addEventListener('keydown', key, true);
     document.addEventListener('scroll', scrolled, true);
-    return () => {
+    return ({ direction }) => {
       document.removeEventListener('pointerdown', down, true);
       document.removeEventListener('keydown', key, true);
       document.removeEventListener('scroll', scrolled, true);
@@ -89,7 +87,7 @@
 </button>
 {#if pinned}
   <!-- Swallows the outside press that closes the pinned tip, so it doesn't also hit what's underneath. -->
-  <div class="scrim" aria-hidden="true" {@attach topLayer(btn)} {@attach raiseTip} transition:fade={{ duration: motion(160) }}></div>
+  <div class="scrim" aria-hidden="true" {@attach topLayer(btn)} {@attach raiseTip} transition:fade></div>
 {/if}
 {#if open}
   <div bind:this={tipEl} id={uid} class="tip" class:pinned role="tooltip" data-floating {@attach topLayer(btn)} {@attach place} transition:pop>

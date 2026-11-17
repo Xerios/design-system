@@ -100,9 +100,10 @@
   --dur-fast: 120ms; --dur: 160ms; --dur-slow: 240ms;
   --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-  /* Carbon's expressive curves, for big moments such as a modal opening: entrance decelerates in, exit accelerates out. */
-  --ease-enter: cubic-bezier(0, 0, 0.3, 1);
-  --ease-exit: cubic-bezier(0.4, 0.14, 1, 1);
+  /* Material 3's standard decelerate and accelerate curves with their durations (modals use them): entering decelerates
+     into place, exiting accelerates away and takes less time. */
+  --ease-enter: cubic-bezier(0, 0, 0, 1); --dur-enter: 250ms;
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1); --dur-exit: 200ms;
 
   /* Layers, lowest to highest. */
   --z-sticky: 10; --z-header: 20; --z-drawer: 40; --z-toast: 50; --z-menu: 60; --z-overlay: 70;

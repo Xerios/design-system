@@ -17,12 +17,10 @@
    * Clicking a tag selects it. Additions and removals are announced to screen readers.
    */
   import { tick } from 'svelte'
-  import { flip } from 'svelte/animate'
-  import { scale } from 'svelte/transition'
   import ErrorMessage from '../ErrorMessage.svelte'
   import Icon from '../Icon.svelte'
   import InfoTip from '../InfoTip.svelte'
-  import { motion } from '../../lib/motion.js'
+  import { flip, scale, durations } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
 
   let {
@@ -159,8 +157,8 @@
           data-tag={tag}
           class="tag"
           tabindex="-1"
-          animate:flip={{ duration: motion(160) }}
-          transition:scale={{ start: 0.85, duration: motion(120) }}
+          animate:flip={{ duration: durations.short4 }}
+          transition:scale={{ start: 0.85, duration: durations.short3 }}
         >
           <span class="text">{tag}</span>
           <button type="button" class="remove" tabindex="-1" aria-label="Remove {tag}" {@attach tooltip('Remove')} onclick={() => remove(i, -1)}

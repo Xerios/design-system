@@ -2,8 +2,7 @@
   import Icon from '../Icon.svelte';
   import { tooltip } from '../../lib/tooltip.js';
   import Tooltip from '../Tooltip.svelte';
-  import { cubicOut } from 'svelte/easing';
-  import { motion } from '../../lib/motion.js';
+  import { motion, durations, easings } from '../../lib/motion.js';
   /**
    * Single choice shown as a joined switch: one track, the chosen segment raised on it (radio group with roving
    * focus). Same options shape as Segmented ({ value, label, icon?, hint?, info? }; `info` adds an ⓘ with that text as a hover tooltip). `fill` stretches it to its container
@@ -26,7 +25,7 @@
     const to = node.getBoundingClientRect();
     if (!from || !to.width) return { duration: 0 };
     const l = from.left - to.left, t = from.top - to.top, r = to.right - from.right, b = to.bottom - from.bottom;
-    return { duration: motion(220), easing: cubicOut, css: (_, u) => `inset: ${u * t}px ${u * r}px ${u * b}px ${u * l}px;` };
+    return { duration: motion(durations.short4), easing: easings.standard.standard, css: (_, u) => `inset: ${u * t}px ${u * r}px ${u * b}px ${u * l}px;` };
   }
 
   function onkeydown(e, i) {

@@ -11,10 +11,9 @@
    * `id` names the body for aria-controls (one is made up if you leave it out).
    * Sections run edge to edge: set --bleed on the container to its side padding.
    */
-  import { slide } from 'svelte/transition';
   import Icon from './Icon.svelte';
   import InfoTip from './InfoTip.svelte';
-  import { motion } from '../lib/motion.js';
+  import { slide } from '../lib/motion.js';
 
   let { id = 'c' + Math.random().toString(36).slice(2, 8), title, open = $bindable(true), ontoggle, count = null, meta, info = '', children } = $props();
   const toggle = () => {
@@ -41,7 +40,7 @@
     {#if meta}<span class="meta" id="{id}-meta" aria-hidden="true">{@render meta()}</span>{/if}
   </h3>
   {#if open}
-    <div {id} class="body" transition:slide={{ duration: motion(180) }}>
+    <div {id} class="body" transition:slide>
       <div class="inner">{@render children()}</div>
     </div>
   {/if}

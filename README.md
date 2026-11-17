@@ -82,7 +82,7 @@ All in `css/tokens.css`. Components read tokens only, never raw colours or pixel
 | Type | `--font-body`, `--font-display`, `--font-data` (= `--font-mono`), weights `--w-normal` 400, `--w-medium` 510, `--w-semibold` 590. Body is 13px/1.5 |
 | Spacing (4px base) | `--space-1` 4 · `-2` 8 · `-3` 12 · `-4` 16 · `-5` 20 · `-6` 24 · `-8` 32 |
 | Radii | `--r-sm` 6 (chips, keys) · `--r` 8 (rows, fields) · `--r-lg` 10 (cards, popovers) · `--r-xl` 12 (panels, dialogs) · `--r-pill` |
-| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in`, `--ease-enter` and `--ease-exit` (Carbon expressive entrance/exit, used by modals) |
+| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in`, `--ease-enter` with `--dur-enter` 250ms and `--ease-exit` with `--dur-exit` 200ms (Material 3 standard decelerate/accelerate, used by modals) |
 | Layers, low to high | `--z-sticky`, `--z-header`, `--z-drawer`, `--z-toast`, `--z-menu`, `--z-overlay` |
 | Icons | `--icon-sm` 14, `--icon-md` 16, `--icon-lg` 20 |
 | Layout | `--gutter-l`, `--gutter-r` (16px or the safe-area inset) |
@@ -123,7 +123,7 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `[data-layer-root]` | Mark the app shell so popover scrims stack inside it (see `portalNear`) |
 | `[data-floating]` | Put on a layer portalled to `<body>` so an open `Popover` doesn't treat clicks in it as outside |
 
-Every `<dialog>` opened with `showModal()` gets the rise-and-fade motion. Scroll containers that float (menus,
+Every `<dialog>` opened with `showModal()` gets Material 3's enter and exit motion: a 24px slide down and a fade, 250ms in on the decelerate curve and 200ms out on the accelerate curve. Scroll containers that float (menus,
 popovers) can't host `.edge`; they paint it as background layers, as described in `css/effects.css`.
 
 ## Components
@@ -223,7 +223,11 @@ export function hold(on) { clearTimeout(timer); if (!on && app.toast) timer = se
 | `topLayer(from)` | Attachment that shows a floating node in the top layer, above modal dialogs (inside the dialog around `from`, else `<body>`) |
 | `backdropClose(close)` | Handlers to spread on a `<dialog>`: closes on a true backdrop click only |
 | `closeRequests(request)` | Handlers to spread on a `<dialog>` that must ask before closing: Esc (however fast it is repeated) and other close requests call `request` instead of closing |
-| `motion(ms)` | Duration for Svelte transitions; 0 under reduced motion |
+| `fade`, `fly`, `slide`, `scale` | Svelte's transitions on Material 3's motion rules: decelerate curve going in (250ms), accelerate going out (200ms), 0ms under reduced motion. Extra params `emphasized` (the emphasized set, for transitions that should draw the eye: 400ms in, 200ms out), `duration` (ms, both ways) and `curve: 'standard'` (one curve both ways, 300ms; `slide`'s default) |
+| `flip` | `animate:flip` on the standard curve, 300ms by default |
+| `tween(value, { emphasized?, duration? })` | A `Tween` from `svelte/motion` on the standard curve, for a value that changes in place |
+| `durations`, `easings`, `defaults` | Material 3's duration tokens (`short1` 50 … `extraLong4` 1000), curves (`easings.standard.decelerate` and so on) and each curve's usual duration, for custom transitions |
+| `motion(ms)` | Duration for a custom transition; 0 under reduced motion (`prefersReducedMotion` from `svelte/motion`) |
 | `scrollFade({ size? })` | Attachment: fades a scroll area's top and bottom edges while there is more to scroll |
 | `fieldErrors(validate)` | A form's error messages with submit-first timing (nothing shows until `validate()`, then fields recheck on blur): `{...form.field('name')}` on a text field, `{@attach form.group('name')}` on a wrapper, `form.validate()` on submit |
 | `tooltip(text, { shortcut? })` | Attachment: tooltip on hover and keyboard focus, above dialogs too. Required on icon-only buttons and terse toggles |
@@ -242,7 +246,7 @@ assume a variable font.
 ## Conventions the system relies on
 
 - Breakpoint: one, at 860px. Below it `Splitter` hides, popovers span the width and fields grow to 16px text.
-- Reduced motion: CSS animation and transitions switch off globally; Svelte transitions go through `motion()`.
+- Reduced motion: CSS animation and transitions switch off globally; Svelte transitions come from `lib/motion.js` (or take `motion(ms)`).
 - Accessibility: every text and background pair meets WCAG AA in both themes; pointer targets are at least
   24×24px; focus rings come from `:focus-visible` in `base.css`.
 - Browser support: current Chromium, Firefox and Safari (`color-mix()`, `@property`, `@starting-style`,

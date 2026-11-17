@@ -11,9 +11,8 @@
    * It shows above modal dialogs: the region is a popover (top layer), and while a modal <dialog> is open it moves
    * into that dialog, since everything outside a modal is inert and could not be clicked or announced.
    */
-  import { fly } from 'svelte/transition';
   import Icon from './Icon.svelte';
-  import { motion } from '../lib/motion.js';
+  import { fly } from '../lib/motion.js';
   import { tooltip } from '../lib/tooltip.js';
 
   let { toast = null, onhold, ondismiss } = $props();
@@ -56,8 +55,8 @@
         onpointerleave={() => onhold?.(false)}
         onfocusin={() => onhold?.(true)}
         onfocusout={() => onhold?.(false)}
-        in:fly={{ y: 12, duration: motion(180) }}
-        out:fly={{ y: 8, duration: motion(120) }}>
+        in:fly={{ y: 12 }}
+        out:fly={{ y: 8 }}>
         <span class="msg">{toast.message}</span>
         {#if toast.action}
           <button

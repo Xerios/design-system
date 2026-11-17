@@ -7,8 +7,7 @@
    * and swallows the outside press that closes it, so that press doesn't also hit whatever was under it.
    */
   import { tick } from 'svelte';
-  import { fly, fade } from 'svelte/transition';
-  import { motion } from '../lib/motion.js';
+  import { fly, fade } from '../lib/motion.js';
   import { portalNear } from '../lib/dom.js';
 
   let { id, label, badge = null, dot = false, align = 'end', placement = 'below', hideLabel = false, width = 320, scrim = false, open = $bindable(false), trigger, children } = $props();
@@ -58,7 +57,7 @@
     {#if dot}<span class="new-dot" aria-hidden="true"></span>{/if}
   </button>
   {#if open && scrim}
-    <div class="pop-scrim" aria-hidden="true" {@attach portalNear(button)} transition:fade={{ duration: motion(160) }}></div>
+    <div class="pop-scrim" aria-hidden="true" {@attach portalNear(button)} transition:fade></div>
   {/if}
   {#if open}
     <div
@@ -72,8 +71,8 @@
       aria-label={label}
       tabindex="-1"
       {onkeydown}
-      in:fly={{ y: placement === 'above' ? 6 : -6, duration: motion(160) }}
-      out:fly={{ y: placement === 'above' ? 4 : -4, duration: motion(100) }}>
+      in:fly={{ y: placement === 'above' ? 6 : -6 }}
+      out:fly={{ y: placement === 'above' ? 4 : -4 }}>
       {@render children({ close: () => hide() })}
     </div>
   {/if}
