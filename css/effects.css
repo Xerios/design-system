@@ -66,19 +66,21 @@
 /* ---------- shine ---------- */
 /* Linear's .shine: a second hairline in --shine, visible only inside a 200px radial beam (at --shine-x / --shine-y), so one
    stretch of the edge catches the light. Put .shine on a non-scrolling box; it draws on ::after (so it combines with .edge,
-   which uses ::before), takes the box's radius, and sits just above sticky headers and below scrims, drawers and menus. */
+   which uses ::before) and sits just above sticky headers and below scrims, drawers and menus.
+   It lies inside the box's 1px border, so its radius is the box's less 1px. CSS can't do arithmetic on an inherited
+   radius, so it reads the box's from --shine-r: set that when the box isn't rounded by --r-xl.
+   Modal dialogs (.dialog, see atoms.css) always have it. */
 :where(.shine) { position: relative; }
-.shine::after {
-  content: ""; position: absolute; inset: 0; z-index: calc(var(--z-sticky) + 1); pointer-events: none; border-radius: inherit; border: var(--edge-w, 1px) solid var(--shine);
+.shine::after, .dialog::after {
+  content: ""; position: absolute; inset: 0; z-index: calc(var(--z-sticky) + 1); pointer-events: none; border-radius: max(0px, calc(var(--shine-r, var(--r-xl)) - 1px)); border: var(--edge-w, 1px) solid var(--shine);
   -webkit-mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
   mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
 }
 
 /* ---------- shell atmosphere ---------- */
-/* Linear's app frame: a lit-relief texture over a soft shading over --bg (only the texture overlay-blends), a 400px light
-   (--glow) centred on the top-left corner (::before) and a fine film grain (--grain) over everything (::after). Put .shell on
-   the app's root frame; it carries no layout. It is its own stacking context and clips the corner light, and both
-   pseudo-elements ignore the pointer. */
+/* Linear's app frame: a lit-relief texture over a soft shading over --bg (only the texture overlay-blends) and a 400px
+   light (--glow) centred on the top-left corner (::before, which ignores the pointer). Put .shell on the app's root frame;
+   it carries no layout. It is its own stacking context and clips the corner light. ::after is left free. */
 .shell {
   position: relative; isolation: isolate; overflow: clip;
   background: var(--relief-texture), var(--relief-shade), var(--bg); background-blend-mode: overlay, normal, normal;
@@ -86,10 +88,6 @@
 .shell::before {
   content: ""; position: absolute; top: 0; left: 0; z-index: -1; width: 400px; height: 400px; pointer-events: none;
   border-radius: var(--r-pill); background: radial-gradient(50% 50%, var(--glow) 0%, transparent 90%); transform: translate(-50%, -50%);
-}
-.shell::after {
-  content: ""; position: absolute; inset: 0; z-index: 100; pointer-events: none;
-  background: var(--grain) 0 0 / 256px 256px; opacity: var(--grain-opacity);
 }
 
 /* ---------- working shimmer ---------- */

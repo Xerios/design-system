@@ -108,10 +108,18 @@
   margin: var(--dialog-top) auto auto; padding: 0;
   border: 1px solid var(--line-float); border-radius: var(--r-xl); background: var(--elevated); color: var(--fg); box-shadow: var(--shadow);
 }
+/* Lit like the view card: the shine on the edge (::after, effects.css) and the corner light (--glow, as .corner-glow
+   draws it) behind the content. A modal is in the top layer, so it is already positioned and its own stacking context.
+   Both lie inside the 1px border, so their radius is the dialog's (--r-xl) less 1px. */
+.dialog::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: calc(var(--r-xl) - 1px);
+  background: radial-gradient(200px 200px at 0 0, var(--glow) 0%, transparent 90%);
+}
 .dialog.confirm { width: min(420px, calc(100vw - var(--space-8))); }
 /* Only `display` depends on [open]: it is held through the closing transition, so the layout can't change mid-fade. */
 .dialog[open] { display: flex; }
-.dialog::backdrop { background: var(--scrim); }
+/* The film grain over the scrim, so the dimmed page reads as a surface rather than a flat tint. */
+.dialog::backdrop { background: var(--grain) 0 0 / 256px 256px, var(--scrim); }
 .dialog-head { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-bottom: 1px solid var(--line); }
 .dialog-head h2 { flex: 1; font: var(--w-semibold) 14px var(--font-display); }
 .dialog-body { display: grid; gap: var(--space-4); padding: var(--space-5); overflow-y: auto; }

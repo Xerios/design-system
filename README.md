@@ -63,7 +63,7 @@ index.js             named exports of everything
 Light by default, dark when the OS asks for it. `<html data-theme="light">` or `data-theme="dark"` overrides
 the OS. To avoid a flash, set the attribute from a small inline script in `index.html` before the page paints
 (the viewer's `index.html` shows how). Each colour token is one `light-dark(light, dark)` pair, and the theme
-only sets `color-scheme`. Non-colour values (`--grain-opacity`) can't use `light-dark()` and are set per theme.
+only sets `color-scheme`. A non-colour value that differs by theme can't use `light-dark()`; it would be set per theme.
 
 ## Tokens
 
@@ -102,7 +102,7 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | Class / attribute | What it is |
 |---|---|
 | `.btn`, `.btn-primary`, `.btn-small`, `.btn-danger` | Pill button: translucent secondary, solid indigo primary, 24px small, solid red for a destructive action |
-| `.dialog`, `.dialog.confirm`, `.dialog-head`, `.dialog-body`, `.dialog-foot` | Modal `<dialog>` panel (560px; 420px for a question) with a header, scrolling body and footer of actions; pair with `backdropClose` |
+| `.dialog`, `.dialog.confirm`, `.dialog-head`, `.dialog-body`, `.dialog-foot` | Modal `<dialog>` panel (560px; 420px for a question) with a header, scrolling body and footer of actions, lit with the shine and corner glow (its `::before` and `::after`); pair with `backdropClose` |
 | `.icon-btn` | 28px ghost circle for an icon; `aria-pressed` and `aria-expanded` are styled |
 | `.linklike` | A button that reads as a link |
 | `kbd` | Key cap |
@@ -114,8 +114,8 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `[data-tone="success\|info\|warning\|neutral\|danger"]` | Sets `--tone` and `--tone-soft` on the element |
 | `.edge` | Lit-corner hairline drawn over the element's edge (give it `border: 0`); tune with `--edge-a`, `--edge-b`, `--edge-w`, `--edge-x`, `--edge-y` |
 | `.corner-glow` | Empty decorative `<span aria-hidden="true">` child: soft corner light |
-| `.shine` | A beam of light on the element's edge, drawn on `::after`; tune with `--shine-x`, `--shine-y`, `--edge-w` |
-| `.shell` | App frame atmosphere: lit relief over `--bg`, a top-left corner light and film grain (uses `::before` and `::after`) |
+| `.shine` | A beam of light on the element's edge, drawn on `::after`; tune with `--shine-x`, `--shine-y`, `--edge-w`; set `--shine-r` to the element's radius when it isn't `--r-xl` |
+| `.shell` | App frame atmosphere: lit relief over `--bg` and a top-left corner light (uses `::before`) |
 | `.shimmer` | Working sweep along a pill's hairline (pair with a `Shimmer` label) |
 | `.sr-only`, `.muted`, `.small`, `.block`, `.nowrap`, `.spacer` | Utilities |
 | `[data-arrow="up\|down"]` | Arrow on a tip pointing at its element; `--arrow-x` places it (the tooltips set both) |

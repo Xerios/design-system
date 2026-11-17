@@ -48,8 +48,8 @@ Read it before building UI, and read a component's header comment before using i
   behaviour. That comment is its documentation. Then add it to `index.js` and to the table in `README.md`.
 - New tokens go in `css/tokens.css` with a comment, in the `:root` block as `light-dark(light, dark)` when they
   differ by theme (shadows: one `light-dark()` per layer colour, `transparent` for a layer one theme lacks), and
-  in the README's token table. A non-colour value that differs goes in both the media query and
-  `[data-theme="dark"]` rules below it. Check contrast (AA) in both themes.
+  in the README's token table. A non-colour value that differs needs its dark value twice below the
+  block: in `[data-theme="dark"]` and in a `@media (prefers-color-scheme: dark)` rule on `:root:not([data-theme="light"])`. Check contrast (AA) in both themes.
 - Renaming or removing a token, class, prop or export breaks every app using it: search the consumers
   (`grep -rn` in `src/`) and update them in the same change.
 - Global CSS goes in the matching file (`base`, `effects`, `atoms`); component styles stay scoped in the
