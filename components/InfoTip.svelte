@@ -3,18 +3,21 @@
    * Small ⓘ button with a tooltip that opens on hover or keyboard focus (Esc closes it). With `pinnable`, clicking pins
    * it open over a dimmed page so its text can be selected and copied; a press outside it, Esc, scrolling the page, or
    * clicking the ⓘ again closes it.
-   * Lives on <body> (fixed, below the button, flipping above when there's no room), so scrolling panes, sticky
-   * headers and clipping cards can't cover or cut it.
+   * Lives in the top layer (fixed, below the button, flipping above when there's no room, with an arrow pointing at it), so modal dialogs, scrolling
+   * panes, sticky headers and clipping cards can't cover or cut it.
    * `lines`: [{ label?, text }]; `label`: the button's accessible name.
+   * The tip fades in and out with a small slide away from the ⓘ (instant under reduced motion).
    */
   import Icon from './Icon.svelte';
   import { fade } from 'svelte/transition';
-  import { portal } from '../lib/dom.js';
+  import { cubicOut } from 'svelte/easing';
+  import { topLayer } from '../lib/dom.js';
   import { motion } from '../lib/motion.js';
 
   let { label = 'More information', lines = [], pinnable = false } = $props();
   const uid = 'tip-' + Math.random().toString(36).slice(2, 8);
   let btn = $state();
+  let tipEl = $state();
   let open = $state(false);
   let pinned = $state(false);
 
@@ -26,9 +29,29 @@
   function place(tip) {
     const r = btn.getBoundingClientRect();
     const w = tip.offsetWidth, h = tip.offsetHeight;
-    const top = r.bottom + 6 + h > innerHeight - 8 && r.top - 6 - h > 8 ? r.top - 6 - h : r.bottom + 6;
-    tip.style.top = `${top}px`;
-    tip.style.left = `${Math.max(8, Math.min(r.left, innerWidth - w - 8))}px`;
+    const above = r.bottom + 8 + h > innerHeight - 8 && r.top - 8 - h > 8;
+    const left = Math.max(8, Math.min(r.left, innerWidth - w - 8));
+    tip.style.top = `${above ? r.top - 8 - h : r.bottom + 8}px`;
+    tip.style.left = `${left}px`;
+    // The arrow points back at the ⓘ.
+    tip.dataset.arrow = above ? 'down' : 'up';
+    tip.style.setProperty('--arrow-x', `${r.left + r.width / 2 - left}px`);
+  }
+
+  /** Svelte transition for the tip: fades and slides 3px toward the side it opens on. Deferred a microtask so `place` has
+   *  already set which side that is. */
+  function pop(node) {
+    return () => {
+      const dy = node.dataset.arrow === 'down' ? 3 : -3;
+      return { duration: motion(140), easing: cubicOut, css: (t, u) => `opacity: ${t}; transform: translateY(${u * dy}px);` };
+    };
+  }
+
+  /** Attachment on the scrim: the top layer stacks by show order, so once the scrim is up the tip is shown again above it. */
+  function raiseTip() {
+    if (!tipEl?.matches(':popover-open')) return;
+    tipEl.hidePopover();
+    tipEl.showPopover();
   }
 
   $effect(() => {
@@ -66,10 +89,10 @@
 </button>
 {#if pinned}
   <!-- Swallows the outside press that closes the pinned tip, so it doesn't also hit what's underneath. -->
-  <div class="scrim" aria-hidden="true" {@attach portal} transition:fade={{ duration: motion(160) }}></div>
+  <div class="scrim" aria-hidden="true" {@attach topLayer(btn)} {@attach raiseTip} transition:fade={{ duration: motion(160) }}></div>
 {/if}
 {#if open}
-  <div id={uid} class="tip" class:pinned role="tooltip" data-floating {@attach portal} {@attach place}>
+  <div bind:this={tipEl} id={uid} class="tip" class:pinned role="tooltip" data-floating {@attach topLayer(btn)} {@attach place} transition:pop>
     {#each lines as l, i (i)}
       <p>{#if l.label}<span class="k">{l.label}</span>{/if}<span>{l.text}</span></p>
     {/each}

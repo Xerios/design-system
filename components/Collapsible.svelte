@@ -7,14 +7,16 @@
    *   <Collapsible title="…" open={saved} ontoggle={(next) => save(next)}>…   …or stores it somewhere (preferences)
    *
    * `count` shows a number pill after the title; `meta` is an optional snippet at the right of the header.
+   * `info`: what the section is for, behind an ⓘ right after the title (see InfoTip).
    * `id` names the body for aria-controls (one is made up if you leave it out).
    * Sections run edge to edge: set --bleed on the container to its side padding.
    */
   import { slide } from 'svelte/transition';
   import Icon from './Icon.svelte';
+  import InfoTip from './InfoTip.svelte';
   import { motion } from '../lib/motion.js';
 
-  let { id = 'c' + Math.random().toString(36).slice(2, 8), title, open = $bindable(true), ontoggle, count = null, meta, children } = $props();
+  let { id = 'c' + Math.random().toString(36).slice(2, 8), title, open = $bindable(true), ontoggle, count = null, meta, info = '', children } = $props();
   const toggle = () => {
     open = !open;
     ontoggle?.(open);
@@ -22,13 +24,21 @@
 </script>
 
 <section class="collapsible" class:open>
+  <!-- The toggle is an empty button stretched over the whole header and named by the parts it covers, so the ⓘ can sit
+       right after the title without being a button inside a button. -->
   <h3>
-    <button type="button" aria-expanded={open} aria-controls={id} onclick={toggle}>
-      <span class="chev"><Icon name="caretRight" size="sm" /></span>
-      <span class="title">{title}</span>
-      {#if count != null}<span class="count">{count}</span>{/if}
-      {#if meta}<span class="meta">{@render meta()}</span>{/if}
-    </button>
+    <button
+      type="button"
+      class="hit"
+      aria-expanded={open}
+      aria-controls={id}
+      aria-labelledby={[`${id}-title`, count != null && `${id}-count`, meta && `${id}-meta`].filter(Boolean).join(' ')}
+      onclick={toggle}></button>
+    <span class="chev" aria-hidden="true"><Icon name="caretRight" size="sm" /></span>
+    <span class="title" id="{id}-title" aria-hidden="true">{title}</span>
+    {#if info}<InfoTip lines={[{ text: info }]} label="About {title}" />{/if}
+    {#if count != null}<span class="count" id="{id}-count" aria-hidden="true">{count}</span>{/if}
+    {#if meta}<span class="meta" id="{id}-meta" aria-hidden="true">{@render meta()}</span>{/if}
   </h3>
   {#if open}
     <div {id} class="body" transition:slide={{ duration: motion(180) }}>
@@ -43,15 +53,18 @@
      reach both edges while the chevron, title and content stay where they were. */
   .collapsible { --pad: calc(var(--bleed, 0px) + var(--space-1)); margin-inline: calc(-1 * var(--bleed, 0px)); border-top: 1px solid var(--line); }
   .collapsible:last-child { border-bottom: 1px solid var(--line); }
-  h3 { margin: 0; }
-  button {
-    display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 32px; padding: 0 var(--pad);
-    background: none; border: 0; border-radius: 0; text-align: left; color: var(--muted);
-    font: var(--w-medium) 12px var(--font-body);
+  /* The header row draws everything; the stretched .hit button on top of it takes the clicks, hover and focus ring.
+     The ⓘ comes after .hit and is positioned, so it paints above it and keeps its own pointer. */
+  h3 {
+    position: relative; display: flex; align-items: center; gap: var(--space-2); min-height: 32px; margin: 0; padding: 0 var(--pad);
+    color: var(--muted); font: var(--w-medium) 12px var(--font-body);
     transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
   }
-  button:hover { color: var(--fg-2); background: var(--fill-2); }
-  button:focus-visible { outline-offset: -2px; border-radius: 0; }
+  h3:has(> .hit:hover) { color: var(--fg-2); background: var(--fill-2); }
+  .hit { position: absolute; inset: 0; padding: 0; background: none; border: 0; border-radius: 0; }
+  .hit:focus-visible { outline-offset: -2px; border-radius: 0; }
+  /* Tucked against the title (the row's gap is for the other parts); its 24px box overlaps the row's padding. */
+  h3 > :global(.info) { position: relative; margin: -4px 0 -4px calc(2px - var(--space-2)); }
   .chev { display: inline-flex; transition: transform var(--dur) var(--ease-out); }
   .open .chev { transform: rotate(90deg); }
   .title { color: var(--fg); }

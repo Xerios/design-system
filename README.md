@@ -48,7 +48,7 @@ For editors, `jsconfig.json` maps `$ds/*` to `design-system/*`.
 css/index.css        imports the four files below, in order
 css/tokens.css       every token, light and dark
 css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
-css/effects.css      scroll fades, lit edge, corner glow, shine, shimmer, dialog motion
+css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, dialog motion
 css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .field-label, .new-dot
 components/          generic components (table below)
 components/inputs/   form controls
@@ -62,8 +62,8 @@ index.js             named exports of everything
 
 Light by default, dark when the OS asks for it. `<html data-theme="light">` or `data-theme="dark"` overrides
 the OS. To avoid a flash, set the attribute from a small inline script in `index.html` before the page paints
-(the viewer's `index.html` shows how). `tokens.css` has the dark values twice, once for the media query and
-once for the attribute: change both.
+(the viewer's `index.html` shows how). Each colour token is one `light-dark(light, dark)` pair, and the theme
+only sets `color-scheme`. Non-colour values (`--grain-opacity`) can't use `light-dark()` and are set per theme.
 
 ## Tokens
 
@@ -108,14 +108,16 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `.data-table` | Wrap a `<table>`: hairline card, 40px rows; `.num` for number columns |
 | `.label-chip`, `.label-dot` | Hairline label pill led by a coloured dot (`--dot`) or icon; `.icon-only`, `.num` variants |
 | `.count` | Small number pill |
-| `.eyebrow`, `.field-label` | Section label; label above a form control |
+| `.eyebrow`, `.field-label`, `.field-head` | Section label; label above a form control; a label row with an `InfoTip` after it |
 | `.new-dot` | Accent dot for unread or new |
 | `[data-tone="success\|info\|warning\|neutral\|danger"]` | Sets `--tone` and `--tone-soft` on the element |
 | `.edge` | Lit-corner hairline drawn over the element's edge (give it `border: 0`); tune with `--edge-a`, `--edge-b`, `--edge-w`, `--edge-x`, `--edge-y` |
-| `.corner-glow`, `.shine` | Empty decorative `<span aria-hidden="true">` children: soft corner light; a beam on the edge |
+| `.corner-glow` | Empty decorative `<span aria-hidden="true">` child: soft corner light |
+| `.shine` | A beam of light on the element's edge, drawn on `::after`; tune with `--shine-x`, `--shine-y`, `--edge-w` |
+| `.shell` | App frame atmosphere: lit relief over `--bg`, a top-left corner light and film grain (uses `::before` and `::after`) |
 | `.shimmer` | Working sweep along a pill's hairline (pair with a `Shimmer` label) |
-| `.skip-link` | First focusable element on the page |
 | `.sr-only`, `.muted`, `.small`, `.block`, `.nowrap`, `.spacer` | Utilities |
+| `[data-arrow="up\|down"]` | Arrow on a tip pointing at its element; `--arrow-x` places it (the tooltips set both) |
 | `[data-layer-root]` | Mark the app shell so popover scrims stack inside it (see `portalNear`) |
 | `[data-floating]` | Put on a layer portalled to `<body>` so an open `Popover` doesn't treat clicks in it as outside |
 
@@ -134,25 +136,25 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `Notice` | Inline notice about a standing condition | `tone`, `icon`, children for the text |
 | `Shimmer` | "Working…" text | `text` or children, `active`, `as` |
 | `WorkingBorder` | Comets circling a card that's busy | none; set `--radius` |
-| `Collapsible` | Section in a panel | `title`, `open` (bindable), `ontoggle`, `count`, `meta` |
+| `Collapsible` | Section in a panel | `title`, `open` (bindable), `ontoggle`, `count`, `meta`, `info` |
 | `CollapsibleAdvanced` | Collapsible card with status | `title`, `open`, `variant`, `dimmed`, `expandable`, `loading`, snippets `lead` `meta` `end` `actions` |
 | `Splitter` | Resizing a panel | `value`, `min`, `max`, `defaultValue`, `side`, `oninput`, `onchange` |
 | `Popover` | Button that opens a panel | `id`, `label`, `trigger` snippet, `badge`, `dot`, `align`, `placement`, `width`, `scrim`, `open` (bindable) |
 | `Tooltip` | Hover or focus tip around content | `tip` snippet, `focusable` |
-| `InfoTip` | ⓘ button with label/text lines | `lines`, `label`, `pinnable` |
+| `InfoTip` | ⓘ button with label/text lines: the place for descriptions and help text | `lines`, `label`, `pinnable` |
 | `Md` | Inline markdown, no `{@html}` | `text` |
 | `MoreButton` | Visible ⋯ twin of a context menu | `items` (function), `label` |
 | `Toast` | The one toast (app owns the state) | `toast`, `onhold`, `ondismiss` |
-| `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, native constraints (`required`, `pattern`…); `focus()` |
-| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error` |
-| `inputs/Segmented`, `ButtonGroup` | One choice of a few | `value`, `options`, `label`, `onchange`, `iconOnly`; ButtonGroup: `fill`, `pill` |
+| `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, `info`, native constraints (`required`, `pattern`…); `focus()` |
+| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info` |
+| `inputs/Segmented`, `ButtonGroup`, `RadioGroup` | One choice of a few: separate pills; one joined pill; a track with the choice raised on it | `value`, `options`, `label`, `onchange`, `iconOnly`; RadioGroup: `fill`, `pill` |
 | `inputs/Switch` | On/off | `checked` (bindable), `id`, `label`, `hint`; other props and attachments go to the button |
 | `inputs/Slider` | Number in a range | `value` (bindable), `min`, `max`, `step`, `id`, `label`, `format` |
 | `inputs/FileButton` | File picker | `label`, `accept`, `multiple`, `onfiles` |
 | `menu/ContextMenu` | The menu layer; mount once | none |
 
-Option shape for `Select`, `Segmented` and `ButtonGroup`: `{ value, label, icon?, hint? }`, plus `text` and
-`group` for `Select`, `done` for `Segmented`, `info` for `ButtonGroup`.
+Option shape for `Select`, `Segmented`, `ButtonGroup` and `RadioGroup`: `{ value, label, icon?, hint? }`, plus `text`
+and `group` for `Select`, `done` for `Segmented`, `info` for `RadioGroup`.
 
 ### Icons
 
@@ -200,6 +202,7 @@ export function hold(on) { clearTimeout(timer); if (!on && app.toast) timer = se
 | Export | What it does |
 |---|---|
 | `portal`, `portalNear(from)` | Attachments that move a node to `<body>` or the nearest `[data-layer-root]` |
+| `topLayer(from)` | Attachment that shows a floating node in the top layer, above modal dialogs (inside the dialog around `from`, else `<body>`) |
 | `backdropClose(close)` | Handlers to spread on a `<dialog>`: closes on a true backdrop click only |
 | `motion(ms)` | Duration for Svelte transitions; 0 under reduced motion |
 | `scrollFade({ size? })` | Attachment: fades a scroll area's top and bottom edges while there is more to scroll |

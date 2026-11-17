@@ -1,20 +1,27 @@
 <script>
   /**
    * Shows a small tooltip when the wrapped content is hovered or focused (it becomes focusable for that; Esc closes).
-   * Lives on <body>, fixed below the content, opening toward the side with more room, so panes and sticky headers don't clip it.
+   * Lives in the top layer (above modal dialogs), fixed below the content with an arrow pointing at it, opening toward the side with more room, so panes and sticky headers don't clip it.
    * `tip`: snippet with the tooltip's content. focusable={false} inside buttons and links (hover only; give the content
    * its own accessible name then).
    */
-  import { portal } from '../lib/dom.js';
+  import { topLayer } from '../lib/dom.js';
 
   let { tip, focusable = true, children } = $props();
   const uid = 'tt-' + Math.random().toString(36).slice(2, 8);
   let el = $state();
-  let pos = $state(null); // { top, left?, right? } in viewport px while open
+  let pos = $state(null); // { top, left?, right?, arrow } in viewport px while open; arrow is the arrow's --arrow-x
 
   function show() {
     const r = el.getBoundingClientRect();
-    pos = r.left + r.width / 2 > innerWidth / 2 ? { top: r.bottom + 6, right: Math.max(8, innerWidth - r.right) } : { top: r.bottom + 6, left: Math.max(8, r.left) };
+    const cx = r.left + r.width / 2;
+    if (cx > innerWidth / 2) {
+      const right = Math.max(8, innerWidth - r.right);
+      pos = { top: r.bottom + 8, right, arrow: `calc(100% - ${innerWidth - right - cx}px)` };
+    } else {
+      const left = Math.max(8, r.left);
+      pos = { top: r.bottom + 8, left, arrow: `${cx - left}px` };
+    }
   }
   const hide = () => (pos = null);
 </script>
@@ -33,7 +40,7 @@
   {@render children()}
 </span>
 {#if pos}
-  <div id={uid} class="tip" role="tooltip" {@attach portal} style:top="{pos.top}px" style:left={pos.left != null ? `${pos.left}px` : null} style:right={pos.right != null ? `${pos.right}px` : null}>
+  <div id={uid} class="tip" role="tooltip" data-arrow="up" {@attach topLayer(el)} style:--arrow-x={pos.arrow} style:top="{pos.top}px" style:left={pos.left != null ? `${pos.left}px` : null} style:right={pos.right != null ? `${pos.right}px` : null}>
     {@render tip()}
   </div>
 {/if}

@@ -12,11 +12,12 @@
 .btn :where(.icon) { color: var(--muted); transition: color var(--dur) var(--ease-out); }
 .btn:hover { background: var(--fill-3); color: var(--fg); }
 .btn:hover :where(.icon) { color: inherit; }
-.btn:active { background: var(--fill-4); transform: scale(0.98); }
+/* Pressed feedback (fill, press-in scale) only on buttons that can act; :where keeps the specificity of .btn:active. */
+.btn:active:where(:not(:disabled, [aria-disabled="true"])) { background: var(--fill-4); transform: scale(0.98); }
 .btn-primary { background: var(--brand); border-color: color-mix(in srgb, white 12%, transparent); color: var(--accent-ink); box-shadow: var(--shadow-btn); }
 .btn-primary :where(.icon) { color: inherit; }
 .btn-primary:hover { background: var(--brand); color: var(--accent-ink); filter: brightness(1.1); }
-.btn-primary:active { background: var(--brand); filter: brightness(0.95); }
+.btn-primary:active:where(:not(:disabled, [aria-disabled="true"])) { background: var(--brand); filter: brightness(0.95); }
 .btn-small { min-height: 24px; padding: 0 9px; font-size: 12px; }
 .linklike { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; font-weight: inherit; }
 .linklike:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -33,8 +34,18 @@
   position: fixed; inset: auto; margin: 0; width: max-content; max-width: 280px; pointer-events: none;
   display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2);
   border: 1px solid var(--line-float); border-radius: var(--r); background: var(--elevated); box-shadow: var(--shadow);
-  color: var(--fg-2); font: 400 12px/1.5 var(--font-body); white-space: normal; text-align: left;
+  color: var(--fg-2); font: 400 12px/1.5 var(--font-body); white-space: normal; text-align: left; overflow: visible;
 }
+/* Arrow on a tip, pointing at the element it belongs to: data-arrow="up" when the tip sits below it, "down" when above.
+   --arrow-x is where the point goes, from the tip's left edge (a length, or calc(100% - …) from the right); it is kept
+   clear of the corners. A rotated square that takes the tip's own background and hairline, so it reads as one shape.
+   The tip needs overflow: visible and a gap of about 8px to the element. */
+[data-arrow]::before {
+  content: ""; position: absolute; left: clamp(12px, var(--arrow-x, 50%), calc(100% - 12px)); width: 8px; height: 8px;
+  background: inherit; border: inherit; border-radius: 0; pointer-events: none; transform: translateX(-50%) rotate(45deg);
+}
+[data-arrow="up"]::before { top: -5px; border-right-width: 0; border-bottom-width: 0; border-top-left-radius: 2px; }
+[data-arrow="down"]::before { bottom: -5px; border-left-width: 0; border-top-width: 0; border-bottom-right-radius: 2px; }
 
 /* ---------- data tables ---------- */
 /* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical
@@ -78,6 +89,9 @@
 
 /* Label above every form control (custom inputs share it). */
 .field-label { font-size: 12px; color: var(--muted); font-weight: var(--w-medium); white-space: nowrap; }
+/* A label with an InfoTip after it (fields' `info`): the 24px ⓘ overlaps the row's padding so the label row keeps its height. */
+.field-head { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.field-head > .info { margin-block: -5px; }
 
 /* Unread / new marker: a small accent dot (Popover's `dot` uses it; use it on rows, cards and list items too). */
 .new-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }

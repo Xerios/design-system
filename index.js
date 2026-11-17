@@ -23,6 +23,7 @@ export { default as Toast } from './components/Toast.svelte';
 export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte';
 export { default as FileButton } from './components/inputs/FileButton.svelte';
 export { default as SearchField } from './components/inputs/SearchField.svelte';
+export { default as RadioGroup } from './components/inputs/RadioGroup.svelte';
 export { default as Segmented } from './components/inputs/Segmented.svelte';
 export { default as Select } from './components/inputs/Select.svelte';
 export { default as Slider } from './components/inputs/Slider.svelte';

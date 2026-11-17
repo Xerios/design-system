@@ -7,14 +7,16 @@
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
    * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
+   * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    */
   import { tick } from 'svelte';
   import ErrorMessage from '../ErrorMessage.svelte';
+  import InfoTip from '../InfoTip.svelte';
   import Shimmer from '../Shimmer.svelte';
   import { tooltip } from '../../lib/tooltip.js';
-  import { portal } from '../../lib/dom.js'; // the list lives on <body> so a scrolling parent can't clip it
+  import { topLayer } from '../../lib/dom.js'; // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
 
-  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '' } = $props();
+  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '', info = '' } = $props();
   let open = $state(false);
   let active = $state(0);
   let button = $state(), list = $state();
@@ -130,7 +132,12 @@
 {/snippet}
 
 <div class="field">
-  <span class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</span>
+  {#snippet fieldLabel()}<span class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</span>{/snippet}
+  {#if info}
+    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
+  {:else}
+    {@render fieldLabel()}
+  {/if}
   <div class="wrap">
     <button
       {id}
@@ -159,7 +166,7 @@
         bind:this={list}
         class="list"
         data-floating
-        {@attach portal}
+        {@attach topLayer(button)}
         role="listbox"
         tabindex="-1"
         aria-labelledby="{id}-label"

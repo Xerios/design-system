@@ -1,6 +1,7 @@
 <script>
   import ErrorMessage from '../ErrorMessage.svelte';
   import Icon from '../Icon.svelte';
+  import InfoTip from '../InfoTip.svelte';
   import { tooltip } from '../../lib/tooltip.js';
   import { validity } from '../../lib/validity.js';
   /**
@@ -9,8 +10,9 @@
    * pass `required`, `pattern`, `minlength`… (any other attribute goes to the <input>) and the browser's own message
    * shows there once the field is left or its form is validated. See lib/validity.js, and lib/field-errors.svelte.js
    * for a form's worth of them.
+   * info: what the field is for or how to fill it, behind an ⓘ next to the label (see InfoTip).
    */
-  let { value = $bindable(''), id, label, placeholder = '', type = 'search', icon = type === 'search', shortcut = null, hideLabel = false, compact = false, onenter = null, error = '', ...rest } = $props();
+  let { value = $bindable(''), id, label, placeholder = '', type = 'search', icon = type === 'search', shortcut = null, hideLabel = false, compact = false, onenter = null, error = '', info = '', ...rest } = $props();
   let input = $state();
   let native = $state(''); // the browser's message for a failed native constraint
   const problem = $derived(error || native);
@@ -29,7 +31,12 @@
 </script>
 
 <div class="field">
-  <label for={id} class:sr-only={hideLabel} class="field-label">{label}</label>
+  {#snippet fieldLabel()}<label for={id} class:sr-only={hideLabel} class="field-label">{label}</label>{/snippet}
+  {#if info}
+    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
+  {:else}
+    {@render fieldLabel()}
+  {/if}
   <div class="box edge" class:compact>
     {#if icon}
       <span class="lead"><Icon name="search" /></span>

@@ -19,7 +19,8 @@ Read it before building UI, and read a component's header comment before using i
   case, no uppercase labels.
 - Icons: `<Icon name="…" />` only. A new glyph is registered in the app (`registerIcons`, see the app's
   `src/lib/icons.js`), from Phosphor's regular weight.
-- Floating things are portalled (`portal`, `portalNear`) and marked `data-floating`. Svelte transitions
+- Floating things are portalled (`portal`, `portalNear`) and marked `data-floating`. Anything that can open from
+  inside a modal dialog (tips, lists, menus) uses `topLayer` instead, or the dialog draws over it. Svelte transitions
   take `motion(ms)` so reduced motion is honoured.
 - Every control has a label (visible, or `hideLabel` / `aria-label`), works from the keyboard, and has a
   pointer target of at least 24×24px. Anything on a context menu also has a visible `MoreButton`.
@@ -27,6 +28,12 @@ Read it before building UI, and read a component's header comment before using i
   exceptions. That covers icon-only buttons and links (`.icon-btn`, close and clear buttons) and terse
   toggles (a switch labelled "Live"). Use `{@attach tooltip('…')}` from `lib/tooltip.js`, alongside the
   `aria-label`. A native `title` is not a tooltip; do not use it for this.
+- Descriptions and help text (what a field or section is for, what a value means, how to fill it in) go behind
+  an `InfoTip` next to the label, never in a paragraph under the control. Pass `info` to `TextField`,
+  `TextArea`, `Select` or `Collapsible`; anywhere else put `<InfoTip>` after the label (in a `.field-head`
+  row for a field). Its tip opens on hover and keyboard focus. Make it `pinnable` (a click toggles it open)
+  when its text is worth selecting or it holds links or actions, so they can be reached. Keep visible:
+  errors, warnings, what a destructive action will do, status, empty states, and anything needed to act safely.
 - App-specific colours and atoms go in the app's own CSS, defined from these tokens (as the viewer does
   for verdicts and statuses in `src/global.css`). Do not add them here.
 
@@ -39,8 +46,10 @@ Read it before building UI, and read a component's header comment before using i
 - A new component belongs here only if another app could use it unchanged. Otherwise it goes in the app.
 - Start each component with a comment block: what it is for, a usage example, each prop, keyboard
   behaviour. That comment is its documentation. Then add it to `index.js` and to the table in `README.md`.
-- New tokens go in `css/tokens.css` with a comment, in the light block and in **both** dark blocks (the
-  media query and `[data-theme="dark"]`), and in the README's token table. Check contrast (AA) in both themes.
+- New tokens go in `css/tokens.css` with a comment, in the `:root` block as `light-dark(light, dark)` when they
+  differ by theme (shadows: one `light-dark()` per layer colour, `transparent` for a layer one theme lacks), and
+  in the README's token table. A non-colour value that differs goes in both the media query and
+  `[data-theme="dark"]` rules below it. Check contrast (AA) in both themes.
 - Renaming or removing a token, class, prop or export breaks every app using it: search the consumers
   (`grep -rn` in `src/`) and update them in the same change.
 - Global CSS goes in the matching file (`base`, `effects`, `atoms`); component styles stay scoped in the

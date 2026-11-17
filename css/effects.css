@@ -1,4 +1,4 @@
-/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, the working shimmer and dialog motion. */
+/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, shell atmosphere, the working shimmer and dialog motion. */
 
 /* ---------- scroll fade ---------- */
 /* Set by the scrollFade attachment (../lib/scroll-fade.js) on scroll areas that overflow: the top edge fades while there's
@@ -65,12 +65,31 @@
 
 /* ---------- shine ---------- */
 /* Linear's .shine: a second hairline in --shine, visible only inside a 200px radial beam (at --shine-x / --shine-y), so one
-   stretch of the edge catches the light. Add an empty <span class="shine" aria-hidden="true"></span> as the first child of a
-   positioned, non-scrolling box; it takes the box's radius. It sits just above sticky headers and below scrims, drawers and menus. */
-.shine {
-  position: absolute; inset: 0; z-index: calc(var(--z-sticky) + 1); pointer-events: none; border-radius: inherit; border: var(--edge-w, 1px) solid var(--shine);
+   stretch of the edge catches the light. Put .shine on a non-scrolling box; it draws on ::after (so it combines with .edge,
+   which uses ::before), takes the box's radius, and sits just above sticky headers and below scrims, drawers and menus. */
+:where(.shine) { position: relative; }
+.shine::after {
+  content: ""; position: absolute; inset: 0; z-index: calc(var(--z-sticky) + 1); pointer-events: none; border-radius: inherit; border: var(--edge-w, 1px) solid var(--shine);
   -webkit-mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
   mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
+}
+
+/* ---------- shell atmosphere ---------- */
+/* Linear's app frame: a lit-relief texture over a soft shading over --bg (only the texture overlay-blends), a 400px light
+   (--glow) centred on the top-left corner (::before) and a fine film grain (--grain) over everything (::after). Put .shell on
+   the app's root frame; it carries no layout. It is its own stacking context and clips the corner light, and both
+   pseudo-elements ignore the pointer. */
+.shell {
+  position: relative; isolation: isolate; overflow: clip;
+  background: var(--relief-texture), var(--relief-shade), var(--bg); background-blend-mode: overlay, normal, normal;
+}
+.shell::before {
+  content: ""; position: absolute; top: 0; left: 0; z-index: -1; width: 400px; height: 400px; pointer-events: none;
+  border-radius: var(--r-pill); background: radial-gradient(50% 50%, var(--glow) 0%, transparent 90%); transform: translate(-50%, -50%);
+}
+.shell::after {
+  content: ""; position: absolute; inset: 0; z-index: 100; pointer-events: none;
+  background: var(--grain) 0 0 / 256px 256px; opacity: var(--grain-opacity);
 }
 
 /* ---------- working shimmer ---------- */
