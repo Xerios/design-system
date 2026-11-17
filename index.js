@@ -6,6 +6,7 @@
 
 export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte';
 export { default as Empty } from './components/Empty.svelte';
+export { default as ErrorMessage } from './components/ErrorMessage.svelte';
 export { default as Notice } from './components/Notice.svelte';
 export { default as Shimmer } from './components/Shimmer.svelte';
 export { default as WorkingBorder } from './components/WorkingBorder.svelte';
@@ -36,4 +37,6 @@ export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu
 export { portal, portalNear, backdropClose } from './lib/dom.js';
 export { motion } from './lib/motion.js';
 export { scrollFade } from './lib/scroll-fade.js';
+export { validity } from './lib/validity.js';
+export { fieldErrors } from './lib/field-errors.svelte.js';
 export { inlineMd } from './lib/inline-md.js';

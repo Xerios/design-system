@@ -53,7 +53,7 @@ css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .
 components/          generic components (table below)
 components/inputs/   form controls
 components/menu/     the context menu layer
-lib/                 dom.js, motion.js, scroll-fade.js, menu.svelte.js, inline-md.js
+lib/                 dom.js, motion.js, scroll-fade.js, validity.js, field-errors.svelte.js, menu.svelte.js, inline-md.js
 fonts.js             bundles the two typefaces
 index.js             named exports of everything
 ```
@@ -130,6 +130,7 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 |---|---|---|
 | `Icon` | Any icon (Phosphor regular) | `name`, `size` sm/md/lg, `label` (only if it carries meaning) |
 | `Empty` | Empty state | `title`, `body`, children for actions |
+| `ErrorMessage` | One line of error text, under a field or beside a form's buttons | `message`, `id` |
 | `Notice` | Inline notice about a standing condition | `tone`, `icon`, children for the text |
 | `Shimmer` | "Working…" text | `text` or children, `active`, `as` |
 | `WorkingBorder` | Comets circling a card that's busy | none; set `--radius` |
@@ -142,8 +143,8 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `Md` | Inline markdown, no `{@html}` | `text` |
 | `MoreButton` | Visible ⋯ twin of a context menu | `items` (function), `label` |
 | `Toast` | The one toast (app owns the state) | `toast`, `onhold`, `ondismiss` |
-| `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`; `focus()` |
-| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading` |
+| `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, native constraints (`required`, `pattern`…); `focus()` |
+| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error` |
 | `inputs/Segmented`, `ButtonGroup` | One choice of a few | `value`, `options`, `label`, `onchange`, `iconOnly`; ButtonGroup: `fill`, `pill` |
 | `inputs/Switch` | On/off | `checked` (bindable), `id`, `label`, `hint` |
 | `inputs/Slider` | Number in a range | `value` (bindable), `min`, `max`, `step`, `id`, `label`, `format` |
@@ -202,6 +203,8 @@ export function hold(on) { clearTimeout(timer); if (!on && app.toast) timer = se
 | `backdropClose(close)` | Handlers to spread on a `<dialog>`: closes on a true backdrop click only |
 | `motion(ms)` | Duration for Svelte transitions; 0 under reduced motion |
 | `scrollFade({ size? })` | Attachment: fades a scroll area's top and bottom edges while there is more to scroll |
+| `fieldErrors(validate)` | A form's error messages with blur-first timing: `{...form.field('name')}` on a text field, `{@attach form.group('name')}` on a wrapper, `form.validate()` on submit |
+| `validity(error, report)` | Attachment: ties an `<input>` or `<textarea>` to the browser's constraint validation (what the `error` prop of the text fields uses) |
 | `contextMenu`, `menu`, `openMenu`, `openMenuFrom`, `closeMenu` | Context menu state and attachment |
 | `inlineMd(text)` | Parses inline markdown into parts (what `Md` renders) |
 

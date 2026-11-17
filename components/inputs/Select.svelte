@@ -6,12 +6,14 @@
    * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
+   * error: a message from the app; the button turns red (`data-invalid`) and shows it underneath.
    */
   import { tick } from 'svelte';
+  import ErrorMessage from '../ErrorMessage.svelte';
   import Shimmer from '../Shimmer.svelte';
   import { portal } from '../../lib/dom.js'; // the list lives on <body> so a scrolling parent can't clip it
 
-  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false } = $props();
+  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '' } = $props();
   let open = $state(false);
   let active = $state(0);
   let button = $state(), list = $state();
@@ -140,6 +142,8 @@
       aria-busy={loading || undefined}
       aria-disabled={loading || undefined}
       aria-labelledby="{id}-label {id}"
+      data-invalid={error ? '' : undefined}
+      aria-describedby={error ? `${id}-error` : undefined}
       onclick={() => (open ? hide() : show())}
       onkeydown={onButtonKey}>
       {#if loading}
@@ -182,6 +186,7 @@
       </ul>
     {/if}
   </div>
+  <ErrorMessage id="{id}-error" message={error} />
 </div>
 
 <style>
@@ -198,6 +203,8 @@
   .trigger[aria-busy] .caret { opacity: 0.5; }
   .trigger[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
   .trigger:focus-visible { border-color: var(--accent-line); box-shadow: var(--ring); outline: none; }
+  .trigger[data-invalid] { border-color: var(--danger); }
+  .trigger[data-invalid]:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent); }
   /* Long values (model ids…) are cut with an ellipsis on one line; the full text is in the tooltip. */
   .trigger :global(.value), .label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .caret { flex: none; display: inline-flex; color: var(--muted); transition: transform var(--dur) var(--ease-out); }
