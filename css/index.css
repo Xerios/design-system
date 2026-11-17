@@ -1,0 +1,5 @@
+/* The design system's whole global layer, in cascade order. Import once, before the app's own CSS. */
+@import './tokens.css';
+@import './base.css';
+@import './effects.css';
+@import './atoms.css';

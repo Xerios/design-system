@@ -1,0 +1,76 @@
+/* Shared atoms: buttons, data tables, counts, tones, label chips, field labels and dots. Anything bigger is a component. */
+
+/* ---------- controls ---------- */
+/* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid indigo; icon buttons are ghost circles. */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 28px;
+  padding: 0 11px; border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong); background: var(--fill-1); color: var(--fg-2);
+  font-weight: var(--w-medium); font-size: 12px; line-height: 14px; letter-spacing: 0; text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out), filter var(--dur) var(--ease-out);
+}
+.btn :where(.icon) { color: var(--muted); transition: color var(--dur) var(--ease-out); }
+.btn:hover { background: var(--fill-3); color: var(--fg); }
+.btn:hover :where(.icon) { color: inherit; }
+.btn:active { background: var(--fill-4); transform: scale(0.98); }
+.btn-primary { background: var(--brand); border-color: color-mix(in srgb, white 12%, transparent); color: var(--accent-ink); box-shadow: var(--shadow-btn); }
+.btn-primary :where(.icon) { color: inherit; }
+.btn-primary:hover { background: var(--brand); color: var(--accent-ink); filter: brightness(1.1); }
+.btn-primary:active { background: var(--brand); filter: brightness(0.95); }
+.btn-small { min-height: 24px; padding: 0 9px; font-size: 12px; }
+.linklike { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; font-weight: inherit; }
+.linklike:hover { text-decoration: underline; text-underline-offset: 3px; }
+.icon-btn {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; padding: 0;
+  background: none; border: 0; border-radius: var(--r-pill); color: var(--muted);
+  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+.icon-btn:hover { background: var(--fill-3); color: var(--fg-2); }
+.icon-btn:active, .icon-btn[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
+.icon-btn[aria-pressed="true"] { color: var(--warning); }
+
+/* ---------- data tables ---------- */
+/* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical
+   hairlines, a header row in small tertiary text, and a full-bleed fill on hover. Wrap a <table> in .data-table;
+   mark number columns .num. Row headers (<th scope="row">) read as the name column. */
+.data-table { overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--r-xl); background: var(--fill-1); }
+.data-table table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--fg-2); }
+.data-table :is(th, td) { height: 40px; padding: 8px 12px; text-align: left; vertical-align: middle; font-weight: inherit; }
+.data-table :is(th, td):first-child { padding-left: 16px; }
+.data-table :is(th, td):last-child { padding-right: 16px; }
+.data-table :is(th, td) + :is(th, td) { border-left: 1px solid var(--line); }
+.data-table thead th { height: 36px; font-size: 12px; font-weight: var(--w-medium); color: var(--muted); white-space: nowrap; }
+.data-table tbody tr { border-top: 1px solid var(--line); transition: background-color var(--dur) var(--ease-out); }
+.data-table tbody tr:hover { background: var(--fill-2); }
+.data-table .num { width: 1%; text-align: right; white-space: nowrap; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+/* ---------- small atoms ---------- */
+/* Section labels: sentence case, small, medium weight, tertiary (Linear doesn't shout with uppercase). */
+.eyebrow { font-size: 12px; color: var(--muted); font-weight: var(--w-medium); }
+.count { font: var(--w-medium) 11px/18px var(--font-data); font-variant-numeric: tabular-nums; color: var(--muted); background: var(--fill-3); border-radius: var(--r-pill); padding: 0 7px; }
+
+/* Tones: set data-tone on any element to get --tone / --tone-soft for it. Apps add their own names the same way. */
+[data-tone="success"] { --tone: var(--success); --tone-soft: var(--success-soft); }
+[data-tone="info"] { --tone: var(--info); --tone-soft: var(--info-soft); }
+[data-tone="warning"] { --tone: var(--warning); --tone-soft: var(--warning-soft); }
+[data-tone="neutral"] { --tone: var(--neutral); --tone-soft: var(--neutral-soft); }
+[data-tone="danger"] { --tone: var(--danger); --tone-soft: var(--danger-soft); }
+
+/* Label chips (Linear's labels and PR pills on issue rows and board cards): a hairline pill in small medium-weight
+   tertiary text, led by a coloured dot (.label-dot, colour from --dot) or a 14px icon. .label-chip.icon-only is the square
+   24px variant (Linear's priority chip). */
+.label-chip {
+  display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; flex: none; min-width: 0;
+  border: 1px solid var(--line-strong); border-radius: var(--r-pill); background: none;
+  font: var(--w-medium) 12px/14px var(--font-body); color: var(--muted); white-space: nowrap;
+}
+.label-chip :where(.icon) { --icon-size: 14px; color: var(--muted); }
+.label-chip.icon-only { width: 22px; padding: 0; justify-content: center; }
+.label-chip.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; padding: 0 7px; }
+.label-dot { width: 7px; height: 7px; margin: 0 2px; border-radius: 50%; background: var(--dot, var(--muted)); flex: none; }
+
+/* Label above every form control (custom inputs share it). */
+.field-label { font-size: 12px; color: var(--muted); font-weight: var(--w-medium); white-space: nowrap; }
+
+/* Unread / new marker: a small accent dot (Popover's `dot` uses it; use it on rows, cards and list items too). */
+.new-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }

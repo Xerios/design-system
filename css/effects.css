@@ -1,0 +1,113 @@
+/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, the working shimmer and dialog motion. */
+
+/* ---------- scroll fade ---------- */
+/* Set by the scrollFade attachment (../lib/scroll-fade.js) on scroll areas that overflow: the top edge fades while there's
+   content above ("above"), the bottom edge while there's more below ("below"); each eases back to solid at its end.
+   The band reserved by scroll-padding-top (a sticky header) stays solid, and the fade starts under it.
+   Layers: the fades, then solid strips over the vertical and horizontal scrollbars so they stay crisp.
+   Override the height per area with --scroll-fade. Pointing at or keyboard-focusing inside the area clears the fades,
+   so nothing you're working with is dimmed. */
+@property --scroll-fade-t { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --scroll-fade-b { syntax: "<length>"; inherits: false; initial-value: 0px; }
+[data-scroll-fade] {
+  --scroll-fade-t: 0px;
+  --scroll-fade-b: 0px;
+  --scroll-fade-mask:
+    linear-gradient(to bottom,
+      #000 var(--scroll-fade-inset, 0px), transparent var(--scroll-fade-inset, 0px), #000 calc(var(--scroll-fade-inset, 0px) + var(--scroll-fade-t)),
+      #000 calc(100% - var(--scroll-fade-sb-h, 0px) - var(--scroll-fade-b)), transparent calc(100% - var(--scroll-fade-sb-h, 0px))),
+    linear-gradient(#000, #000), linear-gradient(#000, #000);
+  transition: --scroll-fade-t var(--dur-slow) var(--ease-out), --scroll-fade-b var(--dur-slow) var(--ease-out);
+  -webkit-mask-image: var(--scroll-fade-mask);
+  mask-image: var(--scroll-fade-mask);
+  -webkit-mask-size: 100% 100%, var(--scroll-fade-sb-w, 0px) 100%, 100% var(--scroll-fade-sb-h, 0px);
+  mask-size: 100% 100%, var(--scroll-fade-sb-w, 0px) 100%, 100% var(--scroll-fade-sb-h, 0px);
+  -webkit-mask-position: 0 0, 100% 0, 0 100%;
+  mask-position: 0 0, 100% 0, 0 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+[data-scroll-fade~="above"] { --scroll-fade-t: var(--scroll-fade, 48px); }
+[data-scroll-fade~="below"] { --scroll-fade-b: var(--scroll-fade, 48px); }
+/* Keyboard focus only: a click also focuses, and that focus outlives the pointer leaving. */
+[data-scroll-fade]:focus-visible, [data-scroll-fade]:has(:focus-visible) { --scroll-fade-t: 0px; --scroll-fade-b: 0px; }
+/* Real hover only; on touch screens it sticks after a tap. */
+@media (hover: hover) { [data-scroll-fade]:hover { --scroll-fade-t: 0px; --scroll-fade-b: 0px; } }
+@media (prefers-reduced-motion: reduce) { [data-scroll-fade] { transition: none; } }
+
+/* ---------- edges ---------- */
+/* Linear's lit corner (their .edgeHighlightRing): the element's hairline in --edge-b, with --edge-a stacked on top inside a
+   radial at the top-left corner, solid for the first --edge-plateau and fading out by --edge-r. --edge-shadow rings the outside.
+   .edge draws it over the element's outer edge (give the element border: 0). Tune per element with --edge-a (corner colour),
+   --edge-b (hairline), --edge-r (reach), --edge-w (width), --edge-x / --edge-y (which corner).
+   Scroll containers (menus, popovers, dialogs) can't host the ring since it would scroll with them; they paint it as background
+   layers instead: border: 1px solid transparent; background: linear-gradient(<bg>, <bg>) padding-box, var(--edge-grad-float).
+   (No clip on the last layers: they default to border-box, so the hairline shows through the transparent border.) */
+:where(.edge) { position: relative; isolation: isolate; box-shadow: var(--edge-shadow); }
+.edge::before {
+  content: ""; position: absolute; inset: 0; z-index: 100; pointer-events: none; border-radius: inherit; padding: var(--edge-w, 1px);
+  background:
+    radial-gradient(var(--edge-r) var(--edge-r) at var(--edge-x, 0) var(--edge-y, 0), var(--edge-a, var(--edge-hi)) 0%, var(--edge-a, var(--edge-hi)) var(--edge-plateau), transparent 100%),
+    linear-gradient(var(--edge-b, var(--line-strong)), var(--edge-b, var(--line-strong)));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+}
+
+/* ---------- corner glow ---------- */
+/* Linear's .corner-glow: a 400px soft light (--glow) centred on the top-left corner, so a quarter of it washes the box.
+   Only that quarter is drawn (a 200px box with the gradient centred on its corner), so the host needn't clip.
+   Add an empty <span class="corner-glow" aria-hidden="true"></span> to a positioned box that is its own stacking
+   context (.edge or isolation: isolate); it sits behind the box's content and follows its top-left radius. */
+.corner-glow {
+  position: absolute; top: 0; left: 0; z-index: -1; width: min(200px, 100%); height: min(200px, 100%); pointer-events: none;
+  border-top-left-radius: inherit; background: radial-gradient(200px 200px at 0 0, var(--glow) 0%, transparent 90%);
+}
+
+/* ---------- shine ---------- */
+/* Linear's .shine: a second hairline in --shine, visible only inside a 200px radial beam (at --shine-x / --shine-y), so one
+   stretch of the edge catches the light. Add an empty <span class="shine" aria-hidden="true"></span> as the first child of a
+   positioned, non-scrolling box; it takes the box's radius. It sits just above sticky headers and below scrims, drawers and menus. */
+.shine {
+  position: absolute; inset: 0; z-index: calc(var(--z-sticky) + 1); pointer-events: none; border-radius: inherit; border: var(--edge-w, 1px) solid var(--shine);
+  -webkit-mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
+  mask-image: radial-gradient(200px 200px at var(--shine-x, 0) var(--shine-y, 50px), #000 0%, #0009 30%, #0003 50%, #0000 70%);
+}
+
+/* ---------- working shimmer ---------- */
+/* Linear's "working" badge: a blurred, tilted stripe (indigo and greys, the image below) sweeps along the pill's hairline
+   every 2s. Put .shimmer on the pill and a Shimmer label inside it. Reduced motion leaves it still. */
+:root { --shimmer-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20180%2072%22%20fill%3D%22none%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22blur%22%20x%3D%22-100%25%22%20y%3D%22-100%25%22%20width%3D%22300%25%22%20height%3D%22300%25%22%3E%0A%20%20%20%20%20%20%3CfeGaussianBlur%20stdDeviation%3D%226%22%20%2F%3E%0A%20%20%20%20%3C%2Ffilter%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Cg%20transform%3D%22rotate(-30%2090%2036)%22%20filter%3D%22url(%23blur)%22%3E%0A%20%20%20%20%3Crect%20x%3D%2272%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%235e6ad2%22%20fill-opacity%3D%221%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%23e4e5e9%22%20fill-opacity%3D%220.5%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2290%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%239c9da1%22%20fill-opacity%3D%221%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%23e4e5e9%22%20fill-opacity%3D%220.4%22%20%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E"); }
+.shimmer { position: relative; }
+.shimmer::after {
+  content: ""; position: absolute; inset: -1px; padding: 1px; border-radius: inherit; pointer-events: none; opacity: 0.4;
+  background: var(--shimmer-image) 0 50% / 120px 72px repeat-x;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+  will-change: background-position; animation: shimmer-ring 2s linear -0.08s infinite;
+}
+/* Thinking text (Linear's "Thinking…" / "Working…" labels): the label rests at --shimmer-base and a soft band of --shimmer-hi
+   sweeps through it every 2s. Both are theme tokens, so it reads on light and dark. Use the Shimmer component rather than
+   the class directly. Reduced motion leaves the label still, at --shimmer-base. */
+.shimmer-text {
+  color: var(--shimmer-base);
+  background: linear-gradient(100deg, var(--shimmer-base) 0%, var(--shimmer-base) 40%, var(--shimmer-hi) 50%, var(--shimmer-base) 60%, var(--shimmer-base) 100%) 0 0 / 200% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 2s linear infinite;
+}
+@keyframes shimmer-sweep { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+@keyframes shimmer-ring { to { background-position: 120px 50%; } }
+@media (prefers-reduced-motion: reduce) { .shimmer-text { background: none; -webkit-text-fill-color: currentColor; } }
+
+/* ---------- modals ---------- */
+/* Every <dialog> opened with showModal(): it rises and scales in while the backdrop fades; closing plays it in reverse
+   (overlay/display transition with allow-discrete keeps it on screen until the exit finishes). */
+dialog {
+  opacity: 0; transform: translateY(8px) scale(0.97);
+  transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out),
+    overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete;
+}
+dialog[open] { opacity: 1; transform: none; }
+@starting-style { dialog[open] { opacity: 0; transform: translateY(8px) scale(0.97); } }
+dialog::backdrop { opacity: 0; transition: opacity var(--dur-slow) var(--ease-out), overlay var(--dur-slow) allow-discrete, display var(--dur-slow) allow-discrete; }
+dialog[open]::backdrop { opacity: 1; }
+@starting-style { dialog[open]::backdrop { opacity: 0; } }

@@ -1,0 +1,102 @@
+<script>
+  /**
+   * Button that opens a non-modal panel below it (or above, with placement="above", for bottom bars). Escape or a
+   * click outside closes it and returns focus to the button. The trigger shows an optional count badge for "what's
+   * active inside". hideLabel keeps the label for screen readers only (when the trigger snippet says it already).
+   * scrim dims the page behind the open panel (the header and status bar it opens from stay undimmed above it)
+   * and swallows the outside press that closes it, so that press doesn't also hit whatever was under it.
+   */
+  import { tick } from 'svelte';
+  import { fly, fade } from 'svelte/transition';
+  import { motion } from '../lib/motion.js';
+  import { portalNear } from '../lib/dom.js';
+
+  let { id, label, badge = null, dot = false, align = 'end', placement = 'below', hideLabel = false, width = 320, scrim = false, open = $bindable(false), trigger, children } = $props();
+  let button = $state(), panel = $state();
+
+  async function show() {
+    open = true;
+    await tick();
+    (panel.querySelector('[data-autofocus]') || panel.querySelector('button, [href], input, [tabindex]:not([tabindex="-1"])'))?.focus();
+  }
+  function hide(refocus = true) {
+    open = false;
+    if (refocus) button?.focus();
+  }
+
+  $effect(() => {
+    if (!open) return;
+    const outside = (e) => {
+      // Clicks inside the panel, on its button, or inside a menu/listbox opened from it (those live on <body>) stay open.
+      if (panel?.contains(e.target) || button?.contains(e.target) || e.target.closest?.('.ctx-menu, [data-floating]')) return;
+      hide(false);
+    };
+    document.addEventListener('pointerdown', outside, true);
+    return () => document.removeEventListener('pointerdown', outside, true);
+  });
+
+  function onkeydown(e) {
+    if (e.key === 'Escape' && !e.target.closest('[role="listbox"]')) {
+      e.stopPropagation();
+      hide();
+    }
+  }
+</script>
+
+<div class="pop">
+  <button
+    {id}
+    bind:this={button}
+    type="button"
+    class="btn trigger"
+    aria-expanded={open}
+    aria-controls="{id}-panel"
+    onclick={() => (open ? hide() : show())}>
+    {@render trigger()}
+    <span class="label" class:sr-only={hideLabel}>{label}</span>
+    {#if badge}<span class="badge">{badge}</span>{/if}
+    {#if dot}<span class="new-dot" aria-hidden="true"></span>{/if}
+  </button>
+  {#if open && scrim}
+    <div class="pop-scrim" aria-hidden="true" {@attach portalNear(button)} transition:fade={{ duration: motion(160) }}></div>
+  {/if}
+  {#if open}
+    <div
+      id="{id}-panel"
+      bind:this={panel}
+      class="panel"
+      class:start={align === 'start'}
+      class:above={placement === 'above'}
+      style:--w="{width}px"
+      role="dialog"
+      aria-label={label}
+      tabindex="-1"
+      {onkeydown}
+      in:fly={{ y: placement === 'above' ? 6 : -6, duration: motion(160) }}
+      out:fly={{ y: placement === 'above' ? 4 : -4, duration: motion(100) }}>
+      {@render children({ close: () => hide() })}
+    </div>
+  {/if}
+</div>
+
+<style>
+  .pop { position: relative; }
+  .trigger[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
+  .badge { font: var(--w-medium) 11px/1 var(--font-data); font-variant-numeric: tabular-nums; color: var(--accent-ink); background: var(--brand); border-radius: var(--r-pill); padding: 2px 5px; min-width: 16px; text-align: center; }
+  .panel {
+    position: absolute; z-index: var(--z-menu); top: calc(100% + 6px); right: 0; width: min(var(--w), calc(100vw - 32px));
+    max-height: min(70vh, 560px); overflow: auto; overscroll-behavior: contain;
+    border: 1px solid var(--line-float); background: var(--elevated); border-radius: var(--r-lg); box-shadow: var(--shadow);
+  }
+  /* Moved out of the trigger's bar (so its fixed box isn't trapped by a backdrop-filter) into the nearest [data-layer-root] or <body>, just
+     under the header and status bar (z-header), so the bar it opened from and the panel inside it stay above it. */
+  .pop-scrim { position: fixed; inset: 0; z-index: calc(var(--z-header) - 1); background: var(--scrim); }
+  .panel.start { right: auto; left: 0; }
+  .panel.above { top: auto; bottom: calc(100% + 6px); }
+  .panel:focus { outline: none; }
+  @media (max-width: 860px) {
+    .pop { position: static; }
+    .panel { left: var(--gutter-l); right: var(--gutter-r); width: auto; top: calc(100% + var(--space-1)); }
+    .panel.above { top: auto; bottom: calc(100% + var(--space-1)); }
+  }
+</style>

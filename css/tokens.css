@@ -1,0 +1,162 @@
+/* Theme tokens, light and dark. Token names are stable across themes; components only ever read tokens.
+   Design language: Linear's app (as in the interactive demo on linear.app). Surfaces are near-black (or white) with
+   translucent hairlines, translucent fills for hover/active, pill-shaped controls, Inter at 13px with weights 510/590
+   (JetBrains Mono for data), and one indigo accent.
+   Text: --fg (primary), --fg-2 (secondary), --muted (tertiary), --faint (quaternary).
+   Fills (translucent, stack on any surface): --fill-1 resting, --fill-2 hover, --fill-3 pressed/raised, --fill-4 active.
+   Theme: follows the OS; <html data-theme="light|dark"> overrides it. The two dark blocks below must stay identical. */
+:root {
+  /* Surfaces, back to front (Linear's hero frame): --bg is the app frame the header and status line sit on; --view-bg the
+     inset view card the layouts live in; --surface the cards and panes inside it; --elevated the floating layers. */
+  --bg: #f3f3f4;
+  --view-bg: #fbfbfb;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --surface-3: #ececee;
+  --elevated: #ffffff;
+  --line: rgb(0 0 0 / 0.075);
+  --line-strong: rgb(0 0 0 / 0.11);
+  /* Floating layers (menus, popovers, dialogs) get a stronger hairline than resting cards. */
+  --line-float: rgb(0 0 0 / 0.13);
+  /* Edges (Linear's lit corner, their .edgeHighlightRing): a base hairline, plus --edge-hi stacked on it inside a 100px
+     radial at the top-left corner (solid for the first 16%, then fading). --edge-shadow is the outer ring.
+     --edge-grad / --edge-grad-float paint the same edge as background layers, for scroll containers. */
+  --edge-hi: rgb(0 0 0 / 0.1);
+  --edge-r: 100px;
+  --edge-plateau: 16%;
+  --edge-grad: radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%), linear-gradient(var(--line-strong), var(--line-strong));
+  --edge-grad-float: radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%), linear-gradient(var(--line-float), var(--line-float));
+  --edge-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  /* Shine (Linear's .shine): a 200px beam of brighter hairline on the view card's left edge, near the top. */
+  --shine: rgb(0 0 0 / 0.12);
+  --view-line: rgb(0 0 0 / 0.07);
+  --view-shadow: 0 0 0 1px rgb(0 0 0 / 0.015), 0 1px 3px rgb(0 0 0 / 0.04);
+  /* Thinking shimmer (see Shimmer.svelte): the label rests at --shimmer-base and a band of --shimmer-hi sweeps across it. */
+  --shimmer-base: var(--muted);
+  --shimmer-hi: var(--fg);
+  /* Fields (inputs, text areas) are lighter than views: a true hairline (0.5px on high-density screens, like Linear's
+     --border-hairline), ending in the faint --line rather than --line-strong, with a hairline-thin dark ring. */
+  --hairline: 1px;
+  --field-edge-end: var(--line);
+  --field-shadow: 0 0 0 0 transparent;
+  /* Shell atmosphere: a soft light in the top-left corner (Linear's sidebar glow) and a fine film grain over the app. */
+  --glow: color-mix(in srgb, #5e6ad2 7%, transparent);
+  --grain-opacity: 0.035;
+  --grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Lit relief (Surface Lab: texture 0.3, reflection 0.2, light 137°), painted under the frame. A lit fractal-noise bump map
+     that overlay-blends into --bg, so flat areas stay neutral and only the relief reads; works on light and dark alike.
+     The original's layer opacities are baked in: 0.24 into the SVG's alpha row, 0.2 into the shading gradient's stops. */
+  --relief-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='0' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='2.2' diffuseConstant='1' lighting-color='%23fff'%3E%3CfeDistantLight azimuth='227' elevation='52'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix values='1 0 0 0 -.29 0 1 0 0 -.29 0 0 1 0 -.29 0 0 0 0 .24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") 0 0 / 240px 240px;
+  --relief-shade: linear-gradient(137deg, rgb(255 255 255 / 0.048) 0%, rgb(255 255 255 / 0) 38%, rgb(0 0 0 / 0) 70%, rgb(0 0 0 / 0.028) 100%);
+  --fill-1: rgb(0 0 0 / 0.02);
+  --fill-2: rgb(0 0 0 / 0.035);
+  --fill-3: rgb(0 0 0 / 0.055);
+  --fill-4: rgb(0 0 0 / 0.08);
+  --fg: #282a30;
+  --fg-2: #3c4149;
+  --muted: #6f6e77;
+  --faint: #8f8d96;
+  --accent: #5e6ad2;
+  --brand: #5e6ad2;
+  --accent-ink: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 36%, transparent);
+
+  /* Semantic tones (separate from the accent): Linear's green / blue / yellow / grey / red. Each has a translucent -soft
+     fill for chips and tinted rows. Set data-tone="success|info|warning|neutral|danger" on an element to get --tone / --tone-soft. */
+  --success: #1f8b4c; --info: #1b6fc2; --warning: #9a6700; --neutral: #6f6e77; --danger: #c93b3b;
+  --success-soft: color-mix(in srgb, var(--success) 11%, transparent);
+  --info-soft: color-mix(in srgb, var(--info) 10%, transparent);
+  --warning-soft: color-mix(in srgb, var(--warning) 11%, transparent);
+  --neutral-soft: color-mix(in srgb, var(--neutral) 10%, transparent);
+  --danger-soft: color-mix(in srgb, var(--danger) 10%, transparent);
+
+  /* Elevation: Linear keeps resting surfaces flat; only floating layers (menus, popovers, dialogs) cast a shadow. */
+  --shadow-sm: 0 1px 1px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 1px 4px -1px rgb(0 0 0 / 0.09);
+  /* Raised small buttons (Linear's Preview / send buttons): a soft drop plus a tight contact shadow. */
+  --shadow-btn: 0 4px 4px -1px rgb(0 0 0 / 0.04), 0 1px 1px rgb(0 0 0 / 0.08);
+  --shadow: 0 0 0 1px rgb(0 0 0 / 0.02), 0 2px 32px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.05);
+  --ring: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+  /* Translucent chrome over scrolling content. */
+  --glass: color-mix(in srgb, var(--bg) 82%, transparent);
+
+  /* Type: Inter for UI, headings and text; JetBrains Mono for scores, counts, dates and code. Both bundled (see ../fonts.js). */
+  --font-display: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-mono: var(--font-data);
+  --w-normal: 400; --w-medium: 510; --w-semibold: 590;
+
+  /* Spacing: 4px base, dense dashboard scale. */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+
+  /* Motion: Linear's quick ease-out-quad, ~160ms. */
+  --dur-fast: 120ms; --dur: 160ms; --dur-slow: 240ms;
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+
+  /* Layers, lowest to highest. */
+  --z-sticky: 10; --z-header: 20; --z-drawer: 40; --z-toast: 50; --z-menu: 60; --z-overlay: 70;
+
+  /* Icons (one family: Phosphor regular). */
+  --icon-sm: 14px; --icon-md: 16px; --icon-lg: 20px;
+
+  --scrim: rgb(0 0 0 / 0.25);
+  --scrollbar-thumb: rgb(0 0 0 / 0.1);
+  --scrollbar-thumb-hover: rgb(0 0 0 / 0.2);
+
+  /* Radii: sm for small chips and keys, r for rows, menu items and fields, lg for cards and popovers, xl for the panel and dialogs. */
+  --r-sm: 6px; --r: 8px; --r-lg: 10px; --r-xl: 12px; --r-pill: 9999px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101112; --view-bg: #121314; --surface: #171819; --surface-2: #1b1c1d; --surface-3: #222325; --elevated: #1b1c1e;
+    --line: rgb(255 255 255 / 0.06); --line-strong: rgb(255 255 255 / 0.08); --line-float: rgb(255 255 255 / 0.12);
+    --edge-hi: rgb(255 255 255 / 0.12); --edge-shadow: 0 0 0 1px rgb(0 0 0 / 0.2); --field-shadow: 0 0 0 var(--hairline) rgb(0 0 0 / 0.2); --glow: rgb(255 255 255 / 0.04); --grain-opacity: 0.05;
+    --shine: rgb(255 255 255 / 0.12); --view-line: rgb(255 255 255 / 0.05); --view-shadow: 0 0 0 2px rgb(0 0 0 / 0.2);
+    --fill-1: rgb(255 255 255 / 0.02); --fill-2: rgb(255 255 255 / 0.035); --fill-3: rgb(255 255 255 / 0.05); --fill-4: rgb(255 255 255 / 0.08);
+    --fg: #f7f8f8; --fg-2: #d0d6e0; --muted: #8a8f98; --faint: #62666d;
+    --accent: #7170ff; --brand: #5e6ad2; --accent-ink: #ffffff;
+    --accent-soft: color-mix(in srgb, var(--brand) 18%, transparent); --accent-line: color-mix(in srgb, var(--accent) 45%, transparent);
+    --success: #4cb782; --info: #4ea7fc; --warning: #f2c94c; --neutral: #8a8f98; --danger: #eb5757;
+    --success-soft: color-mix(in srgb, var(--success) 14%, transparent); --info-soft: color-mix(in srgb, var(--info) 14%, transparent);
+    --warning-soft: color-mix(in srgb, var(--warning) 13%, transparent); --neutral-soft: color-mix(in srgb, var(--neutral) 13%, transparent);
+    --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+    --shadow-sm: 0 0 0 1px rgb(0 0 0 / 0.2);
+    --shadow-md: 0 0 0 1px rgb(0 0 0 / 0.2), 0 2px 4px rgb(0 0 0 / 0.1);
+    --shadow-btn: 0 4px 4px -1px rgb(0 0 0 / 0.06), 0 1px 1px rgb(0 0 0 / 0.12);
+    --shadow: 0 0 0 1px rgb(0 0 0 / 0.2), 0 2px 32px rgb(0 0 0 / 0.25), 0 8px 16px rgb(0 0 0 / 0.2);
+    --ring: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
+    --glass: color-mix(in srgb, var(--bg) 80%, transparent);
+    --scrim: rgb(0 0 0 / 0.55); --scrollbar-thumb: rgb(255 255 255 / 0.1); --scrollbar-thumb-hover: rgb(255 255 255 / 0.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101112; --view-bg: #121314; --surface: #171819; --surface-2: #1b1c1d; --surface-3: #222325; --elevated: #1b1c1e;
+  --line: rgb(255 255 255 / 0.06); --line-strong: rgb(255 255 255 / 0.08); --line-float: rgb(255 255 255 / 0.12);
+  --edge-hi: rgb(255 255 255 / 0.12); --edge-shadow: 0 0 0 1px rgb(0 0 0 / 0.2); --field-shadow: 0 0 0 var(--hairline) rgb(0 0 0 / 0.2); --glow: rgb(255 255 255 / 0.04); --grain-opacity: 0.05;
+  --shine: rgb(255 255 255 / 0.12); --view-line: rgb(255 255 255 / 0.05); --view-shadow: 0 0 0 2px rgb(0 0 0 / 0.2);
+  --fill-1: rgb(255 255 255 / 0.02); --fill-2: rgb(255 255 255 / 0.035); --fill-3: rgb(255 255 255 / 0.05); --fill-4: rgb(255 255 255 / 0.08);
+  --fg: #f7f8f8; --fg-2: #d0d6e0; --muted: #8a8f98; --faint: #62666d;
+  --accent: #7170ff; --brand: #5e6ad2; --accent-ink: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--brand) 18%, transparent); --accent-line: color-mix(in srgb, var(--accent) 45%, transparent);
+  --success: #4cb782; --info: #4ea7fc; --warning: #f2c94c; --neutral: #8a8f98; --danger: #eb5757;
+  --success-soft: color-mix(in srgb, var(--success) 14%, transparent); --info-soft: color-mix(in srgb, var(--info) 14%, transparent);
+  --warning-soft: color-mix(in srgb, var(--warning) 13%, transparent); --neutral-soft: color-mix(in srgb, var(--neutral) 13%, transparent);
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+  --shadow-sm: 0 0 0 1px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 0 0 1px rgb(0 0 0 / 0.2), 0 2px 4px rgb(0 0 0 / 0.1);
+  --shadow-btn: 0 4px 4px -1px rgb(0 0 0 / 0.06), 0 1px 1px rgb(0 0 0 / 0.12);
+  --shadow: 0 0 0 1px rgb(0 0 0 / 0.2), 0 2px 32px rgb(0 0 0 / 0.25), 0 8px 16px rgb(0 0 0 / 0.2);
+  --ring: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
+  --glass: color-mix(in srgb, var(--bg) 80%, transparent);
+  --scrim: rgb(0 0 0 / 0.55); --scrollbar-thumb: rgb(255 255 255 / 0.1); --scrollbar-thumb-hover: rgb(255 255 255 / 0.2);
+  color-scheme: dark;
+}
+
+/* True hairlines on high-density screens. */
+@media (min-resolution: 2dppx) { :root { --hairline: 0.5px; } }
