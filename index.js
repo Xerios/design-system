@@ -28,6 +28,7 @@ export { default as Segmented } from './components/inputs/Segmented.svelte';
 export { default as Select } from './components/inputs/Select.svelte';
 export { default as Slider } from './components/inputs/Slider.svelte';
 export { default as Switch } from './components/inputs/Switch.svelte';
+export { default as TagInput } from './components/inputs/TagInput.svelte';
 export { default as TextArea } from './components/inputs/TextArea.svelte';
 export { default as TextField } from './components/inputs/TextField.svelte';
 

@@ -148,6 +148,7 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, `info`, native constraints (`required`, `pattern`…); `focus()` |
 | `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info` |
 | `inputs/Segmented`, `ButtonGroup`, `RadioGroup` | One choice of a few: separate pills; one joined pill; a track with the choice raised on it | `value`, `options`, `label`, `onchange`, `iconOnly`; RadioGroup: `fill`, `pill` |
+| `inputs/TagInput` | A list of short values (names, labels) typed into one field | `value` (bindable array), `id`, `label`, `hideLabel`, `placeholder`, `info`, `error`, `separator`, `normalize`, `validate` |
 | `inputs/Switch` | On/off | `checked` (bindable), `id`, `label`, `hint`; other props and attachments go to the button |
 | `inputs/Slider` | Number in a range | `value` (bindable), `min`, `max`, `step`, `id`, `label`, `format` |
 | `inputs/FileButton` | File picker | `label`, `accept`, `multiple`, `onfiles` |
