@@ -3,7 +3,7 @@
    * Multi-line text field matching TextField (Linear's composer): faint fill, lit-corner hairline, 8px corners,
    * indigo edge and ring while focused. Grows with its content up to 40% of the window, then scrolls; resizable.
    * Other props (placeholder, events, autofocus, data-*) go to the <textarea>. Call focus() to jump into it.
-   * error: a message from the app; the field turns red and shows it underneath. Native constraints (`required`,
+   * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints (`required`,
    * `minlength`…) report the browser's own message the same way. See lib/validity.js.
    */
   import ErrorMessage from '../ErrorMessage.svelte';
@@ -30,11 +30,11 @@
       aria-describedby={problem ? `${id}-error` : undefined}
       {@attach validity(() => error, (message) => (native = message))}></textarea>
   </div>
-  <ErrorMessage id="{id}-error" message={problem} />
+  <ErrorMessage floating id="{id}-error" message={problem} ondismiss={() => area?.focus()} />
 </div>
 
 <style>
-  .field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .field { position: relative; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .box { border-radius: var(--r); background: var(--fill-2); --edge-w: var(--hairline); --edge-b: var(--field-edge-end); box-shadow: var(--field-shadow); transition: background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
   .box:hover { background: var(--fill-3); }
   .box:focus-within { --edge-a: var(--accent); --edge-b: var(--accent-line); box-shadow: 0 0 0 var(--hairline) var(--accent-line), 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }

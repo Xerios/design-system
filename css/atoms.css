@@ -28,6 +28,13 @@
 .icon-btn:hover { background: var(--fill-3); color: var(--fg-2); }
 .icon-btn:active, .icon-btn[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
 .icon-btn[aria-pressed="true"] { color: var(--warning); }
+/* The tooltip drawn by the `tooltip` attachment (lib/tooltip.js): a popover in the top layer, placed from script. */
+.tooltip {
+  position: fixed; inset: auto; margin: 0; width: max-content; max-width: 280px; pointer-events: none;
+  display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line-float); border-radius: var(--r); background: var(--elevated); box-shadow: var(--shadow);
+  color: var(--fg-2); font: 400 12px/1.5 var(--font-body); white-space: normal; text-align: left;
+}
 
 /* ---------- data tables ---------- */
 /* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical

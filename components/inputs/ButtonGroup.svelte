@@ -1,5 +1,6 @@
 <script>
   import Icon from '../Icon.svelte';
+  import { tooltip } from '../../lib/tooltip.js';
   import Tooltip from '../Tooltip.svelte';
   /**
    * Single choice shown as a joined switch: one track, the chosen segment raised on it (radio group with roving
@@ -29,7 +30,7 @@
       aria-checked={o.value === value}
       tabindex={o.value === value ? 0 : -1}
       onclick={() => onchange(o.value)}
-      title={iconOnly ? o.label + (o.hint ? ` (${o.hint})` : '') : o.hint}
+      {@attach tooltip(iconOnly ? o.label + (o.hint ? ` (${o.hint})` : '') : o.hint)}
       aria-label={iconOnly ? o.label : undefined}
       aria-description={o.info}
       onkeydown={(e) => onkeydown(e, i)}>{#if o.icon}<Icon name={o.icon} size="sm" />{/if}{#if !iconOnly}<span class="text">{o.label}</span>{/if}{#if o.info}<Tooltip focusable={false}>{#snippet tip()}{o.info}{/snippet}<span class="info"><Icon name="infoCircle" size="sm" /></span></Tooltip>{/if}</button>

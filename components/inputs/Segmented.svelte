@@ -1,5 +1,6 @@
 <script>
   import Icon from '../Icon.svelte';
+  import { tooltip } from '../../lib/tooltip.js';
   /** Single choice shown as a row of pills (radio group with roving focus). An option with `done` gets a green icon; `hint` becomes its tooltip. */
   let { value, options, label, onchange, iconOnly = false } = $props();
   const buttons = [];
@@ -25,7 +26,7 @@
       data-done={o.done || undefined}
       tabindex={o.value === value ? 0 : -1}
       onclick={() => onchange(o.value)}
-      title={iconOnly ? o.label + (o.hint ? ` (${o.hint})` : '') : o.hint}
+      {@attach tooltip(iconOnly ? o.label + (o.hint ? ` (${o.hint})` : '') : o.hint)}
       aria-label={iconOnly ? o.label : undefined}
       onkeydown={(e) => onkeydown(e, i)}>{#if o.icon}<Icon name={o.icon} />{/if}{#if !iconOnly}<span>{o.label}</span>{/if}</button>
   {/each}

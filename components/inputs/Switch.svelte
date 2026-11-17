@@ -1,9 +1,9 @@
 <script>
-  /** On/off switch. */
-  let { checked = $bindable(false), id, label, hint = null } = $props();
+  /** On/off switch. Other props and attachments go to the button, e.g. {@attach tooltip('…')} when a short label needs explaining. */
+  let { checked = $bindable(false), id, label, hint = null, ...rest } = $props();
 </script>
 
-<button {id} type="button" class="switch" role="switch" aria-checked={checked} onclick={() => (checked = !checked)}>
+<button {id} type="button" class="switch" role="switch" aria-checked={checked} {...rest} onclick={() => (checked = !checked)}>
   <span class="knob" aria-hidden="true"></span>
   <span class="text">{label}{#if hint != null}<span class="hint">{hint}</span>{/if}</span>
 </button>

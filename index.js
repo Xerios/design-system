@@ -38,5 +38,6 @@ export { portal, portalNear, backdropClose } from './lib/dom.js';
 export { motion } from './lib/motion.js';
 export { scrollFade } from './lib/scroll-fade.js';
 export { validity } from './lib/validity.js';
+export { tooltip } from './lib/tooltip.js';
 export { fieldErrors } from './lib/field-errors.svelte.js';
 export { inlineMd } from './lib/inline-md.js';

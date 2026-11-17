@@ -1,10 +1,11 @@
 <script>
   import ErrorMessage from '../ErrorMessage.svelte';
   import Icon from '../Icon.svelte';
+  import { tooltip } from '../../lib/tooltip.js';
   import { validity } from '../../lib/validity.js';
   /**
    * Text input with optional search icon, clear button and shortcut hint. `compact`: 28px, for toolbars (see SearchField).
-   * error: a message from the app; the field turns red and shows it underneath. Native constraints work the same way:
+   * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints work the same way:
    * pass `required`, `pattern`, `minlength`… (any other attribute goes to the <input>) and the browser's own message
    * shows there once the field is left or its form is validated. See lib/validity.js, and lib/field-errors.svelte.js
    * for a form's worth of them.
@@ -48,16 +49,16 @@
       {onkeydown}
       {@attach validity(() => error, (message) => (native = message))} />
     {#if value}
-      <button type="button" class="clear" aria-label="Clear {label}" onclick={() => { value = ''; input.focus(); }}><Icon name="x" size="sm" /></button>
+      <button type="button" class="clear" aria-label="Clear {label}" {@attach tooltip('Clear')} onclick={() => { value = ''; input.focus(); }}><Icon name="x" size="sm" /></button>
     {:else if shortcut}
       <kbd aria-hidden="true">{shortcut}</kbd>
     {/if}
   </div>
-  <ErrorMessage id="{id}-error" message={problem} />
+  <ErrorMessage floating id="{id}-error" message={problem} ondismiss={() => input?.focus()} />
 </div>
 
 <style>
-  .field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .field { position: relative; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .box {
     display: flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 6px 0 10px;
     background: var(--fill-2); border: 0; border-radius: var(--r);

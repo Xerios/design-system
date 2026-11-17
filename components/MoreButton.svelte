@@ -2,6 +2,7 @@
   /** Visible "More actions" button: the same menu as right-click, for mouse, touch and keyboard users. */
   import Icon from './Icon.svelte';
   import { menu, openMenuFrom, closeMenu } from '../lib/menu.svelte.js';
+  import { tooltip } from '../lib/tooltip.js';
 
   let { items, label } = $props();
   let button = $state();
@@ -21,6 +22,7 @@
   aria-label="More actions for {label}"
   aria-haspopup="menu"
   aria-expanded={expanded}
+  {@attach tooltip('More actions')}
   onclick={toggle}>
   <Icon name="more" size="lg" />
 </button>

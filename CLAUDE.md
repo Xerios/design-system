@@ -23,6 +23,10 @@ Read it before building UI, and read a component's header comment before using i
   take `motion(ms)` so reduced motion is honoured.
 - Every control has a label (visible, or `hideLabel` / `aria-label`), works from the keyboard, and has a
   pointer target of at least 24×24px. Anything on a context menu also has a visible `MoreButton`.
+- Strict rule: every button whose meaning is not spelled out in visible text has a tooltip, with no
+  exceptions. That covers icon-only buttons and links (`.icon-btn`, close and clear buttons) and terse
+  toggles (a switch labelled "Live"). Use `{@attach tooltip('…')}` from `lib/tooltip.js`, alongside the
+  `aria-label`. A native `title` is not a tooltip; do not use it for this.
 - App-specific colours and atoms go in the app's own CSS, defined from these tokens (as the viewer does
   for verdicts and statuses in `src/global.css`). Do not add them here.
 

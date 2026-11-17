@@ -6,11 +6,12 @@
    * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
-   * error: a message from the app; the button turns red (`data-invalid`) and shows it underneath.
+   * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
    */
   import { tick } from 'svelte';
   import ErrorMessage from '../ErrorMessage.svelte';
   import Shimmer from '../Shimmer.svelte';
+  import { tooltip } from '../../lib/tooltip.js';
   import { portal } from '../../lib/dom.js'; // the list lives on <body> so a scrolling parent can't clip it
 
   let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '' } = $props();
@@ -172,7 +173,7 @@
                 <span id="{id}-group-{si}">{sec.group}</span>
                 {#if action}
                   <!-- Pointer only (keeps focus on the listbox, which owns the keyboard). -->
-                  <button type="button" class="group-action" tabindex="-1" title={action.label} aria-label={action.label} onmousedown={(e) => e.preventDefault()} onclick={() => runGroupAction(action)}><Icon name={action.icon} size="sm" /></button>
+                  <button type="button" class="group-action" tabindex="-1" aria-label={action.label} {@attach tooltip(action.label)} onmousedown={(e) => e.preventDefault()} onclick={() => runGroupAction(action)}><Icon name={action.icon} size="sm" /></button>
                 {/if}
               </div>
               <ul role="none">
@@ -186,11 +187,11 @@
       </ul>
     {/if}
   </div>
-  <ErrorMessage id="{id}-error" message={error} />
+  <ErrorMessage floating id="{id}-error" message={error} ondismiss={() => button?.focus()} />
 </div>
 
 <style>
-  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field { position: relative; display: flex; flex-direction: column; gap: 3px; }
   .wrap { position: relative; }
   .trigger {
     display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 120px; max-width: 100%; min-height: 32px; text-align: left;
