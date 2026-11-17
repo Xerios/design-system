@@ -48,12 +48,12 @@ For editors, `jsconfig.json` maps `$ds/*` to `design-system/*`.
 css/index.css        imports the four files below, in order
 css/tokens.css       every token, light and dark
 css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
-css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, dialog motion
+css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, spotlight, dialog motion
 css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .field-label, .new-dot
 components/          generic components (table below)
 components/inputs/   form controls
 components/menu/     the context menu layer
-lib/                 dom.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, inline-md.js
+lib/                 dom.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, inline-md.js, spotlight.js
 fonts.js             bundles the two typefaces
 index.js             named exports of everything
 ```
@@ -212,6 +212,7 @@ export function hold(on) { clearTimeout(timer); if (!on && app.toast) timer = se
 | `validity(error, report)` | Attachment: ties an `<input>` or `<textarea>` to the browser's constraint validation (what the `error` prop of the text fields uses) |
 | `contextMenu`, `menu`, `openMenu`, `openMenuFrom`, `closeMenu` | Context menu state and attachment |
 | `inlineMd(text)` | Parses inline markdown into parts (what `Md` renders) |
+| `spotlight(id, { timeout? })` | Waits for the element with that id (or the collapsed toggle whose `aria-controls` names it) to appear, reveals it (clicks the toggle, opens a closed `<details>` around it), scrolls to it and flashes it briefly. Call it right after opening what holds it. Resolves to the element or null |
 
 ## Fonts
 

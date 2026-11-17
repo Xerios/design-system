@@ -1,4 +1,4 @@
-/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, shell atmosphere, the working shimmer and dialog motion. */
+/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, shell atmosphere, the working shimmer, the spotlight and dialog motion. */
 
 /* ---------- scroll fade ---------- */
 /* Set by the scrollFade attachment (../lib/scroll-fade.js) on scroll areas that overflow: the top edge fades while there's
@@ -116,6 +116,16 @@
 @keyframes shimmer-sweep { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 @keyframes shimmer-ring { to { background-position: 120px 50%; } }
 @media (prefers-reduced-motion: reduce) { .shimmer-text { background: none; -webkit-text-fill-color: currentColor; } }
+
+/* ---------- spotlight ---------- */
+/* Set for a moment by spotlight() (../lib/spotlight.js) on the element someone was sent to: an accent tint and inset
+   hairline fade in, hold, then ease back to the element's own background and shadow (the keyframes leave 0% and 100%
+   out, so it starts and ends on whatever the element already has). Reduced motion shows the tint still for the same time. */
+[data-spotlight] { animation: spotlight 1.8s var(--ease-out); }
+@keyframes spotlight {
+  12%, 50% { background-color: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); }
+}
+@media (prefers-reduced-motion: reduce) { [data-spotlight] { background-color: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); } }
 
 /* ---------- modals ---------- */
 /* Every <dialog> opened with showModal(): it rises and scales in while the backdrop fades; closing plays it in reverse

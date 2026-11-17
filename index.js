@@ -43,3 +43,4 @@ export { validity } from './lib/validity.js';
 export { tooltip } from './lib/tooltip.js';
 export { fieldErrors } from './lib/field-errors.svelte.js';
 export { inlineMd } from './lib/inline-md.js';
+export { spotlight } from './lib/spotlight.js';
