@@ -4,6 +4,7 @@
    * x/y: preferred top-left corner. flipX: right edge to align to when there is no room on the right.
    */
   import { tick } from 'svelte';
+  // oxlint-disable-next-line import/no-self-import -- a recursive component: importing itself is how Svelte 5 renders its own submenu
   import MenuList from './MenuList.svelte';
   import Icon from '../Icon.svelte';
 

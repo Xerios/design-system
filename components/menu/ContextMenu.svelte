@@ -3,10 +3,11 @@
   import MenuList from './MenuList.svelte';
   import { menu, closeMenu, anchorMoved } from '../../lib/menu.svelte.js';
 
+  const away = () => closeMenu({ restoreFocus: false });
+
   // Close on anything that would leave the menu floating in the wrong place.
   $effect(() => {
     if (!menu.open) return;
-    const away = () => closeMenu({ restoreFocus: false });
     // A click on the button that opened the menu is left to that button (it toggles).
     const outside = (e) => !e.target.closest?.('.ctx-menu') && !menu.trigger?.contains(e.target) && away();
     // Scrolling only closes the menu once it would point at the wrong thing.

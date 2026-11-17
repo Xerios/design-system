@@ -6,6 +6,7 @@
 
 export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte';
 export { default as Empty } from './components/Empty.svelte';
+export { default as Notice } from './components/Notice.svelte';
 export { default as Shimmer } from './components/Shimmer.svelte';
 export { default as WorkingBorder } from './components/WorkingBorder.svelte';
 export { default as Collapsible } from './components/Collapsible.svelte';

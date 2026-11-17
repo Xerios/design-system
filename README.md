@@ -130,6 +130,7 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 |---|---|---|
 | `Icon` | Any icon (Phosphor regular) | `name`, `size` sm/md/lg, `label` (only if it carries meaning) |
 | `Empty` | Empty state | `title`, `body`, children for actions |
+| `Notice` | Inline notice about a standing condition | `tone`, `icon`, children for the text |
 | `Shimmer` | "Working…" text | `text` or children, `active`, `as` |
 | `WorkingBorder` | Comets circling a card that's busy | none; set `--radius` |
 | `Collapsible` | Section in a panel | `title`, `open` (bindable), `ontoggle`, `count`, `meta` |
