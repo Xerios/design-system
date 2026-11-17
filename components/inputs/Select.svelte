@@ -7,6 +7,7 @@
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
    * ghost: a flat button with no raised edges (for toolbars and dense rows); the default is raised.
+   * disabled: shows the value but doesn't open, flat with no fill or caret (e.g. when there is only one choice).
    * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    */
@@ -17,7 +18,7 @@
   import { tooltip } from '../../lib/tooltip.js';
   import { topLayer } from '../../lib/dom.js'; // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
 
-  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '', info = '', ghost = false } = $props();
+  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '', info = '', ghost = false, disabled = false } = $props();
   let open = $state(false);
   let active = $state(0);
   let button = $state(), list = $state();
@@ -45,7 +46,7 @@
   }
 
   async function show() {
-    if (loading || !options.length) return;
+    if (disabled || loading || !options.length) return;
     active = Math.max(0, options.indexOf(current));
     open = true;
     await tick();
@@ -150,6 +151,7 @@
       class="trigger"
       class:shimmer={loading}
       class:ghost
+      {disabled}
       aria-haspopup="listbox"
       aria-expanded={open}
       aria-busy={loading || undefined}
@@ -164,7 +166,7 @@
       {:else}
         <span class="value" title={current?.label}>{current?.label ?? ''}</span>
       {/if}
-      <span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>
+      {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
     </button>
     {#if open}
       <ul
@@ -214,7 +216,7 @@
     box-shadow: var(--raise);
     transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
   }
-  .trigger:hover:not([aria-busy]) { background: var(--fill-3); color: var(--fg); }
+  .trigger:hover:not([aria-busy], :disabled) { background: var(--fill-3); color: var(--fg); }
   /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text). */
   .trigger[aria-busy] { cursor: progress; border-color: var(--line); }
   .trigger[aria-busy] .caret { opacity: 0.5; }
@@ -223,6 +225,8 @@
   .trigger.ghost { --raise: 0 0 transparent; }
   /* …and no fill at rest; hover and open fill it as usual. */
   .trigger.ghost:not(:hover, [aria-expanded="true"]) { background: none; }
+  /* Disabled: ghost-flat, no fill, a quieter edge; the value stays readable. */
+  .trigger:disabled { --raise: 0 0 transparent; background: none; border-color: var(--line); cursor: default; }
   .trigger:focus-visible { border-color: var(--accent-line); box-shadow: var(--raise), var(--ring); outline: none; }
   .trigger[data-invalid] { border-color: var(--danger); }
   .trigger[data-invalid]:focus-visible { box-shadow: var(--raise), 0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent); }

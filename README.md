@@ -106,7 +106,7 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `.icon-btn` | 28px ghost circle for an icon; `aria-pressed` and `aria-expanded` are styled |
 | `.linklike` | A button that reads as a link |
 | `kbd` | Key cap |
-| `.data-table` | Wrap a `<table>`: hairline card, 40px rows; `.num` for number columns |
+| `.data-table` | Wrap a `<table>`: hairline card, 40px rows; `.num` for number columns. For sorting, groups or row menus use the `Table` component |
 | `.label-chip`, `.label-dot` | Hairline label pill led by a coloured dot (`--dot`) or icon; `.icon-only`, `.num` variants |
 | `.count` | Small number pill |
 | `.field-box` | The box a text field draws: sunken (faint fill, inset hairline, shadow inside the top and left edges), focus and invalid states |
@@ -146,9 +146,10 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `InfoTip` | ⓘ button with label/text lines: the place for descriptions and help text | `lines`, `label`, `pinnable` |
 | `Md` | Inline markdown, no `{@html}` | `text` |
 | `MoreButton` | Visible ⋯ twin of a context menu | `items` (function), `label` |
+| `Table` | Data table in a lit card: sortable columns, collapsible row groups, sticky header, row menu | `columns`, `rows` or `groups`, `key`, `cell` snippet, `sort` and `collapsed` (bindable), `selected`, `onselect`, `rowMenu`, `rowLabel`, `label`, `emptyGroup` |
 | `Toast` | The one toast (app owns the state) | `toast`, `onhold`, `ondismiss` |
 | `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, `info`, native constraints (`required`, `pattern`…); `focus()` |
-| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info`, `ghost` (flat, not raised) |
+| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info`, `ghost` (flat, not raised), `disabled` |
 | `inputs/Segmented`, `ButtonGroup`, `RadioGroup` | One choice of a few: separate pills; one joined pill; a track with the choice raised on it | `value`, `options`, `label`, `onchange`, `iconOnly`; RadioGroup: `fill`, `pill` |
 | `inputs/TagInput` | A list of short values (names, labels) typed into one field | `value` (bindable array), `id`, `label`, `hideLabel`, `placeholder`, `info`, `error`, `separator`, `normalize`, `validate` |
 | `inputs/Switch` | On/off | `checked` (bindable), `id`, `label`, `hint`; other props and attachments go to the button |

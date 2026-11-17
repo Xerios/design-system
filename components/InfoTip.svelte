@@ -1,6 +1,6 @@
 <script>
   /**
-   * Small ⓘ button with a tooltip that opens on hover or keyboard focus (Esc closes it). With `pinnable`, clicking pins
+   * Small ⓘ button with a tooltip that opens on hover or keyboard focus (Esc only closes it, not a dialog around it). With `pinnable`, clicking pins
    * it open over a dimmed page so its text can be selected and copied; a press outside it, Esc, scrolling the page, or
    * clicking the ⓘ again closes it.
    * Lives in the top layer (fixed, below the button, flipping above when there's no room, with an arrow pointing at it), so modal dialogs, scrolling
@@ -56,7 +56,7 @@
     if (!pinned) return;
     const inside = (t) => btn?.contains(t) || t.closest?.(`#${uid}`);
     const down = (e) => !inside(e.target) && hide();
-    const key = (e) => e.key === 'Escape' && (e.stopPropagation(), hide());
+    const key = (e) => e.key === 'Escape' && (e.preventDefault(), e.stopPropagation(), hide());
     const scrolled = (e) => !inside(e.target) && hide();
     document.addEventListener('pointerdown', down, true);
     document.addEventListener('keydown', key, true);
@@ -82,7 +82,7 @@
   onfocus={show}
   onblur={softHide}
   onclick={(e) => { e.stopPropagation(); if (!pinnable) show(); else if (pinned) hide(); else { pinned = true; show(); } }}
-  onkeydown={(e) => e.key === 'Escape' && open && (e.stopPropagation(), hide())}>
+  onkeydown={(e) => e.key === 'Escape' && open && (e.preventDefault(), e.stopPropagation(), hide())}>
   <Icon name="infoCircle" size="sm" />
 </button>
 {#if pinned}

@@ -18,6 +18,7 @@ export { default as Tooltip } from './components/Tooltip.svelte';
 export { default as InfoTip } from './components/InfoTip.svelte';
 export { default as Md } from './components/Md.svelte';
 export { default as MoreButton } from './components/MoreButton.svelte';
+export { default as Table } from './components/Table.svelte';
 export { default as Toast } from './components/Toast.svelte';
 export { default as Dialogs } from './components/Dialogs.svelte';
 
