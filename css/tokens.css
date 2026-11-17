@@ -36,13 +36,16 @@
   /* Thinking shimmer (see Shimmer.svelte): the label rests at --shimmer-base and a band of --shimmer-hi sweeps across it. */
   --shimmer-base: var(--muted);
   --shimmer-hi: var(--fg);
-  /* Fields (inputs, text areas) are lighter than views: a true hairline (0.5px on high-density screens, like Linear's
-     --border-hairline), ending in the faint --line rather than --line-strong, with a hairline-thin dark ring. */
-  --hairline: 1px;
-  --field-edge-end: var(--line);
-  --field-shadow: 0 0 0 var(--hairline) light-dark(transparent, rgb(0 0 0 / 0.2));
+  /* Raised relief (the chosen segment of a RadioGroup): the top inner edge catches the light and the bottom inner edge
+     falls into shade, so the box reads as standing off the surface. Use both: inset 0 1px 0 …-edge, inset 0 -1px 0 …-base. */
+  --raised-edge: light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12));
+  --raised-base: light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.25));
+  /* Sunken relief for fields, lit from the top left: a soft shadow inside the top and left edges, so the box reads as
+     pressed into the surface. */
+  --sunken-shadow: inset 1px 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3));
   /* Atmosphere: a soft light in the top-left corner of the shell (Linear's sidebar glow), and a fine film grain for the
-     modal backdrops. The grain's strength (6%) is baked into its alpha, so it can be one background layer over a colour. */
+     modal backdrops. The grain's strength is baked into its alpha (the matrix's last value), so it can be one background
+     layer over a colour. */
   --glow: light-dark(color-mix(in srgb, #5e6ad2 7%, transparent), rgb(255 255 255 / 0.04));
   --grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 .13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* Lit relief (Surface Lab: texture 0.3, reflection 0.2, light 137°), painted under the frame. A lit fractal-noise bump map
@@ -97,6 +100,9 @@
   --dur-fast: 120ms; --dur: 160ms; --dur-slow: 240ms;
   --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  /* Carbon's expressive curves, for big moments such as a modal opening: entrance decelerates in, exit accelerates out. */
+  --ease-enter: cubic-bezier(0, 0, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0.14, 1, 1);
 
   /* Layers, lowest to highest. */
   --z-sticky: 10; --z-header: 20; --z-drawer: 40; --z-toast: 50; --z-menu: 60; --z-overlay: 70;
@@ -117,5 +123,3 @@
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
-/* True hairlines on high-density screens. */
-@media (min-resolution: 2dppx) { :root { --hairline: 0.5px; } }

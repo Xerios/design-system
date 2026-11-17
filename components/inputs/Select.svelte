@@ -6,6 +6,7 @@
    * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
+   * ghost: a flat button with no raised edges (for toolbars and dense rows); the default is raised.
    * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    */
@@ -16,7 +17,7 @@
   import { tooltip } from '../../lib/tooltip.js';
   import { topLayer } from '../../lib/dom.js'; // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
 
-  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '', info = '' } = $props();
+  let { value = $bindable(), options, id, label, hideLabel = false, groupActions = {}, loading = false, error = '', info = '', ghost = false } = $props();
   let open = $state(false);
   let active = $state(0);
   let button = $state(), list = $state();
@@ -101,7 +102,8 @@
 
   $effect(() => {
     if (!open) return;
-    const outside = (e) => !button.contains(e.target) && !list?.contains(e.target) && hide(false);
+    // The label counts as the button (its click toggles the list), so pressing it isn't an outside press.
+    const outside = (e) => !button.contains(e.target) && !list?.contains(e.target) && !e.target.closest?.(`label[for="${id}"]`) && hide(false);
     const follow = (e) => e.target !== list && place();
     document.addEventListener('pointerdown', outside, true);
     addEventListener('scroll', follow, true);
@@ -132,7 +134,9 @@
 {/snippet}
 
 <div class="field">
-  {#snippet fieldLabel()}<span class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</span>{/snippet}
+  <!-- A real label for the trigger button: clicking it activates the button, so it opens the list, as clicking a text
+       field's label puts you in the field. -->
+  {#snippet fieldLabel()}<label for={id} class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</label>{/snippet}
   {#if info}
     <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
   {:else}
@@ -145,6 +149,7 @@
       type="button"
       class="trigger"
       class:shimmer={loading}
+      class:ghost
       aria-haspopup="listbox"
       aria-expanded={open}
       aria-busy={loading || undefined}
@@ -202,17 +207,25 @@
   .wrap { position: relative; }
   .trigger {
     display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 120px; max-width: 100%; min-height: 32px; text-align: left;
-    padding: 0 8px 0 10px; font-size: 13px; font-weight: var(--w-medium); color: var(--fg-2); background: none; border: 1px solid var(--line-strong); border-radius: var(--r); cursor: pointer;
+    padding: 0 8px 0 10px; font-size: 13px; font-weight: var(--w-medium); color: var(--fg-2); background: var(--fill-2); border: 1px solid var(--line-strong); border-radius: var(--r); cursor: pointer;
+    /* Raised (--raised-*): a button you press to open, unlike the sunken text fields, on the same faint fill as theirs.
+       Open, it sits flat. */
+    --raise: inset 0 1px 0 var(--raised-edge), inset 0 -1px 0 var(--raised-base);
+    box-shadow: var(--raise);
     transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
   }
   .trigger:hover:not([aria-busy]) { background: var(--fill-3); color: var(--fg); }
   /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text). */
   .trigger[aria-busy] { cursor: progress; border-color: var(--line); }
   .trigger[aria-busy] .caret { opacity: 0.5; }
-  .trigger[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
-  .trigger:focus-visible { border-color: var(--accent-line); box-shadow: var(--ring); outline: none; }
+  .trigger[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); box-shadow: none; }
+  /* Ghost: no relief, open or closed (the focus ring still shows). */
+  .trigger.ghost { --raise: 0 0 transparent; }
+  /* …and no fill at rest; hover and open fill it as usual. */
+  .trigger.ghost:not(:hover, [aria-expanded="true"]) { background: none; }
+  .trigger:focus-visible { border-color: var(--accent-line); box-shadow: var(--raise), var(--ring); outline: none; }
   .trigger[data-invalid] { border-color: var(--danger); }
-  .trigger[data-invalid]:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent); }
+  .trigger[data-invalid]:focus-visible { box-shadow: var(--raise), 0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent); }
   /* Long values (model ids…) are cut with an ellipsis on one line; the full text is in the tooltip. */
   .trigger :global(.value), .label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .caret { flex: none; display: inline-flex; color: var(--muted); transition: transform var(--dur) var(--ease-out); }

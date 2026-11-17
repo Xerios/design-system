@@ -73,16 +73,16 @@ All in `css/tokens.css`. Components read tokens only, never raw colours or pixel
 |---|---|
 | Surfaces, back to front | `--bg` (app frame), `--view-bg` (inset view card), `--surface`, `--surface-2`, `--surface-3`, `--elevated` (floating layers) |
 | Text | `--fg` primary, `--fg-2` secondary, `--muted` tertiary, `--faint` quaternary |
-| Hairlines | `--line`, `--line-strong`, `--line-float` (menus, popovers, dialogs), `--hairline` (1px, 0.5px on dense screens) |
+| Hairlines | `--line`, `--line-strong`, `--line-float` (menus, popovers, dialogs) |
 | Fills (translucent, stack on any surface) | `--fill-1` resting, `--fill-2` hover, `--fill-3` pressed or raised, `--fill-4` active |
 | Accent | `--accent` (text, focus, ticks), `--brand` (solid fills), `--accent-ink`, `--accent-soft`, `--accent-line` |
 | Semantic tones | `--success`, `--info`, `--warning`, `--neutral`, `--danger`, each with a `-soft` fill |
 | Elevation | `--shadow-sm`, `--shadow-md`, `--shadow-btn`, `--shadow` (floating), `--ring` (focus), `--glass`, `--scrim` |
-| Edges and light | `--edge-hi`, `--edge-r`, `--edge-plateau`, `--edge-grad`, `--edge-grad-float`, `--edge-shadow`, `--shine`, `--glow`, `--grain`, `--relief-texture`, `--relief-shade` |
+| Edges and light | `--edge-hi`, `--edge-r`, `--edge-plateau`, `--edge-grad`, `--edge-grad-float`, `--edge-shadow`, `--shine`, `--glow`, `--grain`, `--raised-edge`, `--raised-base`, `--sunken-shadow`, `--relief-texture`, `--relief-shade` |
 | Type | `--font-body`, `--font-display`, `--font-data` (= `--font-mono`), weights `--w-normal` 400, `--w-medium` 510, `--w-semibold` 590. Body is 13px/1.5 |
 | Spacing (4px base) | `--space-1` 4 · `-2` 8 · `-3` 12 · `-4` 16 · `-5` 20 · `-6` 24 · `-8` 32 |
 | Radii | `--r-sm` 6 (chips, keys) · `--r` 8 (rows, fields) · `--r-lg` 10 (cards, popovers) · `--r-xl` 12 (panels, dialogs) · `--r-pill` |
-| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in` |
+| Motion | `--dur-fast` 120ms, `--dur` 160ms, `--dur-slow` 240ms, `--ease-out`, `--ease-in`, `--ease-enter` and `--ease-exit` (Carbon expressive entrance/exit, used by modals) |
 | Layers, low to high | `--z-sticky`, `--z-header`, `--z-drawer`, `--z-toast`, `--z-menu`, `--z-overlay` |
 | Icons | `--icon-sm` 14, `--icon-md` 16, `--icon-lg` 20 |
 | Layout | `--gutter-l`, `--gutter-r` (16px or the safe-area inset) |
@@ -109,6 +109,7 @@ of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll a
 | `.data-table` | Wrap a `<table>`: hairline card, 40px rows; `.num` for number columns |
 | `.label-chip`, `.label-dot` | Hairline label pill led by a coloured dot (`--dot`) or icon; `.icon-only`, `.num` variants |
 | `.count` | Small number pill |
+| `.field-box` | The box a text field draws: sunken (faint fill, inset hairline, shadow inside the top and left edges), focus and invalid states |
 | `.eyebrow`, `.field-label`, `.field-head` | Section label; label above a form control; a label row with an `InfoTip` after it |
 | `.new-dot` | Accent dot for unread or new |
 | `[data-tone="success\|info\|warning\|neutral\|danger"]` | Sets `--tone` and `--tone-soft` on the element |
@@ -147,7 +148,7 @@ Each file starts with a comment giving its props and behaviour; that comment is 
 | `MoreButton` | Visible ⋯ twin of a context menu | `items` (function), `label` |
 | `Toast` | The one toast (app owns the state) | `toast`, `onhold`, `ondismiss` |
 | `inputs/TextField`, `SearchField`, `TextArea` | Text entry | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, `info`, native constraints (`required`, `pattern`…); `focus()` |
-| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info` |
+| `inputs/Select` | Dropdown | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info`, `ghost` (flat, not raised) |
 | `inputs/Segmented`, `ButtonGroup`, `RadioGroup` | One choice of a few: separate pills; one joined pill; a track with the choice raised on it | `value`, `options`, `label`, `onchange`, `iconOnly`; RadioGroup: `fill`, `pill` |
 | `inputs/TagInput` | A list of short values (names, labels) typed into one field | `value` (bindable array), `id`, `label`, `hideLabel`, `placeholder`, `info`, `error`, `separator`, `normalize`, `validate` |
 | `inputs/Switch` | On/off | `checked` (bindable), `id`, `label`, `hint`; other props and attachments go to the button |

@@ -152,7 +152,7 @@
     {@render fieldLabel()}
   {/if}
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-  <div bind:this={box} class="box edge" {onfocusout} onkeydown={onTagKeydown} onclick={(e) => e.target === e.currentTarget && input.focus()}>
+  <div bind:this={box} class="box field-box" {onfocusout} onkeydown={onTagKeydown} onclick={(e) => e.target === e.currentTarget && input.focus()}>
     <ul aria-labelledby="{id}-label">
       {#each value as tag, i (tag)}
         <li
@@ -205,34 +205,6 @@
     min-height: 32px;
     padding: 3px 6px 3px 4px;
     cursor: text;
-    background: var(--fill-2);
-    border: 0;
-    border-radius: var(--r);
-    --edge-w: var(--hairline);
-    --edge-b: var(--field-edge-end);
-    box-shadow: var(--field-shadow);
-    transition:
-      box-shadow var(--dur-fast) var(--ease-out),
-      background-color var(--dur-fast) var(--ease-out);
-  }
-  .box:hover {
-    background: var(--fill-3);
-  }
-  .box:focus-within {
-    --edge-a: var(--accent);
-    --edge-b: var(--accent-line);
-    box-shadow:
-      0 0 0 var(--hairline) var(--accent-line),
-      0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
-  }
-  .box:has([aria-invalid='true']) {
-    --edge-a: var(--danger);
-    --edge-b: var(--danger);
-  }
-  .box:has([aria-invalid='true']):focus-within {
-    box-shadow:
-      0 0 0 var(--hairline) var(--danger),
-      0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent);
   }
   /* The list's items flow in the box's own rows, beside the input. */
   ul {

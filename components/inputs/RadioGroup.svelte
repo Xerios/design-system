@@ -59,7 +59,8 @@
 <style>
   .group {
     display: inline-grid; grid-auto-flow: column; grid-auto-columns: auto; gap: 2px; max-width: 100%; padding: 2px;
-    border-radius: var(--r); background: var(--fill-2); box-shadow: inset 0 0 0 1px var(--line);
+    /* Sunken like a field (--sunken-*), so the raised thumb reads as sitting in a track. */
+    border-radius: var(--r); background: var(--fill-2); box-shadow: inset 0 0 0 1px var(--line), var(--sunken-shadow);
     /* The thumb sits at z-index -1 in here: under every segment's content, even while it slides across them. */
     isolation: isolate;
   }
@@ -76,7 +77,9 @@
   /* The raised surface behind the chosen segment; its own element so it can slide between segments. */
   .thumb {
     position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-    background: var(--elevated); box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--line);
+    /* Raised (--raised-*) out of the sunken track. */
+    background: var(--elevated);
+    box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--line), inset 0 1px 0 var(--raised-edge), inset 0 -1px 0 var(--raised-base);
   }
   button :global(.icon) { flex: none; }
   .info { display: inline-flex; color: var(--faint); }

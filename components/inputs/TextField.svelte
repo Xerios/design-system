@@ -37,7 +37,7 @@
   {:else}
     {@render fieldLabel()}
   {/if}
-  <div class="box edge" class:compact>
+  <div class="box field-box" class:compact>
     {#if icon}
       <span class="lead"><Icon name="search" /></span>
     {/if}
@@ -68,16 +68,7 @@
   .field { position: relative; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .box {
     display: flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 6px 0 10px;
-    background: var(--fill-2); border: 0; border-radius: var(--r);
-    --edge-w: var(--hairline); --edge-b: var(--field-edge-end); box-shadow: var(--field-shadow);
-    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
   }
-  .box:hover { background: var(--fill-3); }
-  .box:focus-within { --edge-a: var(--accent); --edge-b: var(--accent-line); box-shadow: 0 0 0 var(--hairline) var(--accent-line), 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
-  /* Invalid: a red edge, and a red ring while focused. Only once there is a message (aria-invalid), not the browser's
-     :user-invalid, which turns a field red as soon as it is left. */
-  .box:has([aria-invalid="true"]) { --edge-a: var(--danger); --edge-b: var(--danger); }
-  .box:has([aria-invalid="true"]):focus-within { box-shadow: 0 0 0 var(--hairline) var(--danger), 0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent); }
   /* Compact (toolbars): shorter. */
   .compact { min-height: 28px; }
   .lead { display: inline-flex; color: var(--faint); }
