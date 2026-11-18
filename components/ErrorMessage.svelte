@@ -3,7 +3,10 @@
   import { tooltip } from '../lib/tooltip.js'
   /**
    * One line of error text with a warning icon. Draws nothing while `message` is empty, so it can stay in the
-   * markup. Announced by screen readers when it appears (role="alert").
+   * markup. Inline, it is an alert (role="alert"): read out as it appears, for a failure no field owns. Floating, it is
+   * not: the field points at it (aria-describedby), so it is read when the field gets focus (a failed submit moves the
+   * focus there), and fieldErrors announces it once when the field is left (lib/announce.js). An alert per field would
+   * read every message at once.
    *
    *   <ErrorMessage message={failure} />            inline: next to a form's buttons, or where no single control is at fault
    *   <ErrorMessage floating message={error} />     a bubble under its control, with a button to dismiss it
@@ -32,7 +35,7 @@
 </script>
 
 {#if shown}
-  <p {id} class={['error', className]} class:floating data-tone="danger" role="alert" {...rest}>
+  <p {id} class={['error', className]} class:floating data-tone="danger" role={floating ? undefined : 'alert'} {...rest}>
     <Icon name="warning" size="sm" />
     <span class="text">{message}</span>
     {#if floating}

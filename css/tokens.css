@@ -166,6 +166,21 @@
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
 }
 /* Theme: follows the OS; data-theme pins it. color-scheme picks the side of every light-dark() token. */
+/* More contrast (the OS setting): the design leans on faint hairlines and quiet secondary text, so those get stronger.
+   Every boundary (fields, cards, menus) reaches 3:1 against its surface and --muted and --faint body text 4.5:1,
+   in both themes. */
+@media (prefers-contrast: more) {
+  :root {
+    --line: light-dark(rgb(0 0 0 / 0.45), rgb(255 255 255 / 0.4));
+    --line-strong: light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.48));
+    --line-float: light-dark(rgb(0 0 0 / 0.55), rgb(255 255 255 / 0.52));
+    --view-line: var(--line);
+    --muted: light-dark(#55545c, #b4b9c2);
+    --faint: light-dark(#646369, #8a8f98);
+    --scrollbar-thumb: light-dark(rgb(0 0 0 / 0.45), rgb(255 255 255 / 0.45));
+    --scrollbar-thumb-hover: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.6));
+  }
+}
 :root[data-theme='light'] {
   color-scheme: light;
 }

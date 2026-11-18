@@ -24,6 +24,7 @@
   import { flip, scale, durations } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
   import { composing } from '../../lib/dom.js'
+  import { announce } from '../../lib/announce.js'
 
   /**
    * @typedef {object} Props
@@ -57,7 +58,6 @@
   let box = $state()
   let draft = $state('')
   let rejected = $state('') // validate's message for the text left in the input
-  let announcement = $state('')
   const problem = $derived(rejected || error)
 
   /** Adds the pieces as tags in one change; returns the ones validate turned down. */
@@ -72,10 +72,11 @@
       if (message) {
         refused.push(piece.trim())
         rejected = message
+        announce(message, { delay: 0 })
       } else if (!next.includes(tag)) next.push(tag)
     }
     if (next.length !== value.length) {
-      announcement = `Added ${next.slice(value.length).join(', ')}`
+      announce(`Added ${next.slice(value.length).join(', ')}`, { delay: 0 })
       value = next
     }
     return refused
@@ -92,7 +93,7 @@
   function remove(i, focusAfter) {
     const tag = value[i]
     value = value.filter((_, j) => j !== i)
-    announcement = `Removed ${tag}`
+    announce(`Removed ${tag}`, { delay: 0 })
     // Once the list has updated, focus where the selection goes next.
     void tick().then(() => focusAt(focusAfter))
   }
@@ -197,14 +198,15 @@
       placeholder={value.length ? '' : placeholder}
       autocomplete="off"
       spellcheck="false"
-      aria-invalid={problem ? 'true' : undefined}
+      autocapitalize="none"
+      autocorrect="off"
+      aria-invalid={problem ? 'true' : 'false'}
       aria-describedby="{id}-keys{problem ? ` ${id}-error` : ''}"
       {oninput}
       onkeydown={onInputKeydown}
     />
   </div>
   <span id="{id}-keys" class="sr-only">Enter or a comma adds what is typed. Backspace selects the last one; Backspace again removes it.</span>
-  <span class="sr-only" aria-live="polite">{announcement}</span>
   <ErrorMessage floating id="{id}-error" message={problem} ondismiss={() => input?.focus()} />
 </div>
 

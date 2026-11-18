@@ -73,6 +73,17 @@
   const uid = $props.id()
   const anchor = `--select-${uid}`
 
+  // Whether the value on the button is cut off by its ellipsis: then the button's tooltip shows it whole (a native title
+  // can't be reached from the keyboard). Checked on resize, and again whenever the value changes.
+  let cut = $state(false)
+  const watchCut = (_text) => (node) => {
+    const check = () => (cut = node.scrollWidth > node.clientWidth)
+    const observer = new ResizeObserver(check)
+    observer.observe(node)
+    check()
+    return () => observer.disconnect()
+  }
+
   async function show() {
     if (disabled || loading || !options.length) return
     active = Math.max(0, options.indexOf(current))
@@ -198,11 +209,12 @@
       aria-describedby={error ? `${id}-error` : undefined}
       onclick={() => (open ? hide() : show())}
       onkeydown={onButtonKey}
+      {@attach tooltip(cut && !open ? current?.label : '')}
     >
       {#if loading}
         <Shimmer class="value">{typeof loading === 'string' ? loading : 'Loading…'}</Shimmer>
       {:else}
-        <span class="value" title={current?.label}>{current?.label ?? ''}</span>
+        <span class="value" {@attach watchCut(current?.label)}>{current?.label ?? ''}</span>
       {/if}
       {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
     </button>

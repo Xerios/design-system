@@ -40,6 +40,7 @@
   import InfoTip from './InfoTip.svelte'
   import MenuButton from './menu/MenuButton.svelte'
   import { contextMenu } from '../lib/menu.svelte.js'
+  import { announce } from '../lib/announce.js'
   import { scrollFade } from '../lib/scroll-fade.js'
   import { tooltip } from '../lib/tooltip.js'
 
@@ -111,14 +112,19 @@
     return (a, b) => {
       const x = column.sortValue(a)
       const y = column.sortValue(b)
-      return (x < y ? -1 : x > y ? 1 : 0) * sort.dir
+      const order = typeof x === 'string' && typeof y === 'string' ? collator.compare(x, y) : x < y ? -1 : x > y ? 1 : 0
+      return order * sort.dir
     }
   })
+  // Text sorts the way people read it: "app2" before "app10", case and accents aside.
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
   const ordered = (items) => (compare ? items.toSorted(compare) : items)
 
   function sortBy(column) {
     if (sort?.key === column.key) sort = { key: column.key, dir: -sort.dir }
     else sort = { key: column.key, dir: (column.desc ?? column.num) ? -1 : 1 }
+    // The new order is said once (the header's aria-sort isn't reliably read out when it changes under the focus).
+    announce(`Sorted by ${(column.title ?? column.label).toLowerCase()}, ${sort.dir > 0 ? 'ascending' : 'descending'}`, { delay: 0 })
   }
 
   const isOpen = (group) => !collapsed.includes(group.key)
@@ -148,7 +154,7 @@
               class:num={column.num}
               class:center={column.center}
               class:shrink={column.shrink}
-              aria-sort={column.sortValue ? (active ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none') : undefined}
+              aria-sort={active ? (sort.dir > 0 ? 'ascending' : 'descending') : undefined}
             >
               {#if column.sortValue}
                 <button type="button" class="sort" {@attach tooltip(`Sort by ${(column.title ?? column.label).toLowerCase()}`)} onclick={() => sortBy(column)}>

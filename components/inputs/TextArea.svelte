@@ -44,7 +44,7 @@
       bind:this={area}
       bind:value
       {...rest}
-      aria-invalid={problem ? 'true' : undefined}
+      aria-invalid={problem ? 'true' : 'false'}
       aria-describedby={problem ? `${id}-error` : undefined}
       {@attach validity(
         () => error,

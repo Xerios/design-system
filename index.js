@@ -42,6 +42,7 @@ export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu
 export { alertDialog, confirmDialog, promptDialog } from './lib/dialogs.svelte.js'
 export { portal, portalNear, topLayer, backdropClose, closeRequests, composing } from './lib/dom.js'
 export { radioKeys } from './lib/roving.js'
+export { announce, cancelAnnouncement } from './lib/announce.js'
 export { motion, durations, easings, fade, fly, slide, scale, flip, tween } from './lib/motion.js'
 export { scrollFade } from './lib/scroll-fade.js'
 export { validity } from './lib/validity.js'

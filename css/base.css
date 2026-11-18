@@ -18,7 +18,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Controls and chrome aren't text to copy: no accidental selection when clicking or dragging. Content stays selectable. */
+/* Controls and chrome aren't text to copy: no accidental selection when clicking or dragging. Content stays selectable,
+   including what sits in a toggle or a pill but is data (a <summary> holding a log entry's call, a count). */
 button,
 [role='button'],
 [role='tab'],
@@ -31,13 +32,11 @@ button,
 [role='slider'],
 label,
 kbd,
-summary,
 select,
 .btn,
 .icon-btn,
 .chip,
 .badge,
-.count,
 .ctx-menu,
 .tip,
 svg text {
@@ -62,6 +61,13 @@ textarea,
   scrollbar-color: var(--scrollbar-thumb-hover) transparent;
 }
 /* Safari and older Chromium ignore scrollbar-color; style the WebKit parts there. */
+/* With more contrast (the OS setting), full-width scrollbars: the thin ones are hard to hit for some people. The thumb
+   colours strengthen with it (tokens.css). */
+@media (prefers-contrast: more) {
+  * {
+    scrollbar-width: auto;
+  }
+}
 @supports not (scrollbar-color: auto) {
   ::-webkit-scrollbar {
     width: 10px;
@@ -209,12 +215,15 @@ kbd {
   }
 }
 
+/* Reduced motion: nothing moves, grows or spins, and nothing loops (every animation's resting state is its visible end:
+   tooltips and menus simply appear, shimmer labels sit still). Colour changes still ease, as they don't move anything:
+   the transitions an element declares are cut down to these properties (their durations carry over). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation: none !important;
-    transition: none !important;
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke !important;
   }
 }
 
@@ -222,6 +231,8 @@ kbd {
 /* Sizes may transition to and from keywords (auto, fit-content…), so a box can animate to its natural height. Inherited. */
 :root {
   interpolate-size: allow-keywords;
+  /* Native controls (checkboxes, radios, range, progress) take the brand colour, should an app use them. */
+  accent-color: var(--brand);
 }
 /* <details> slides open and shut. Its body (::details-content) stays in the page while closed, hidden by the browser's
    content-visibility, so find-in-page still reaches it and opens it; allow-discrete holds it visible until the slide
@@ -237,5 +248,68 @@ kbd {
   }
   details[open]::details-content {
     block-size: auto;
+  }
+}
+
+/* ---------- forced colours (Windows High Contrast and the like) ---------- */
+/* The browser swaps every colour for the user's system palette and drops box-shadows, gradients and background images.
+   This design draws field boxes, focus rings, the edges of floating layers and chosen states with exactly those, so
+   here they come back as borders, outlines and fills in system colours. !important because component styles are
+   unlayered and would win otherwise; it only applies in this mode. */
+@media (forced-colors: active) {
+  /* Focus is always visible, whatever ring a component draws in its place. */
+  :focus-visible {
+    outline: 2px solid Highlight !important;
+  }
+  /* Edges drawn as an inset shadow (fields) or a gradient under a transparent border (menus, lists, toasts, tables). */
+  .field-box {
+    outline: 1px solid CanvasText !important;
+    outline-offset: -1px;
+  }
+  [role='menu'],
+  [role='listbox'],
+  .toast,
+  .table-card {
+    border-color: CanvasText !important;
+  }
+  /* Chosen and current: the fill or raised thumb that marks them is gone, so they take the system highlight. */
+  [role='radio'][aria-checked='true'],
+  [role='option'].active,
+  [role^='menuitem']:focus,
+  .icon-btn:is([aria-pressed='true'], [aria-expanded='true']) {
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+  [role='switch'] .knob {
+    outline: 1px solid CanvasText !important;
+    outline-offset: -1px;
+  }
+  [role='switch'] .knob::after,
+  [role='slider'] .thumb {
+    background: CanvasText !important;
+  }
+  [role='switch'][aria-checked='true'] .knob,
+  [role='slider'] .fill {
+    background: Highlight !important;
+  }
+  [role='switch'][aria-checked='true'] .knob::after {
+    background: HighlightText !important;
+  }
+  [role='slider'] .track {
+    outline: 1px solid CanvasText !important;
+  }
+  /* Dots carry no meaning their text doesn't (status chips say it in words), but keep their shape. */
+  .label-dot,
+  .new-dot {
+    background: CanvasText !important;
+  }
+  :disabled {
+    color: GrayText !important;
+    border-color: GrayText !important;
+  }
+  /* Shimmer text is painted through its background, which this mode removes: draw it as plain text or it vanishes. */
+  .shimmer-text {
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
   }
 }

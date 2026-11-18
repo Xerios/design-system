@@ -128,9 +128,11 @@
 >
 
 <style>
+  /* Never the target of a click: the press belongs to the button or link around it. */
   .icon {
     display: inline-flex;
     flex: none;
+    pointer-events: none;
     width: var(--icon-size);
     height: var(--icon-size);
   }

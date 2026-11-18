@@ -83,8 +83,11 @@
       {placeholder}
       autocomplete="off"
       spellcheck="false"
+      autocapitalize="none"
+      autocorrect="off"
+      enterkeyhint={type === 'search' ? 'search' : undefined}
       {...rest}
-      aria-invalid={problem ? 'true' : undefined}
+      aria-invalid={problem ? 'true' : 'false'}
       aria-describedby={problem ? `${id}-error` : undefined}
       {onkeydown}
       {@attach validity(

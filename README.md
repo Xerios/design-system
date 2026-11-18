@@ -264,6 +264,7 @@ export function hold(on) {
 | Export                                                         | What it does                                                                                                                                                                                                                                                                                                                                                    |
 | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `portal`, `portalNear(from)`                                   | Attachments that move a node to `<body>` or the nearest `[data-layer-root]`                                                                                                                                                                                                                                                                                     |
+| `announce(text, { delay? })`, `cancelAnnouncement()`           | The page's one polite live region (moved into the open modal, since outside it is inert). `fieldErrors` uses it for an error that appears as a field is left; `TagInput` for tags added, removed or refused                                                                                                                                                     |
 | `composing(event)`                                             | True while a key belongs to an IME composition (`isComposing`, or `keyCode` 229 for Safari): return early from a field's own Enter / Esc / Backspace handling                                                                                                                                                                                                   |
 | `radioKeys`                                                    | Attachment for a `role="radiogroup"` with roving focus: arrows, Home and End move to an option and choose it (what `Segmented`, `ButtonGroup` and `RadioGroup` use)                                                                                                                                                                                             |
 | `topLayer(from)`                                               | Attachment that shows a floating node in the top layer, above modal dialogs (inside the dialog around `from`, else `<body>`)                                                                                                                                                                                                                                    |
@@ -294,9 +295,14 @@ assume a variable font.
 - Breakpoint: one, at 860px. Below it `Splitter` hides, popovers span the width and fields grow to 16px text.
 - Text sizes are in px. Boxes that hold text take a `min-height`, not a fixed `height`, so a label that wraps grows the
   box instead of spilling out of it.
-- Reduced motion: CSS animation and transitions switch off globally; Svelte transitions come from `lib/motion.js` (or take `motion(ms)`).
+- Reduced motion: CSS animations stop and transitions keep only colour changes (nothing moves, scales or loops), globally; Svelte transitions come from `lib/motion.js` (or take `motion(ms)`).
 - Accessibility: every text and background pair meets WCAG AA in both themes; pointer targets are at least
   24×24px; focus rings come from `:focus-visible` in `base.css`.
+- Contrast settings: with `prefers-contrast: more` the hairlines, scrollbar and quiet text tokens strengthen (boundaries
+  3:1, `--muted`/`--faint` text 4.5:1, both themes; `tokens.css`). In forced colours (Windows High Contrast) the
+  shadows and gradients that draw field boxes, focus rings, floating edges and chosen states are replaced by
+  outlines, borders and system-colour fills (`base.css`). A new component that marks state or an edge only with a
+  shadow, gradient or fill adds its own forced-colours rule.
 - Browser support: current Chromium, Firefox and Safari (`color-mix()`, `@property`, `@starting-style`,
   `offset-path`, Svelte 5.29+ for `{@attach}`).
 

@@ -1,4 +1,5 @@
 <script>
+  import { tooltip } from '../lib/tooltip.js'
   /**
    * Vertical drag handle that resizes the panel beside it. `side` says where that panel is:
    * "end" (right of the handle, so dragging left makes it wider) or "start".
@@ -89,7 +90,7 @@
   aria-valuemin={min}
   aria-valuemax={max}
   tabindex="0"
-  title="Drag to resize · double-click to reset"
+  {@attach tooltip('Drag to resize, or double-click to reset')}
   onpointerdown={down}
   onpointermove={move}
   onpointerup={up}
