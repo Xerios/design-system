@@ -51,7 +51,9 @@
     border-radius: var(--r-pill);
     padding: 0 10px;
     background: var(--fill-2);
-    box-shadow: inset 0 0 0 1px var(--line);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--shadow-btn);
     font-size: 12px;
     line-height: 14px;
     font-weight: var(--w-medium);

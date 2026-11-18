@@ -291,9 +291,9 @@
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
     cursor: pointer;
-    /* Raised (--raised-*): a button you press to open, unlike the sunken text fields, on the same faint fill as theirs.
-       Open, it sits flat. */
-    --raise: inset 0 1px 0 var(--raised-edge), inset 0 -1px 0 var(--raised-base);
+    /* Raised (--shadow-btn) like a button: you press it to open, unlike the sunken text fields, on the same faint fill
+       as theirs. Open, it sits flat. */
+    --raise: var(--shadow-btn);
     box-shadow: var(--raise);
     transition:
       background-color var(--dur) var(--ease-out),

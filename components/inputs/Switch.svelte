@@ -60,7 +60,10 @@
     height: 16px;
     border-radius: var(--r-pill);
     background: var(--fill-4);
-    box-shadow: inset 0 0 0 1px var(--line);
+    /* Sunken, like the fields: the track the knob slides in. */
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--sunken-shadow);
     transition:
       background var(--dur) var(--ease-out),
       box-shadow var(--dur) var(--ease-out),
@@ -95,7 +98,9 @@
     color: var(--fg);
   }
   .switch:hover:not(:disabled):not([aria-checked='true']) .knob {
-    box-shadow: inset 0 0 0 1px var(--line-float);
+    box-shadow:
+      inset 0 0 0 1px var(--line-float),
+      var(--sunken-shadow);
   }
   .switch:hover:not(:disabled)[aria-checked='true'] .knob {
     filter: brightness(1.1);

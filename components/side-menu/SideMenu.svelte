@@ -97,6 +97,7 @@
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
     background: var(--fill-1);
+    box-shadow: var(--shadow-btn);
     color: var(--fg-2);
   }
   .actions > :global(.icon-btn:last-child:hover) {

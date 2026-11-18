@@ -10,7 +10,7 @@
   color-scheme: light dark;
   /* Surfaces, back to front (Linear's hero frame): --bg is the app frame the header and status line sit on; --view-bg the
      inset view card the layouts live in; --surface the cards and panes inside it; --elevated the floating layers. */
-  --bg: light-dark(#ebebeb, #101112);
+  --bg: light-dark(#ebebeb, #020202);
   --view-bg: light-dark(#fbfbfb, #121314);
   --surface: light-dark(#ffffff, #171819);
   --surface-2: light-dark(#f4f4f5, #1b1c1d);
@@ -59,9 +59,13 @@
   --knob: #ffffff;
   --knob-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
   --knob-ring: rgb(0 0 0 / 0.12);
-  /* Sunken relief for fields, lit from the top left: a soft shadow inside the top and left edges, so the box reads as
-     pressed into the surface. */
-  --sunken-shadow: inset 1px 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3));
+  /* Sunken relief for fields and tracks, the counterpart of --shadow-btn at about the same edge contrast, kept crisp: the
+     button's faint lit ring inside, a sharp shade under the top edge with a short falloff, and the lit edge at the bottom
+     instead of the top, so the box reads as pressed into the surface. No dark ring: on the dark frame it would sink the
+     edge into the page instead of drawing it. Goes under the field's own hairline. */
+  --sunken-shadow:
+    inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.03)), inset 0 -1px 0 light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.04)),
+    inset 0 2px 0 light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35)), inset 0 2px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.2));
   /* Atmosphere: a soft light in the top-left corner of the shell (Linear's sidebar glow), and a fine film grain for the
      modal backdrops. The grain's strength is baked into its alpha (the matrix's last value), so it can be one background
      layer over a colour. */
@@ -105,8 +109,12 @@
   --shadow-md:
     0 1px 4px -1px light-dark(rgb(0 0 0 / 0.09), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2)),
     0 2px 4px light-dark(transparent, rgb(0 0 0 / 0.1));
-  /* Raised small buttons (Linear's Preview / send buttons): a soft drop plus a tight contact shadow. */
-  --shadow-btn: 0 4px 4px -1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.06)), 0 1px 1px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.12));
+  /* Raised controls (buttons, select triggers, chosen segments; Linear's buttons): a faint lit ring and a lit top edge
+     inside, a contact ring and a soft drop outside. Dark rings the control in near-black against the frame; light has
+     no use for the inner ring, takes a stronger top light and a quieter contact ring and drop. */
+  --shadow-btn:
+    inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.03)), inset 0 1px 0 light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.04)),
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.6)), 0 4px 4px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.1));
   --shadow:
     0 0 0 1px light-dark(rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.2)), 0 2px 32px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.25)),
     0 4px 12px light-dark(rgb(0 0 0 / 0.05), transparent), 0 8px 16px light-dark(transparent, rgb(0 0 0 / 0.2));

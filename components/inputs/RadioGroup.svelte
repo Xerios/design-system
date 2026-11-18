@@ -83,7 +83,7 @@
     background: var(--fill-2);
     box-shadow:
       inset 0 0 0 1px var(--line),
-      var(--sunken-shadow);
+      var(--shadow-sm);
     /* The thumb sits at z-index -1 in here: under every segment's content, even while it slides across them. */
     isolation: isolate;
   }
@@ -133,13 +133,11 @@
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;
-    /* Raised (--raised-*) out of the sunken track. */
+    /* Raised (--shadow-btn) out of the sunken track, with a hairline so light's white thumb has an edge. */
     background: var(--elevated);
     box-shadow:
-      var(--shadow-sm),
       inset 0 0 0 1px var(--line),
-      inset 0 1px 0 var(--raised-edge),
-      inset 0 -1px 0 var(--raised-base);
+      var(--shadow-btn);
   }
   button :global(.icon) {
     flex: none;

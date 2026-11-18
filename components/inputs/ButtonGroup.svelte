@@ -49,7 +49,9 @@
     max-width: 100%;
     border-radius: var(--r-pill);
     background: var(--fill-2);
-    box-shadow: inset 0 0 0 1px var(--line);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--shadow-btn);
   }
   button {
     display: inline-flex;

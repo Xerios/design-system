@@ -81,7 +81,9 @@
       open = true
     }
     if (!focus) return
-    await tick()(/** @type {HTMLElement | null | undefined} */ (sheet?.querySelector('[data-autofocus], [tabindex="0"]')))?.focus()
+    await tick()
+    const target = /** @type {HTMLElement | null | undefined} */ (sheet?.querySelector('[data-autofocus], [tabindex="0"]'))
+    target?.focus()
   }
   async function close(refocus = true) {
     open = false
