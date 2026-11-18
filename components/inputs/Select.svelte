@@ -346,7 +346,7 @@
   .trigger:global([aria-invalid='true']):focus-visible {
     box-shadow:
       var(--raise),
-      0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent);
+      0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
   }
   /* Long values (model ids…) are cut with an ellipsis on one line; the full text is in the tooltip. */
   .trigger :global(.value),

@@ -149,7 +149,7 @@ a {
   text-underline-offset: 2px;
 }
 a:hover {
-  color: color-mix(in srgb, var(--accent) 80%, var(--fg));
+  color: color-mix(in lch, var(--accent) 80%, var(--fg));
 }
 :focus-visible {
   outline: 2px solid var(--accent);
@@ -162,7 +162,7 @@ a:hover {
   outline-offset: -2px;
 }
 ::selection {
-  background: color-mix(in srgb, var(--brand) 32%, transparent);
+  background: color-mix(in lch, var(--brand) 32%, transparent);
 }
 /* Visually hidden, still read out. !important because it is a utility that has to beat the component styles on the same
    element (they're unlayered, so they would win otherwise). Shows again while something inside has focus (a skip link). */

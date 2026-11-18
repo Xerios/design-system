@@ -357,7 +357,7 @@
   box-shadow:
     inset 0 0 0 1px var(--danger),
     var(--sunken-shadow),
-    0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent);
+    0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
 }
 .field-label {
   font-size: 12px;

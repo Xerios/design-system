@@ -271,7 +271,7 @@
   z-index: var(--z-overlay);
   padding: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, var(--accent) 35%, color-mix(in srgb, var(--accent) 45%, white) 50%, var(--accent) 65%, transparent) -150% 0 /
+  background: linear-gradient(90deg, transparent, var(--accent) 35%, color-mix(in lch, var(--accent) 45%, white) 50%, var(--accent) 65%, transparent) -150% 0 /
     60% 100% no-repeat;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,

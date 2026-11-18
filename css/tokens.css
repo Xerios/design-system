@@ -65,7 +65,7 @@
   /* Atmosphere: a soft light in the top-left corner of the shell (Linear's sidebar glow), and a fine film grain for the
      modal backdrops. The grain's strength is baked into its alpha (the matrix's last value), so it can be one background
      layer over a colour. */
-  --glow: light-dark(color-mix(in srgb, #5e6ad2 7%, transparent), rgb(255 255 255 / 0.04));
+  --glow: light-dark(color-mix(in lch, #5e6ad2 7%, transparent), rgb(255 255 255 / 0.04));
   --grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 .13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* Lit relief (Surface Lab: texture 0.3, reflection 0.2, light 137°), painted under the frame. A lit fractal-noise bump map
      that overlay-blends into --bg, so flat areas stay neutral and only the relief reads; works on light and dark alike.
@@ -84,8 +84,8 @@
   --accent: light-dark(#5e6ad2, #7170ff);
   --brand: #5e6ad2;
   --accent-ink: #ffffff;
-  --accent-soft: light-dark(color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--brand) 18%, transparent));
-  --accent-line: light-dark(color-mix(in srgb, var(--accent) 36%, transparent), color-mix(in srgb, var(--accent) 45%, transparent));
+  --accent-soft: light-dark(color-mix(in lch, var(--accent) 10%, transparent), color-mix(in lch, var(--brand) 18%, transparent));
+  --accent-line: light-dark(color-mix(in lch, var(--accent) 36%, transparent), color-mix(in lch, var(--accent) 45%, transparent));
 
   /* Semantic tones (separate from the accent): Linear's green / blue / yellow / grey / red. Each has a translucent -soft
      fill for chips and tinted rows. Set data-tone="success|info|warning|neutral|danger" on an element to get --tone / --tone-soft. */
@@ -94,11 +94,11 @@
   --warning: light-dark(#9a6700, #f2c94c);
   --neutral: light-dark(#6f6e77, #8a8f98);
   --danger: light-dark(#c93b3b, #eb5757);
-  --success-soft: light-dark(color-mix(in srgb, var(--success) 11%, transparent), color-mix(in srgb, var(--success) 14%, transparent));
-  --info-soft: light-dark(color-mix(in srgb, var(--info) 10%, transparent), color-mix(in srgb, var(--info) 14%, transparent));
-  --warning-soft: light-dark(color-mix(in srgb, var(--warning) 11%, transparent), color-mix(in srgb, var(--warning) 13%, transparent));
-  --neutral-soft: light-dark(color-mix(in srgb, var(--neutral) 10%, transparent), color-mix(in srgb, var(--neutral) 13%, transparent));
-  --danger-soft: light-dark(color-mix(in srgb, var(--danger) 10%, transparent), color-mix(in srgb, var(--danger) 14%, transparent));
+  --success-soft: light-dark(color-mix(in lch, var(--success) 11%, transparent), color-mix(in lch, var(--success) 14%, transparent));
+  --info-soft: light-dark(color-mix(in lch, var(--info) 10%, transparent), color-mix(in lch, var(--info) 14%, transparent));
+  --warning-soft: light-dark(color-mix(in lch, var(--warning) 11%, transparent), color-mix(in lch, var(--warning) 13%, transparent));
+  --neutral-soft: light-dark(color-mix(in lch, var(--neutral) 10%, transparent), color-mix(in lch, var(--neutral) 13%, transparent));
+  --danger-soft: light-dark(color-mix(in lch, var(--danger) 10%, transparent), color-mix(in lch, var(--danger) 14%, transparent));
 
   /* Elevation: Linear keeps resting surfaces flat; only floating layers (menus, popovers, dialogs) cast a shadow. */
   --shadow-sm: 0 1px 1px light-dark(rgb(0 0 0 / 0.04), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
@@ -110,9 +110,9 @@
   --shadow:
     0 0 0 1px light-dark(rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.2)), 0 2px 32px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.25)),
     0 4px 12px light-dark(rgb(0 0 0 / 0.05), transparent), 0 8px 16px light-dark(transparent, rgb(0 0 0 / 0.2));
-  --ring: 0 0 0 2px light-dark(color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--accent) 40%, transparent));
+  --ring: 0 0 0 2px light-dark(color-mix(in lch, var(--accent) 30%, transparent), color-mix(in lch, var(--accent) 40%, transparent));
   /* Translucent chrome over scrolling content. */
-  --glass: light-dark(color-mix(in srgb, var(--bg) 82%, transparent), color-mix(in srgb, var(--bg) 80%, transparent));
+  --glass: light-dark(color-mix(in lch, var(--bg) 82%, transparent), color-mix(in lch, var(--bg) 80%, transparent));
 
   /* Type: Inter for UI, headings and text; JetBrains Mono for scores, counts, dates and code. Both bundled (see ../fonts.js). */
   --font-display: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;

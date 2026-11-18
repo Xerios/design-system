@@ -37,7 +37,7 @@
     const [a, from] = STOPS[i - 1]
     const [b, to] = STOPS[i]
     const share = Math.round(((t - a) / (b - a)) * 100)
-    return `color-mix(in oklab, ${to} ${share}%, ${from})`
+    return `color-mix(in lch, ${to} ${share}%, ${from})`
   }
 
   const seg = LENGTH / DASHES
