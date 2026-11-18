@@ -57,7 +57,7 @@
       return {
         duration: motion(direction === 'out' ? durations.short2 : durations.short3),
         easing: easings.standard[direction === 'out' ? 'accelerate' : 'decelerate'],
-        css: (t, u) => `opacity: ${t}; transform: translateY(${u * dy}px);`,
+        css: (t, u) => `opacity: ${t}; translate: 0 ${u * dy}px;`,
       }
     }
   }
@@ -142,7 +142,7 @@
     left: 0;
     z-index: var(--z-menu);
     width: max-content;
-    max-width: min(328px, calc(100vw - 16px));
+    max-width: min(328px, calc(100dvw - 16px));
     pointer-events: none;
     display: grid;
     gap: 4px;

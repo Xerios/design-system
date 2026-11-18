@@ -75,16 +75,17 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
-    transition: transform var(--dur) var(--ease-out);
+    background: var(--knob);
+    box-shadow: var(--knob-shadow);
+    translate: 0 0;
+    transition: translate var(--dur) var(--ease-out);
   }
   [aria-checked='true'] .knob {
     background: var(--brand);
     box-shadow: none;
   }
   [aria-checked='true'] .knob::after {
-    transform: translateX(12px);
+    translate: 12px 0;
   }
   /* Hover (when it can act): the label comes forward, an off track firms up its hairline, an on track brightens. */
   .switch {

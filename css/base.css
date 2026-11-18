@@ -1,71 +1,219 @@
 /* Base elements: reset, body type, selection rules, scrollbars, links, focus rings, keys and the small utilities.
-   Page layout (what scrolls, how tall the root is) is the app's business, not this file's. */
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
+   Page layout (what scrolls, how tall the root is) is the app's business, not this file's.
+   This file is the ds.base cascade layer (see index.css), so the * rules below are overridable by any unlayered style. */
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
   font: 400 13px/1.5 var(--font-body);
-  font-feature-settings: "cv11", "ss01"; /* Inter: single-storey a, open digits */
+  font-feature-settings: 'cv11', 'ss01'; /* Inter: single-storey a, open digits */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Controls and chrome aren't text to copy: no accidental selection when clicking or dragging. Content stays selectable. */
-button, [role="button"], [role="tab"], [role="radio"], [role="menuitem"], [role="menuitemradio"], [role="option"],
-[role="separator"], [role="switch"], [role="slider"], label, kbd, summary, select,
-.btn, .icon-btn, .chip, .badge, .count, .ctx-menu, .tip, svg text { -webkit-user-select: none; user-select: none; }
+button,
+[role='button'],
+[role='tab'],
+[role='radio'],
+[role='menuitem'],
+[role='menuitemradio'],
+[role='option'],
+[role='separator'],
+[role='switch'],
+[role='slider'],
+label,
+kbd,
+summary,
+select,
+.btn,
+.icon-btn,
+.chip,
+.badge,
+.count,
+.ctx-menu,
+.tip,
+svg text {
+  -webkit-user-select: none;
+  user-select: none;
+}
 /* ...except text fields inside them. */
-input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
+input,
+textarea,
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+}
 
 /* ---------- scrollbars ---------- */
 /* Thin, theme-aware, transparent track so panes don't look boxed in. */
-* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
-*:hover { scrollbar-color: var(--scrollbar-thumb-hover) transparent; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+*:hover {
+  scrollbar-color: var(--scrollbar-thumb-hover) transparent;
+}
 /* Safari and older Chromium ignore scrollbar-color; style the WebKit parts there. */
 @supports not (scrollbar-color: auto) {
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 99px; border: 3px solid transparent; background-clip: content-box; }
-  ::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-thumb-hover); }
-  ::-webkit-scrollbar-corner { background: transparent; }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 99px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
-h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: var(--w-semibold); }
-p { margin: 0; }
-ul, ol { margin: 0; padding: 0; list-style: none; }
-button { font: inherit; color: inherit; letter-spacing: inherit; }
-button, a, [role="button"], [role="slider"], [role="switch"], [role="option"], [role="menuitem"], [role="menuitemradio"] { touch-action: manipulation; }
-button:not(:disabled), [role="button"], [role="option"], summary { cursor: pointer; }
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
+  font-weight: var(--w-semibold);
+}
+/* Headings balance their lines (above); running text avoids a lone last word. Never on *: text-wrap has a layout cost. */
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+button,
+a,
+[role='button'],
+[role='slider'],
+[role='switch'],
+[role='option'],
+[role='menuitem'],
+[role='menuitemradio'] {
+  touch-action: manipulation;
+}
+button:not(:disabled),
+[role='button'],
+[role='option'],
+summary {
+  cursor: pointer;
+}
 
 /* Floating layers shown with the topLayer attachment (lib/dom.js) are popovers: drop the browser's centred, bordered,
    padded box so the component's own class draws them. Zero specificity, so any class wins. */
-:where([data-top-layer]) { inset: auto; margin: 0; width: auto; height: auto; padding: 0; border: 0; background: none; color: inherit; overflow: visible; }
-a { color: var(--accent); text-decoration-thickness: from-font; text-underline-offset: 2px; }
-a:hover { color: color-mix(in srgb, var(--accent) 80%, var(--fg)); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+:where([data-top-layer]) {
+  inset: auto;
+  margin: 0;
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  overflow: visible;
+}
+a {
+  color: var(--accent);
+  text-decoration-thickness: from-font;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: color-mix(in srgb, var(--accent) 80%, var(--fg));
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
 /* The item a context menu (right-click / Menu key) is acting on, while the menu is open. */
-[data-menu-target] { outline: 2px solid var(--accent); outline-offset: -2px; }
-::selection { background: color-mix(in srgb, var(--brand) 32%, transparent); }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.muted { color: var(--muted); }
-.small { font-size: 12px; }
-.block { display: block; }
-.nowrap { white-space: nowrap; }
-.spacer { flex: 1; }
+[data-menu-target] {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+::selection {
+  background: color-mix(in srgb, var(--brand) 32%, transparent);
+}
+/* Visually hidden, still read out. !important because it is a utility that has to beat the component styles on the same
+   element (they're unlayered, so they would win otherwise). Shows again while something inside has focus (a skip link). */
+.sr-only:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 12px;
+}
+.block {
+  display: block;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.spacer {
+  flex: 1;
+}
 /* Keys: small rounded caps, quiet. */
 kbd {
-  display: inline-block; font: var(--w-medium) 11px/16px var(--font-data); font-variant-numeric: tabular-nums; min-width: 18px; text-align: center;
-  border: 1px solid var(--line-strong); border-radius: 4px; padding: 0 4px; background: var(--fill-1); color: var(--muted);
+  display: inline-block;
+  font: var(--w-medium) 11px/16px var(--font-data);
+  font-variant-numeric: tabular-nums;
+  min-width: 18px;
+  text-align: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 0 4px;
+  background: var(--fill-1);
+  color: var(--muted);
 }
 
 @media (max-width: 860px) {
   /* 16px keeps iOS from zooming into fields on focus. */
-  input, select, textarea { font-size: 16px !important; }
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

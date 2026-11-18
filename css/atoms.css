@@ -20,11 +20,13 @@
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  /* At rest at its identity, so pressing (scale below) doesn't add a stacking context mid-click. */
+  scale: 1;
   transition:
     border-color var(--dur) var(--ease-out),
     background-color var(--dur) var(--ease-out),
     color var(--dur) var(--ease-out),
-    transform var(--dur) var(--ease-out),
+    scale var(--dur) var(--ease-out),
     filter var(--dur) var(--ease-out);
 }
 .btn :where(.icon) {
@@ -41,14 +43,14 @@
 }
 .btn:active:where(:not(:disabled, [aria-disabled='true'])) {
   background: var(--fill-4);
-  transform: scale(0.98);
+  scale: 0.98;
 }
 .btn-primary {
   background: var(--brand);
-  border-color: color-mix(in srgb, white 12%, transparent);
+  border-color: var(--solid-line);
   color: var(--accent-ink);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 1px 0 var(--solid-edge),
     var(--shadow-btn);
 }
 .btn-primary :where(.icon) {
@@ -73,7 +75,7 @@
   border-color: transparent;
   color: var(--accent-ink);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    inset 0 1px 0 var(--solid-edge),
     var(--shadow-btn);
 }
 .btn-danger :where(.icon) {
@@ -171,7 +173,8 @@
   border: inherit;
   border-radius: 0;
   pointer-events: none;
-  transform: translateX(-50%) rotate(45deg);
+  translate: -50% 0;
+  rotate: 45deg;
 }
 [data-arrow='up']::before {
   top: -5px;
@@ -190,8 +193,9 @@
 /* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical
    hairlines, a header row in small tertiary text, and a full-bleed fill on hover. Wrap a <table> in .data-table;
    mark number columns .num. Row headers (<th scope="row">) read as the name column. */
+/* clip, not hidden: it only rounds the corners off, and hidden would make it a scroll container. */
 .data-table {
-  overflow: hidden;
+  overflow: clip;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-xl);
   background: var(--fill-1);
@@ -384,11 +388,12 @@
 /* ---------- modal dialogs ---------- */
 /* A floating panel with a header, a scrolling body and a footer of actions; .confirm is the narrow one for a question.
    --dialog-width sets another width (560px, or 420px for .confirm); it is inherited, so <Modal --dialog-width="720px"> works.
+   A modal is fixed to the viewport, so 100% is the viewport less any scrollbar (100vw would include it).
    Pinned near the top of the window: when the content grows or shrinks the bottom edge moves and the header stays put. */
 .dialog {
   --dialog-top: clamp(var(--space-4), 10dvh, calc(var(--space-8) * 3));
   flex-direction: column;
-  width: min(var(--dialog-width, 560px), calc(100vw - var(--space-8)));
+  width: min(var(--dialog-width, 560px), calc(100% - var(--space-8)));
   max-height: calc(100dvh - var(--dialog-top) - var(--space-4));
   margin: var(--dialog-top) auto auto;
   padding: 0;
@@ -411,7 +416,7 @@
   background: radial-gradient(200px 200px at 0 0, var(--glow) 0%, transparent 90%);
 }
 .dialog.confirm {
-  width: min(var(--dialog-width, 420px), calc(100vw - var(--space-8)));
+  width: min(var(--dialog-width, 420px), calc(100% - var(--space-8)));
 }
 /* Only `display` depends on [open]: it is held through the closing transition, so the layout can't change mid-fade. */
 .dialog[open] {
@@ -440,6 +445,7 @@
   gap: var(--space-4);
   padding: var(--space-5);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .dialog-foot {
   display: flex;

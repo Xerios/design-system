@@ -401,10 +401,11 @@
   .chev {
     display: inline-flex;
     color: var(--muted);
-    transition: transform var(--dur) var(--ease-out);
+    rotate: 0deg;
+    transition: rotate var(--dur) var(--ease-out);
   }
   .chev.open {
-    transform: rotate(90deg);
+    rotate: 90deg;
   }
   .swatch {
     width: 8px;

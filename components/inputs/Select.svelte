@@ -72,7 +72,7 @@
     if (!list || !button) return
     const r = button.getBoundingClientRect()
     list.style.minWidth = `${r.width}px`
-    list.style.maxWidth = `min(${Math.max(r.width, 440)}px, calc(100vw - 32px))`
+    list.style.maxWidth = `min(${Math.max(r.width, 440)}px, calc(100dvw - 32px))`
     const h = list.offsetHeight,
       w = list.offsetWidth
     const above = r.bottom + h + 8 > innerHeight && r.top > h + 8
@@ -354,10 +354,11 @@
     flex: none;
     display: inline-flex;
     color: var(--muted);
-    transition: transform var(--dur) var(--ease-out);
+    rotate: 0deg;
+    transition: rotate var(--dur) var(--ease-out);
   }
   .caret.flip {
-    transform: rotate(180deg);
+    rotate: 180deg;
   }
   .list {
     position: fixed;
@@ -365,7 +366,7 @@
     top: 0;
     left: 0;
     width: max-content;
-    max-height: min(280px, calc(100vh - 16px));
+    max-height: min(280px, calc(100dvh - 16px));
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;

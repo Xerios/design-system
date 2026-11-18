@@ -92,7 +92,7 @@
     border-right: 0;
     border-bottom: 0;
     background: inherit;
-    transform: rotate(45deg);
+    rotate: 45deg;
   }
   .floating > :global(.icon) {
     color: var(--tone);

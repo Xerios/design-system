@@ -10,7 +10,7 @@
   color-scheme: light dark;
   /* Surfaces, back to front (Linear's hero frame): --bg is the app frame the header and status line sit on; --view-bg the
      inset view card the layouts live in; --surface the cards and panes inside it; --elevated the floating layers. */
-  --bg: light-dark(#ebebeb, #101112); 
+  --bg: light-dark(#ebebeb, #101112);
   --view-bg: light-dark(#fbfbfb, #121314);
   --surface: light-dark(#ffffff, #171819);
   --surface-2: light-dark(#f4f4f5, #1b1c1d);
@@ -26,13 +26,19 @@
   --edge-hi: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
   --edge-r: 100px;
   --edge-plateau: 16%;
-  --edge-grad: radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%), linear-gradient(var(--line-strong), var(--line-strong));
-  --edge-grad-float: radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%), linear-gradient(var(--line-float), var(--line-float));
+  --edge-grad:
+    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%),
+    linear-gradient(var(--line-strong), var(--line-strong));
+  --edge-grad-float:
+    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%),
+    linear-gradient(var(--line-float), var(--line-float));
   --edge-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
   /* Shine (Linear's .shine): a 200px beam of brighter hairline on the view card's left edge, near the top. */
   --shine: light-dark(rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.4));
   --view-line: light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.05));
-  --view-shadow: 0 0 0 1px light-dark(rgb(0 0 0 / 0.015), transparent), 0 1px 3px light-dark(rgb(0 0 0 / 0.04), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
+  --view-shadow:
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.015), transparent), 0 1px 3px light-dark(rgb(0 0 0 / 0.04), transparent),
+    0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
   /* Thinking shimmer (see Shimmer.svelte): the label rests at --shimmer-base and a band of --shimmer-hi sweeps across it. */
   --shimmer-base: var(--muted);
   --shimmer-hi: var(--fg);
@@ -40,6 +46,13 @@
      falls into shade, so the box reads as standing off the surface. Use both: inset 0 1px 0 …-edge, inset 0 -1px 0 …-base. */
   --raised-edge: light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12));
   --raised-base: light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.25));
+  /* Solid buttons (primary, danger) on their own colour, both themes: the lit top inner edge, and the hairline around them. */
+  --solid-edge: rgb(255 255 255 / 0.2);
+  --solid-line: rgb(255 255 255 / 0.12);
+  /* Thumbs and knobs (Switch, Slider): a white disc that keeps its contact shadow on any track. */
+  --knob: #ffffff;
+  --knob-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --knob-ring: rgb(0 0 0 / 0.12);
   /* Sunken relief for fields, lit from the top left: a soft shadow inside the top and left edges, so the box reads as
      pressed into the surface. */
   --sunken-shadow: inset 1px 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.3));
@@ -51,7 +64,8 @@
   /* Lit relief (Surface Lab: texture 0.3, reflection 0.2, light 137°), painted under the frame. A lit fractal-noise bump map
      that overlay-blends into --bg, so flat areas stay neutral and only the relief reads; works on light and dark alike.
      The original's layer opacities are baked in: 0.24 into the SVG's alpha row, 0.2 into the shading gradient's stops. */
-  --relief-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='0' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='2.2' diffuseConstant='1' lighting-color='%23fff'%3E%3CfeDistantLight azimuth='227' elevation='52'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix values='1 0 0 0 -.29 0 1 0 0 -.29 0 0 1 0 -.29 0 0 0 0 .24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E") 0 0 / 240px 240px;
+  --relief-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='0' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' surfaceScale='2.2' diffuseConstant='1' lighting-color='%23fff'%3E%3CfeDistantLight azimuth='227' elevation='52'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix values='1 0 0 0 -.29 0 1 0 0 -.29 0 0 1 0 -.29 0 0 0 0 .24'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E")
+    0 0 / 240px 240px;
   --relief-shade: linear-gradient(137deg, rgb(255 255 255 / 0.048) 0%, rgb(255 255 255 / 0) 38%, rgb(0 0 0 / 0) 70%, rgb(0 0 0 / 0.028) 100%);
   --fill-1: light-dark(rgb(0 0 0 / 0.02), rgb(255 255 255 / 0.02));
   --fill-2: light-dark(rgb(0 0 0 / 0.035), rgb(255 255 255 / 0.035));
@@ -69,7 +83,11 @@
 
   /* Semantic tones (separate from the accent): Linear's green / blue / yellow / grey / red. Each has a translucent -soft
      fill for chips and tinted rows. Set data-tone="success|info|warning|neutral|danger" on an element to get --tone / --tone-soft. */
-  --success: light-dark(#1f8b4c, #4cb782); --info: light-dark(#1b6fc2, #4ea7fc); --warning: light-dark(#9a6700, #f2c94c); --neutral: light-dark(#6f6e77, #8a8f98); --danger: light-dark(#c93b3b, #eb5757);
+  --success: light-dark(#1f8b4c, #4cb782);
+  --info: light-dark(#1b6fc2, #4ea7fc);
+  --warning: light-dark(#9a6700, #f2c94c);
+  --neutral: light-dark(#6f6e77, #8a8f98);
+  --danger: light-dark(#c93b3b, #eb5757);
   --success-soft: light-dark(color-mix(in srgb, var(--success) 11%, transparent), color-mix(in srgb, var(--success) 14%, transparent));
   --info-soft: light-dark(color-mix(in srgb, var(--info) 10%, transparent), color-mix(in srgb, var(--info) 14%, transparent));
   --warning-soft: light-dark(color-mix(in srgb, var(--warning) 11%, transparent), color-mix(in srgb, var(--warning) 13%, transparent));
@@ -78,49 +96,79 @@
 
   /* Elevation: Linear keeps resting surfaces flat; only floating layers (menus, popovers, dialogs) cast a shadow. */
   --shadow-sm: 0 1px 1px light-dark(rgb(0 0 0 / 0.04), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
-  --shadow-md: 0 1px 4px -1px light-dark(rgb(0 0 0 / 0.09), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2)), 0 2px 4px light-dark(transparent, rgb(0 0 0 / 0.1));
+  --shadow-md:
+    0 1px 4px -1px light-dark(rgb(0 0 0 / 0.09), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2)),
+    0 2px 4px light-dark(transparent, rgb(0 0 0 / 0.1));
   /* Raised small buttons (Linear's Preview / send buttons): a soft drop plus a tight contact shadow. */
   --shadow-btn: 0 4px 4px -1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.06)), 0 1px 1px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.12));
-  --shadow: 0 0 0 1px light-dark(rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.2)), 0 2px 32px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.25)), 0 4px 12px light-dark(rgb(0 0 0 / 0.05), transparent), 0 8px 16px light-dark(transparent, rgb(0 0 0 / 0.2));
+  --shadow:
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.2)), 0 2px 32px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.25)),
+    0 4px 12px light-dark(rgb(0 0 0 / 0.05), transparent), 0 8px 16px light-dark(transparent, rgb(0 0 0 / 0.2));
   --ring: 0 0 0 2px light-dark(color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--accent) 40%, transparent));
   /* Translucent chrome over scrolling content. */
   --glass: light-dark(color-mix(in srgb, var(--bg) 82%, transparent), color-mix(in srgb, var(--bg) 80%, transparent));
 
   /* Type: Inter for UI, headings and text; JetBrains Mono for scores, counts, dates and code. Both bundled (see ../fonts.js). */
-  --font-display: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-data: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-display: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-data: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --font-mono: var(--font-data);
-  --w-normal: 400; --w-medium: 510; --w-semibold: 590;
+  --w-normal: 400;
+  --w-medium: 510;
+  --w-semibold: 590;
 
   /* Spacing: 4px base, dense dashboard scale. */
-  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
 
   /* Motion: Linear's quick ease-out-quad, ~160ms. */
-  --dur-fast: 120ms; --dur: 160ms; --dur-slow: 240ms;
+  --dur-fast: 120ms;
+  --dur: 160ms;
+  --dur-slow: 240ms;
   --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-in: cubic-bezier(0.55, 0.085, 0.68, 0.53);
   /* Material 3's standard decelerate and accelerate curves with their durations (modals use them): entering decelerates
      into place, exiting accelerates away and takes less time. */
-  --ease-enter: cubic-bezier(0, 0, 0, 1); --dur-enter: 120ms;
-  --ease-exit: cubic-bezier(0.3, 0, 1, 1); --dur-exit: 80ms;
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --dur-enter: 120ms;
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --dur-exit: 80ms;
 
   /* Layers, lowest to highest. */
-  --z-sticky: 10; --z-header: 20; --z-drawer: 40; --z-toast: 50; --z-menu: 60; --z-overlay: 70;
+  --z-sticky: 10;
+  --z-header: 20;
+  --z-drawer: 40;
+  --z-toast: 50;
+  --z-menu: 60;
+  --z-overlay: 70;
 
   /* Icons (one family: Phosphor regular). */
-  --icon-sm: 14px; --icon-md: 16px; --icon-lg: 20px;
+  --icon-sm: 14px;
+  --icon-md: 16px;
+  --icon-lg: 20px;
 
   --scrim: light-dark(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.55));
   --scrollbar-thumb: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.1));
   --scrollbar-thumb-hover: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.2));
 
   /* Radii: sm for small chips and keys, r for rows, menu items and fields, lg for cards and popovers, xl for the panel and dialogs. */
-  --r-sm: 6px; --r: 8px; --r-lg: 10px; --r-xl: 12px; --r-pill: 9999px;
+  --r-sm: 6px;
+  --r: 8px;
+  --r-lg: 10px;
+  --r-xl: 12px;
+  --r-pill: 9999px;
   --gutter-l: max(16px, env(safe-area-inset-left, 0px));
   --gutter-r: max(16px, env(safe-area-inset-right, 0px));
 }
 /* Theme: follows the OS; data-theme pins it. color-scheme picks the side of every light-dark() token. */
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
-
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}

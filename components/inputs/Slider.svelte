@@ -111,7 +111,7 @@
     height: 4px;
     border-radius: var(--r-pill);
     background: var(--fill-4);
-    overflow: hidden;
+    overflow: clip;
   }
   .fill {
     position: absolute;
@@ -125,17 +125,18 @@
     top: 50%;
     width: 14px;
     height: 14px;
-    transform: translate(-50%, -50%);
+    translate: -50% -50%;
+    scale: 1;
     border-radius: 50%;
-    background: #fff;
+    background: var(--knob);
     border: 0;
     box-shadow:
-      0 0 0 1px rgb(0 0 0 / 0.12),
-      0 1px 3px rgb(0 0 0 / 0.3);
-    transition: transform 0.1s;
+      0 0 0 1px var(--knob-ring),
+      var(--knob-shadow);
+    transition: scale var(--dur-fast) var(--ease-out);
   }
   .slider:hover .thumb,
   .dragging .thumb {
-    transform: translate(-50%, -50%) scale(1.12);
+    scale: 1.12;
   }
 </style>

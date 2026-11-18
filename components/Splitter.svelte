@@ -115,7 +115,7 @@
     bottom: 8px;
     left: 50%;
     width: 2px;
-    transform: translateX(-50%);
+    translate: -50% 0;
     border-radius: 2px;
     background: transparent;
     transition: background-color var(--dur-fast) var(--ease-out);

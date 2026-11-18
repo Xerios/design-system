@@ -96,7 +96,7 @@
   @keyframes tip-in {
     from {
       opacity: 0;
-      transform: translateY(-3px);
+      translate: 0 -3px;
     }
   }
 </style>

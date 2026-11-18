@@ -142,8 +142,8 @@
     z-index: var(--z-menu);
     top: calc(100% + 6px);
     right: 0;
-    width: min(var(--w), calc(100vw - 32px));
-    max-height: min(70vh, 560px);
+    width: min(var(--w), calc(100dvw - 32px));
+    max-height: min(70dvh, 560px);
     overflow: auto;
     overscroll-behavior: contain;
     border: 1px solid var(--line-float);

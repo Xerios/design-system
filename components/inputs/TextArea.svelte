@@ -66,7 +66,7 @@
     display: block;
     width: 100%;
     min-height: 72px;
-    max-height: 40vh;
+    max-height: 40dvh;
     resize: vertical;
     field-sizing: content;
     padding: 10px 12px 12px;

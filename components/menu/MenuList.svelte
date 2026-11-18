@@ -174,9 +174,10 @@
     position: fixed;
     z-index: var(--z-menu);
     min-width: 220px;
-    max-width: min(340px, calc(100vw - 16px));
-    max-height: calc(100vh - 16px);
+    max-width: min(340px, calc(100dvw - 16px));
+    max-height: calc(100dvh - 16px);
     overflow-y: auto;
+    overscroll-behavior: contain;
     border: 1px solid transparent;
     background:
       linear-gradient(var(--elevated), var(--elevated)) padding-box,
@@ -251,7 +252,7 @@
   @keyframes pop {
     from {
       opacity: 0;
-      transform: scale(0.96);
+      scale: 0.96;
     }
   }
 </style>

@@ -1,5 +1,10 @@
-/* The design system's whole global layer, in cascade order. Import once, before the app's own CSS. */
-@import './tokens.css';
-@import './base.css';
-@import './effects.css';
-@import './atoms.css';
+/* The design system's whole global layer, in cascade order. Import once, before the app's own CSS.
+   Each file goes into its own cascade layer under `ds`, declared up front so the order holds whatever loads first.
+   Anything unlayered (the app's CSS, every component's scoped <style>) beats all of it whatever its specificity, so
+   overriding a token, atom or base rule never needs a heavier selector or !important. An app that layers its own CSS
+   declares `@layer ds, app;` (or similar) before importing this. */
+@layer ds.tokens, ds.base, ds.effects, ds.atoms;
+@import './tokens.css' layer(ds.tokens);
+@import './base.css' layer(ds.base);
+@import './effects.css' layer(ds.effects);
+@import './atoms.css' layer(ds.atoms);

@@ -47,7 +47,7 @@
   } = $props()
 </script>
 
-<div class={['card', className]} {...rest} data-variant={variant} class:dimmed class:loading class:locked={!expandable} class:has-actions={!!actions}>
+<div class={['card', className]} {...rest} data-variant={variant} class:dimmed class:loading class:locked={!expandable}>
   <details open={expandable && open}>
     <summary
       tabindex={expandable ? undefined : -1}
@@ -93,7 +93,7 @@
   }
 
   details {
-    overflow: hidden;
+    overflow: clip;
     border-radius: calc(var(--r-xl) - 1px);
   }
   summary {
@@ -109,7 +109,8 @@
     color: var(--fg);
     transition: background-color var(--dur) var(--ease-out);
   }
-  .has-actions summary {
+  /* Room for the corner actions, when there are any. */
+  .card:has(> .actions) summary {
     padding-right: 40px;
   }
   summary::-webkit-details-marker {
@@ -128,10 +129,11 @@
   .chev {
     display: inline-flex;
     color: var(--muted);
-    transition: transform var(--dur) var(--ease-out);
+    rotate: 0deg;
+    transition: rotate var(--dur) var(--ease-out);
   }
   details[open] .chev {
-    transform: rotate(90deg);
+    rotate: 90deg;
   }
   .lead {
     display: inline-flex;

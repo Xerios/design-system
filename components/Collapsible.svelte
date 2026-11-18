@@ -111,10 +111,11 @@
   }
   .chev {
     display: inline-flex;
-    transition: transform var(--dur) var(--ease-out);
+    rotate: 0deg;
+    transition: rotate var(--dur) var(--ease-out);
   }
   .open .chev {
-    transform: rotate(90deg);
+    rotate: 90deg;
   }
   .title {
     color: var(--fg);
