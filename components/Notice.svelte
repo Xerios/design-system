@@ -9,11 +9,18 @@
    *
    * tone: success | info | warning | neutral | danger (colours the icon and the fill). icon: an Icon name.
    * children: the text; links and buttons inside it are reachable with the keyboard as usual.
+   * Other attributes (class, id…) and attachments go to the strip.
+   *
+   * @typedef {object} Props
+   * @property {'success' | 'info' | 'warning' | 'neutral' | 'danger'} [tone]
+   * @property {string} [icon]
+   * @property {import('svelte').Snippet} [children]
    */
-  let { tone = 'neutral', icon = 'infoCircle', children } = $props()
+  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLParagraphElement>, keyof Props>} */
+  let { tone = 'neutral', icon = 'infoCircle', class: className, children, ...rest } = $props()
 </script>
 
-<p class="notice" data-tone={tone}>
+<p class={['notice', className]} data-tone={tone} {...rest}>
   <Icon name={icon} size="sm" />
   <span class="text">{@render children?.()}</span>
 </p>

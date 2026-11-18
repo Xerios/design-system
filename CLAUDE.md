@@ -7,7 +7,10 @@ Read it before building UI, and read a component's header comment before using i
 ## Using it (when working in an app)
 
 - Look here first. Before writing a button, field, dropdown, menu, popover, tooltip, toggle, collapsible,
-  empty state, toast or resizable panel, use the one in `components/` or the class in `css/atoms.css`.
+  empty state, toast, modal dialog or resizable panel, use the one in `components/` or the class in `css/atoms.css`.
+  A modal is `<Modal>`, not a hand-built `<dialog class="dialog">`; a plain question is `confirmDialog`.
+- Compose instead of copying: pass content as children and snippets, and add a class, attributes or an attachment
+  straight on the component (`<Empty class="…" {@attach …}>`); they reach its main element.
 - Import by path: `import Select from '$ds/components/inputs/Select.svelte'`, helpers from `$ds/lib/…`.
 - Style with tokens only: colours, radii, spacing, durations, z-index and shadows all come from
   `css/tokens.css`. No hex or rgb values, pixel radii or millisecond durations in component styles, with
@@ -24,7 +27,7 @@ Read it before building UI, and read a component's header comment before using i
   and animations come from `lib/motion.js` (`fade`, `fly`, `slide`, `scale`, `flip`, `tween`), which follow Material 3's
   motion rules and honour reduced motion; a custom one uses its `durations`, `easings` and `motion(ms)`.
 - Every control has a label (visible, or `hideLabel` / `aria-label`), works from the keyboard, and has a
-  pointer target of at least 24×24px. Anything on a context menu also has a visible `MoreButton`.
+  pointer target of at least 24×24px. Anything on a context menu also has a visible `MenuButton`.
 - Strict rule: every button whose meaning is not spelled out in visible text has a tooltip, with no
   exceptions. That covers icon-only buttons and links (`.icon-btn`, close and clear buttons) and terse
   toggles (a switch labelled "Live"). Use `{@attach tooltip('…')}` from `lib/tooltip.js`, alongside the
@@ -47,6 +50,12 @@ Read it before building UI, and read a component's header comment before using i
 - A new component belongs here only if another app could use it unchanged. Otherwise it goes in the app.
 - Start each component with a comment block: what it is for, a usage example, each prop, keyboard
   behaviour. That comment is its documentation. Then add it to `index.js` and to the table in `README.md`.
+- Type the props with a JSDoc `Props` typedef on `$props()`, intersected with the main element's attributes from
+  `svelte/elements` (`Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props>`). Take `class: className` and
+  `...rest`, and put `class={['own-class', className]} {...rest}` on that element, before the component's own event
+  handlers, so a consumer's class adds to it and their attachments arrive. Snippets for the parts a consumer fills in.
+- Svelte 5 practice: `$derived` (writable when a value resets) over `$effect` that sets state; DOM work in
+  `{@attach}`; page-wide listeners in `<svelte:document>` / `<svelte:window>`; ids from `$props.id()`.
 - New tokens go in `css/tokens.css` with a comment, in the `:root` block as `light-dark(light, dark)` when they
   differ by theme (shadows: one `light-dark()` per layer colour, `transparent` for a layer one theme lacks), and
   in the README's token table. A non-colour value that differs needs its dark value twice below the

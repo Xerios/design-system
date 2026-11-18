@@ -38,11 +38,49 @@
    */
   import Icon from './Icon.svelte'
   import InfoTip from './InfoTip.svelte'
-  import MoreButton from './MoreButton.svelte'
+  import MenuButton from './menu/MenuButton.svelte'
   import { contextMenu } from '../lib/menu.svelte.js'
   import { scrollFade } from '../lib/scroll-fade.js'
   import { tooltip } from '../lib/tooltip.js'
 
+  /**
+   * @typedef {object} Column
+   * @property {string} key
+   * @property {string} label
+   * @property {string} [title] names the column in its sort tooltip when `label` is terse
+   * @property {boolean} [hideLabel]
+   * @property {boolean} [header] cells are row headers (<th scope="row">)
+   * @property {boolean} [num]
+   * @property {boolean} [center]
+   * @property {boolean} [shrink]
+   * @property {boolean} [desc] sorts descending first
+   * @property {(row: any) => string | number} [sortValue] makes the column sortable
+   * @property {(row: any) => unknown} [value] the cell's text when there is no `cell` snippet
+   *
+   * @typedef {object} Group
+   * @property {string} key
+   * @property {string} label
+   * @property {any[]} rows
+   * @property {string} [sub]
+   * @property {string} [tone]
+   * @property {{ label?: string, text: string }[]} [info]
+   *
+   * @typedef {object} Props
+   * @property {Column[]} columns
+   * @property {any[]} [rows]
+   * @property {Group[] | null} [groups]
+   * @property {(row: any) => string | number} key
+   * @property {import('svelte').Snippet<[any, Column]>} [cell]
+   * @property {{ key: string, dir: number } | null} [sort] bindable
+   * @property {string[]} [collapsed] bindable
+   * @property {string | number | null} [selected]
+   * @property {(row: any) => void} [onselect]
+   * @property {(row: any) => import('../lib/menu.svelte.js').MenuItem[]} [rowMenu]
+   * @property {(row: any) => string} [rowLabel]
+   * @property {string} [label]
+   * @property {string} [emptyGroup]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
   let {
     columns,
     rows = [],
@@ -57,6 +95,8 @@
     rowLabel = (row) => String(key(row)),
     label = undefined,
     emptyGroup = 'Nothing here.',
+    class: className,
+    ...rest
   } = $props()
 
   const grouped = $derived(Boolean(groups))
@@ -96,7 +136,7 @@
   const noMenu = () => {}
 </script>
 
-<div class="table-card">
+<div class={['table-card', className]} {...rest}>
   <div class="table-scroll" {@attach scrollFade()}>
     <table aria-label={label}>
       <thead>
@@ -166,7 +206,7 @@
                     {#if cell}{@render cell(row, column)}{:else}{column.value?.(row) ?? ''}{/if}
                   </svelte:element>
                 {/each}
-                {#if rowMenu}<td class="shrink actions"><MoreButton items={() => rowMenu(row)} label={rowLabel(row)} /></td>{/if}
+                {#if rowMenu}<td class="shrink actions"><MenuButton items={() => rowMenu(row)} label={rowLabel(row)} /></td>{/if}
               </tr>
             {:else}
               {#if grouped}

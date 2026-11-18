@@ -15,6 +15,7 @@
    * Keyboard: Backspace or ← at the start of the input selects the last tag; ← and → move between tags and back to the
    * input; Backspace or Delete removes the selected tag; Escape clears what is typed; typing goes back to the input.
    * Clicking a tag selects it. Additions and removals are announced to screen readers.
+   * Other attributes and attachments go to the <input>.
    */
   import { tick } from 'svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
@@ -23,6 +24,20 @@
   import { flip, scale, durations } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
 
+  /**
+   * @typedef {object} Props
+   * @property {string[]} [value] bindable
+   * @property {string} id
+   * @property {string} label
+   * @property {boolean} [hideLabel]
+   * @property {string} [placeholder]
+   * @property {string} [info]
+   * @property {string} [error]
+   * @property {RegExp} [separator]
+   * @property {(text: string) => string} [normalize]
+   * @property {((tag: string) => string | null | undefined) | null} [validate]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLInputAttributes, keyof Props>} */
   let {
     value = $bindable([]),
     id,
@@ -34,6 +49,7 @@
     separator = /[,\n]+/,
     normalize = (text) => text.trim(),
     validate = null,
+    ...rest
   } = $props()
 
   let input = $state()
@@ -67,9 +83,9 @@
   /** Turns the typed text into tags. `all`: the last piece too (Enter, paste, leaving); otherwise it may still be typed. */
   function commit(all) {
     const pieces = draft.split(separator)
-    const rest = all ? '' : pieces.pop()
+    const unfinished = all ? '' : pieces.pop()
     const refused = add(pieces)
-    draft = [...refused, rest].filter(Boolean).join(', ')
+    draft = [...refused, unfinished].filter(Boolean).join(', ')
   }
 
   function remove(i, focusAfter) {
@@ -171,6 +187,7 @@
       {id}
       bind:this={input}
       bind:value={draft}
+      {...rest}
       type="text"
       placeholder={value.length ? '' : placeholder}
       autocomplete="off"

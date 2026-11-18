@@ -4,46 +4,48 @@
 //   import '$ds/fonts.js';
 //   import '$ds/css/index.css';
 
-export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte';
-export { default as Empty } from './components/Empty.svelte';
-export { default as ErrorMessage } from './components/ErrorMessage.svelte';
-export { default as Notice } from './components/Notice.svelte';
-export { default as Shimmer } from './components/Shimmer.svelte';
-export { default as WorkingBorder } from './components/WorkingBorder.svelte';
-export { default as Collapsible } from './components/Collapsible.svelte';
-export { default as CollapsibleAdvanced } from './components/CollapsibleAdvanced.svelte';
-export { default as Splitter } from './components/Splitter.svelte';
-export { default as Popover } from './components/Popover.svelte';
-export { default as Tooltip } from './components/Tooltip.svelte';
-export { default as InfoTip } from './components/InfoTip.svelte';
-export { default as Md } from './components/Md.svelte';
-export { default as MoreButton } from './components/MoreButton.svelte';
-export { default as Table } from './components/Table.svelte';
-export { default as Toast } from './components/Toast.svelte';
-export { default as Dialogs } from './components/Dialogs.svelte';
+export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte'
+export { default as Empty } from './components/Empty.svelte'
+export { default as ErrorMessage } from './components/ErrorMessage.svelte'
+export { default as Notice } from './components/Notice.svelte'
+export { default as Shimmer } from './components/Shimmer.svelte'
+export { default as WorkingBorder } from './components/WorkingBorder.svelte'
+export { default as Collapsible } from './components/Collapsible.svelte'
+export { default as CollapsibleAdvanced } from './components/CollapsibleAdvanced.svelte'
+export { default as Splitter } from './components/Splitter.svelte'
+export { default as Popover } from './components/Popover.svelte'
+export { default as Tooltip } from './components/Tooltip.svelte'
+export { default as InfoTip } from './components/InfoTip.svelte'
+export { default as Md } from './components/Md.svelte'
+export { default as Table } from './components/Table.svelte'
+export { default as Toast } from './components/Toast.svelte'
+export { default as Dialogs } from './components/Dialogs.svelte'
+export { default as Modal } from './components/Modal.svelte'
 
-export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte';
-export { default as FileButton } from './components/inputs/FileButton.svelte';
-export { default as SearchField } from './components/inputs/SearchField.svelte';
-export { default as RadioGroup } from './components/inputs/RadioGroup.svelte';
-export { default as Segmented } from './components/inputs/Segmented.svelte';
-export { default as Select } from './components/inputs/Select.svelte';
-export { default as Slider } from './components/inputs/Slider.svelte';
-export { default as Switch } from './components/inputs/Switch.svelte';
-export { default as TagInput } from './components/inputs/TagInput.svelte';
-export { default as TextArea } from './components/inputs/TextArea.svelte';
-export { default as TextField } from './components/inputs/TextField.svelte';
+export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte'
+export { default as FileButton } from './components/inputs/FileButton.svelte'
+export { default as SearchField } from './components/inputs/SearchField.svelte'
+export { default as RadioGroup } from './components/inputs/RadioGroup.svelte'
+export { default as Segmented } from './components/inputs/Segmented.svelte'
+export { default as Select } from './components/inputs/Select.svelte'
+export { default as Slider } from './components/inputs/Slider.svelte'
+export { default as Switch } from './components/inputs/Switch.svelte'
+export { default as TagInput } from './components/inputs/TagInput.svelte'
+export { default as TextArea } from './components/inputs/TextArea.svelte'
+export { default as TextField } from './components/inputs/TextField.svelte'
 
-export { default as ContextMenu } from './components/menu/ContextMenu.svelte';
-export { default as MenuList } from './components/menu/MenuList.svelte';
+export { default as ContextMenu } from './components/menu/ContextMenu.svelte'
+export { default as MenuList } from './components/menu/MenuList.svelte'
+export { default as MenuButton } from './components/menu/MenuButton.svelte'
 
-export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu.svelte.js';
-export { alertDialog, confirmDialog, promptDialog } from './lib/dialogs.svelte.js';
-export { portal, portalNear, backdropClose, closeRequests } from './lib/dom.js';
-export { motion, durations, easings, fade, fly, slide, scale, flip, tween } from './lib/motion.js';
-export { scrollFade } from './lib/scroll-fade.js';
-export { validity } from './lib/validity.js';
-export { tooltip } from './lib/tooltip.js';
-export { fieldErrors } from './lib/field-errors.svelte.js';
-export { inlineMd } from './lib/inline-md.js';
-export { spotlight } from './lib/spotlight.js';
+export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu.svelte.js'
+export { alertDialog, confirmDialog, promptDialog } from './lib/dialogs.svelte.js'
+export { portal, portalNear, topLayer, backdropClose, closeRequests } from './lib/dom.js'
+export { radioKeys } from './lib/roving.js'
+export { motion, durations, easings, fade, fly, slide, scale, flip, tween } from './lib/motion.js'
+export { scrollFade } from './lib/scroll-fade.js'
+export { validity } from './lib/validity.js'
+export { tooltip } from './lib/tooltip.js'
+export { fieldErrors } from './lib/field-errors.svelte.js'
+export { inlineMd } from './lib/inline-md.js'
+export { spotlight } from './lib/spotlight.js'

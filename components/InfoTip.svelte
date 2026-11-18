@@ -7,12 +7,20 @@
    * panes, sticky headers and clipping cards can't cover or cut it.
    * `lines`: [{ label?, text }]; `label`: the button's accessible name.
    * The tip fades in and out with a small slide away from the ⓘ (instant under reduced motion).
+   * Other attributes (class…) and attachments go to the ⓘ button.
    */
   import Icon from './Icon.svelte'
   import { topLayer } from '../lib/dom.js'
   import { fade, motion, durations, easings } from '../lib/motion.js'
 
-  let { label = 'More information', lines = [], pinnable = false } = $props()
+  /**
+   * @typedef {object} Props
+   * @property {string} [label]
+   * @property {{ label?: string, text: string }[]} [lines]
+   * @property {boolean} [pinnable]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
+  let { label = 'More information', lines = [], pinnable = false, class: className, ...rest } = $props()
   const propsId = $props.id()
   const uid = 'tip-' + propsId
   let btn = $state()
@@ -72,7 +80,8 @@
 <button
   bind:this={btn}
   type="button"
-  class="info"
+  class={['info', className]}
+  {...rest}
   class:pinned
   aria-label={label}
   aria-expanded={pinnable ? pinned : undefined}

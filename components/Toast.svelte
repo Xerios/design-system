@@ -15,6 +15,14 @@
   import { fly } from '../lib/motion.js'
   import { tooltip } from '../lib/tooltip.js'
 
+  /**
+   * @typedef {{ id: string | number, message: string, action?: { label: string, run: () => void, icon?: string } }} ToastData
+   * @typedef {object} Props
+   * @property {ToastData | null} [toast]
+   * @property {(held: boolean) => void} [onhold]
+   * @property {() => void} [ondismiss]
+   */
+  /** @type {Props} */
   let { toast = null, onhold, ondismiss } = $props()
   /** Attachment on the region: each new toast re-enters the top layer, so it lands above whatever opened since the last one. */
   function inTopLayer(node) {

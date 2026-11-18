@@ -12,6 +12,22 @@
    * for a form's worth of them.
    * info: what the field is for or how to fill it, behind an ⓘ next to the label (see InfoTip).
    */
+  /**
+   * @typedef {object} Props
+   * @property {string} [value] bindable
+   * @property {string} id
+   * @property {string} label
+   * @property {string} [placeholder]
+   * @property {string} [type] 'search' (the default) adds the search icon, the clear button and Esc to clear
+   * @property {boolean} [icon]
+   * @property {string | null} [shortcut]
+   * @property {boolean} [hideLabel]
+   * @property {boolean} [compact]
+   * @property {((value: string) => void) | null} [onenter]
+   * @property {string} [error]
+   * @property {string} [info]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLInputAttributes, keyof Props>} */
   let {
     value = $bindable(''),
     id,

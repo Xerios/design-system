@@ -103,15 +103,7 @@
   }
 </script>
 
-<div
-  class="ctx-menu"
-  role="menu"
-  aria-label={label}
-  tabindex="-1"
-  {@attach place}
-  {onkeydown}
-  oncontextmenu={(e) => e.preventDefault()}
->
+<div class="ctx-menu" role="menu" aria-label={label} tabindex="-1" {@attach place} {onkeydown} oncontextmenu={(e) => e.preventDefault()}>
   {#each items as item, i (i)}
     {#if item.separator}
       <div class="sep" role="separator"></div>

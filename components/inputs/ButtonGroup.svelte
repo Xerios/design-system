@@ -1,6 +1,7 @@
 <script>
   import Icon from '../Icon.svelte'
   import { tooltip } from '../../lib/tooltip.js'
+  import { radioKeys } from '../../lib/roving.js'
   /**
    * Single choice shown as one joined pill: the options sit side by side, split by hairlines, with only the first and last
    * rounded off; the chosen one is filled. A radio group with roving focus, for toolbar filters and view switches.
@@ -11,24 +12,22 @@
    * name); `onchange(value)`; `iconOnly` shows only the icons, with the label as tooltip and aria-label.
    * Keyboard: Tab focuses the chosen option; arrows, Home and End move and choose.
    */
-  let { value, options, label, onchange, iconOnly = false } = $props()
-  const buttons = []
-
-  function onkeydown(e, i) {
-    const n = options.length
-    const next = { ArrowRight: (i + 1) % n, ArrowDown: (i + 1) % n, ArrowLeft: (i - 1 + n) % n, ArrowUp: (i - 1 + n) % n, Home: 0, End: n - 1 }[e.key]
-    if (next === undefined) return
-    e.preventDefault()
-    e.stopPropagation()
-    buttons[next].focus()
-    onchange(options[next].value)
-  }
+  /**
+   * @typedef {{ value: any, label: string, icon?: string, hint?: string }} Option
+   * @typedef {object} Props
+   * @property {any} value
+   * @property {Option[]} options
+   * @property {string} label
+   * @property {(value: any) => void} onchange
+   * @property {boolean} [iconOnly]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
+  let { value, options, label, onchange, iconOnly = false, class: className, ...rest } = $props()
 </script>
 
-<div class="group" role="radiogroup" aria-label={label}>
-  {#each options as o, i (o.value)}
+<div class={['group', className]} role="radiogroup" aria-label={label} {...rest} {@attach radioKeys}>
+  {#each options as o (o.value)}
     <button
-      bind:this={buttons[i]}
       type="button"
       role="radio"
       aria-checked={o.value === value}
@@ -36,7 +35,6 @@
       onclick={() => onchange(o.value)}
       {@attach tooltip(iconOnly ? o.label + (o.hint ? ` (${o.hint})` : '') : o.hint)}
       aria-label={iconOnly ? o.label : undefined}
-      onkeydown={(e) => onkeydown(e, i)}
       >{#if o.icon}<Icon name={o.icon} size="sm" />{/if}{#if !iconOnly}<span class="text">{o.label}</span>{/if}</button
     >
   {/each}

@@ -4,139 +4,447 @@
 /* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid indigo; icon buttons are ghost circles.
    The solid buttons (primary, danger) are raised: their top inner edge catches the light. */
 .btn {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 28px;
-  padding: 0 11px; border-radius: var(--r-pill);
-  border: 1px solid var(--line-strong); background: var(--fill-1); color: var(--fg-2);
-  font-weight: var(--w-medium); font-size: 12px; line-height: 14px; letter-spacing: 0; text-decoration: none; cursor: pointer; white-space: nowrap;
-  transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out), filter var(--dur) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: var(--fill-1);
+  color: var(--fg-2);
+  font-weight: var(--w-medium);
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    filter var(--dur) var(--ease-out);
 }
-.btn :where(.icon) { color: var(--muted); transition: color var(--dur) var(--ease-out); }
+.btn :where(.icon) {
+  color: var(--muted);
+  transition: color var(--dur) var(--ease-out);
+}
 /* Hover and pressed feedback only on buttons that can act; :where keeps the plain .btn:hover / .btn:active specificity. */
-.btn:hover:where(:not(:disabled, [aria-disabled="true"])) { background: var(--fill-3); color: var(--fg); }
-.btn:hover:where(:not(:disabled, [aria-disabled="true"])) :where(.icon) { color: inherit; }
-.btn:active:where(:not(:disabled, [aria-disabled="true"])) { background: var(--fill-4); transform: scale(0.98); }
-.btn-primary { background: var(--brand); border-color: color-mix(in srgb, white 12%, transparent); color: var(--accent-ink); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), var(--shadow-btn); }
-.btn-primary :where(.icon) { color: inherit; }
-.btn-primary:hover:where(:not(:disabled, [aria-disabled="true"])) { background: var(--brand); color: var(--accent-ink); filter: brightness(1.1); }
-.btn-primary:active:where(:not(:disabled, [aria-disabled="true"])) { background: var(--brand); filter: brightness(0.95); }
-.btn-small { min-height: 24px; padding: 0 9px; font-size: 12px; }
-.btn-danger { background: var(--danger); border-color: transparent; color: var(--accent-ink); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2), var(--shadow-btn); }
-.btn-danger :where(.icon) { color: inherit; }
-/* Disabled: faded and flat (no raised edge, no drop shadow), and it doesn't answer the pointer. After the variants so it wins. */
-.btn:where(:disabled, [aria-disabled="true"]) { opacity: 0.5; box-shadow: none; filter: none; cursor: default; }
-.btn-danger:hover:where(:not(:disabled, [aria-disabled="true"])) { background: var(--danger); color: var(--accent-ink); filter: brightness(1.1); }
-.linklike { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-align: left; font-weight: inherit; }
-.linklike:hover { text-decoration: underline; text-underline-offset: 3px; }
-.icon-btn {
-  display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; padding: 0;
-  background: none; border: 0; border-radius: var(--r-pill); color: var(--muted);
-  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+.btn:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--fill-3);
+  color: var(--fg);
 }
-.icon-btn:hover:where(:not(:disabled, [aria-disabled="true"])) { background: var(--fill-3); color: var(--fg-2); }
-.icon-btn:active:where(:not(:disabled, [aria-disabled="true"])), .icon-btn[aria-expanded="true"] { background: var(--fill-4); color: var(--fg); }
-.icon-btn[aria-pressed="true"] { color: var(--warning); }
-.icon-btn:where(:disabled, [aria-disabled="true"]) { opacity: 0.5; cursor: default; }
+.btn:hover:where(:not(:disabled, [aria-disabled='true'])) :where(.icon) {
+  color: inherit;
+}
+.btn:active:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--fill-4);
+  transform: scale(0.98);
+}
+.btn-primary {
+  background: var(--brand);
+  border-color: color-mix(in srgb, white 12%, transparent);
+  color: var(--accent-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    var(--shadow-btn);
+}
+.btn-primary :where(.icon) {
+  color: inherit;
+}
+.btn-primary:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--brand);
+  color: var(--accent-ink);
+  filter: brightness(1.1);
+}
+.btn-primary:active:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--brand);
+  filter: brightness(0.95);
+}
+.btn-small {
+  min-height: 24px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+.btn-danger {
+  background: var(--danger);
+  border-color: transparent;
+  color: var(--accent-ink);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.2),
+    var(--shadow-btn);
+}
+.btn-danger :where(.icon) {
+  color: inherit;
+}
+/* Disabled: faded and flat (no raised edge, no drop shadow), and it doesn't answer the pointer. After the variants so it wins. */
+.btn:where(:disabled, [aria-disabled='true']) {
+  opacity: 0.5;
+  box-shadow: none;
+  filter: none;
+  cursor: default;
+}
+.btn-danger:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--danger);
+  color: var(--accent-ink);
+  filter: brightness(1.1);
+}
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  cursor: pointer;
+  text-align: left;
+  font-weight: inherit;
+}
+.linklike:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+.icon-btn:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--fill-3);
+  color: var(--fg-2);
+}
+.icon-btn:active:where(:not(:disabled, [aria-disabled='true'])),
+.icon-btn[aria-expanded='true'] {
+  background: var(--fill-4);
+  color: var(--fg);
+}
+.icon-btn[aria-pressed='true'] {
+  color: var(--warning);
+}
+.icon-btn:where(:disabled, [aria-disabled='true']) {
+  opacity: 0.5;
+  cursor: default;
+}
 /* The tooltip drawn by the `tooltip` attachment (lib/tooltip.js): a popover in the top layer, placed from script. */
 .tooltip {
-  position: fixed; inset: auto; margin: 0; width: max-content; max-width: 280px; pointer-events: none;
-  display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--line-float); border-radius: var(--r); background: var(--elevated); box-shadow: var(--shadow);
-  color: var(--fg-2); font: 400 12px/1.5 var(--font-body); white-space: normal; text-align: left; overflow: visible;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: max-content;
+  max-width: 280px;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line-float);
+  border-radius: var(--r);
+  background: var(--elevated);
+  box-shadow: var(--shadow);
+  color: var(--fg-2);
+  font: 400 12px/1.5 var(--font-body);
+  white-space: normal;
+  text-align: left;
+  overflow: visible;
 }
 /* Arrow on a tip, pointing at the element it belongs to: data-arrow="up" when the tip sits below it, "down" when above.
    --arrow-x is where the point goes, from the tip's left edge (a length, or calc(100% - …) from the right); it is kept
    clear of the corners. A rotated square that takes the tip's own background and hairline, so it reads as one shape.
    The tip needs overflow: visible and a gap of about 8px to the element. */
 [data-arrow]::before {
-  content: ""; position: absolute; left: clamp(12px, var(--arrow-x, 50%), calc(100% - 12px)); width: 8px; height: 8px;
-  background: inherit; border: inherit; border-radius: 0; pointer-events: none; transform: translateX(-50%) rotate(45deg);
+  content: '';
+  position: absolute;
+  left: clamp(12px, var(--arrow-x, 50%), calc(100% - 12px));
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  border: inherit;
+  border-radius: 0;
+  pointer-events: none;
+  transform: translateX(-50%) rotate(45deg);
 }
-[data-arrow="up"]::before { top: -5px; border-right-width: 0; border-bottom-width: 0; border-top-left-radius: 2px; }
-[data-arrow="down"]::before { bottom: -5px; border-left-width: 0; border-top-width: 0; border-bottom-right-radius: 2px; }
+[data-arrow='up']::before {
+  top: -5px;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-top-left-radius: 2px;
+}
+[data-arrow='down']::before {
+  bottom: -5px;
+  border-left-width: 0;
+  border-top-width: 0;
+  border-bottom-right-radius: 2px;
+}
 
 /* ---------- data tables ---------- */
 /* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical
    hairlines, a header row in small tertiary text, and a full-bleed fill on hover. Wrap a <table> in .data-table;
    mark number columns .num. Row headers (<th scope="row">) read as the name column. */
-.data-table { overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--r-xl); background: var(--fill-1); }
-.data-table table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--fg-2); }
-.data-table :is(th, td) { height: 40px; padding: 8px 12px; text-align: left; vertical-align: middle; font-weight: inherit; }
-.data-table :is(th, td):first-child { padding-left: 16px; }
-.data-table :is(th, td):last-child { padding-right: 16px; }
-.data-table :is(th, td) + :is(th, td) { border-left: 1px solid var(--line); }
-.data-table thead th { height: 36px; font-size: 12px; font-weight: var(--w-medium); color: var(--muted); white-space: nowrap; }
-.data-table tbody tr { border-top: 1px solid var(--line); transition: background-color var(--dur) var(--ease-out); }
-.data-table tbody tr:hover { background: var(--fill-2); }
-.data-table .num { width: 1%; text-align: right; white-space: nowrap; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.data-table {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-xl);
+  background: var(--fill-1);
+}
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--fg-2);
+}
+.data-table :is(th, td) {
+  height: 40px;
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: middle;
+  font-weight: inherit;
+}
+.data-table :is(th, td):first-child {
+  padding-left: 16px;
+}
+.data-table :is(th, td):last-child {
+  padding-right: 16px;
+}
+.data-table :is(th, td) + :is(th, td) {
+  border-left: 1px solid var(--line);
+}
+.data-table thead th {
+  height: 36px;
+  font-size: 12px;
+  font-weight: var(--w-medium);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.data-table tbody tr {
+  border-top: 1px solid var(--line);
+  transition: background-color var(--dur) var(--ease-out);
+}
+.data-table tbody tr:hover {
+  background: var(--fill-2);
+}
+.data-table .num {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ---------- small atoms ---------- */
 /* Section labels: sentence case, small, medium weight, tertiary (Linear doesn't shout with uppercase). */
-.eyebrow { font-size: 12px; color: var(--muted); font-weight: var(--w-medium); }
-.count { font: var(--w-medium) 11px/18px var(--font-data); font-variant-numeric: tabular-nums; color: var(--muted); background: var(--fill-3); border-radius: var(--r-pill); padding: 0 7px; }
+.eyebrow {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: var(--w-medium);
+}
+.count {
+  font: var(--w-medium) 11px/18px var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--fill-3);
+  border-radius: var(--r-pill);
+  padding: 0 7px;
+}
 
 /* Tones: set data-tone on any element to get --tone / --tone-soft for it. Apps add their own names the same way. */
-[data-tone="success"] { --tone: var(--success); --tone-soft: var(--success-soft); }
-[data-tone="info"] { --tone: var(--info); --tone-soft: var(--info-soft); }
-[data-tone="warning"] { --tone: var(--warning); --tone-soft: var(--warning-soft); }
-[data-tone="neutral"] { --tone: var(--neutral); --tone-soft: var(--neutral-soft); }
-[data-tone="danger"] { --tone: var(--danger); --tone-soft: var(--danger-soft); }
+[data-tone='success'] {
+  --tone: var(--success);
+  --tone-soft: var(--success-soft);
+}
+[data-tone='info'] {
+  --tone: var(--info);
+  --tone-soft: var(--info-soft);
+}
+[data-tone='warning'] {
+  --tone: var(--warning);
+  --tone-soft: var(--warning-soft);
+}
+[data-tone='neutral'] {
+  --tone: var(--neutral);
+  --tone-soft: var(--neutral-soft);
+}
+[data-tone='danger'] {
+  --tone: var(--danger);
+  --tone-soft: var(--danger-soft);
+}
 
 /* Label chips (Linear's labels and PR pills on issue rows and board cards): a hairline pill in small medium-weight
    tertiary text, led by a coloured dot (.label-dot, colour from --dot) or a 14px icon. .label-chip.icon-only is the square
    24px variant (Linear's priority chip). */
 .label-chip {
-  display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; flex: none; min-width: 0;
-  border: 1px solid var(--line-strong); border-radius: var(--r-pill); background: none;
-  font: var(--w-medium) 12px/14px var(--font-body); color: var(--muted); white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px 0 6px;
+  flex: none;
+  min-width: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: none;
+  font: var(--w-medium) 12px/14px var(--font-body);
+  color: var(--muted);
+  white-space: nowrap;
 }
-.label-chip :where(.icon) { --icon-size: 14px; color: var(--muted); }
-.label-chip.icon-only { width: 22px; padding: 0; justify-content: center; }
-.label-chip.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; padding: 0 7px; }
-.label-dot { width: 7px; height: 7px; margin: 0 2px; border-radius: 50%; background: var(--dot, var(--muted)); flex: none; }
+.label-chip :where(.icon) {
+  --icon-size: 14px;
+  color: var(--muted);
+}
+.label-chip.icon-only {
+  width: 22px;
+  padding: 0;
+  justify-content: center;
+}
+.label-chip.num {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  padding: 0 7px;
+}
+.label-dot {
+  width: 7px;
+  height: 7px;
+  margin: 0 2px;
+  border-radius: 50%;
+  background: var(--dot, var(--muted));
+  flex: none;
+}
 
 /* Label above every form control (custom inputs share it). */
 /* The box a text field draws (TextField, TextArea, TagInput): sunken, the opposite of a raised button. A faint fill
    inside an inset hairline, with a soft shadow inside its top and left edges (--sunken-shadow). Focus turns the hairline
    to the accent and adds the ring; a message turns it red. */
 .field-box {
-  border-radius: var(--r); background: var(--fill-2); box-shadow: inset 0 0 0 1px var(--line), var(--sunken-shadow);
-  transition: background-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  border-radius: var(--r);
+  background: var(--fill-2);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    var(--sunken-shadow);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
 }
-.field-box:hover { background: var(--fill-3); }
-.field-box:focus-within { box-shadow: inset 0 0 0 1px var(--accent-line), var(--sunken-shadow), var(--ring); }
+.field-box:hover {
+  background: var(--fill-3);
+}
+.field-box:focus-within {
+  box-shadow:
+    inset 0 0 0 1px var(--accent-line),
+    var(--sunken-shadow),
+    var(--ring);
+}
 /* Red only once there is a message (aria-invalid), not on the browser's :user-invalid, which fires as soon as a field is left. */
-.field-box:has([aria-invalid="true"]) { box-shadow: inset 0 0 0 1px var(--danger), var(--sunken-shadow); }
-.field-box:has([aria-invalid="true"]):focus-within { box-shadow: inset 0 0 0 1px var(--danger), var(--sunken-shadow), 0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent); }
-.field-label { font-size: 12px; color: var(--muted); font-weight: var(--w-medium); white-space: nowrap; }
+.field-box:has([aria-invalid='true']) {
+  box-shadow:
+    inset 0 0 0 1px var(--danger),
+    var(--sunken-shadow);
+}
+.field-box:has([aria-invalid='true']):focus-within {
+  box-shadow:
+    inset 0 0 0 1px var(--danger),
+    var(--sunken-shadow),
+    0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent);
+}
+.field-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: var(--w-medium);
+  white-space: nowrap;
+}
 /* A label with an InfoTip after it (fields' `info`): the 24px ⓘ overlaps the row's padding so the label row keeps its height. */
-.field-head { display: flex; align-items: center; gap: 2px; min-width: 0; }
-.field-head > .info { margin-block: -5px; }
+.field-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.field-head > .info {
+  margin-block: -5px;
+}
 
 /* Unread / new marker: a small accent dot (Popover's `dot` uses it; use it on rows, cards and list items too). */
-.new-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+.new-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
 
 /* ---------- modal dialogs ---------- */
 /* A floating panel with a header, a scrolling body and a footer of actions; .confirm is the narrow one for a question.
+   --dialog-width sets another width (560px, or 420px for .confirm); it is inherited, so <Modal --dialog-width="720px"> works.
    Pinned near the top of the window: when the content grows or shrinks the bottom edge moves and the header stays put. */
 .dialog {
   --dialog-top: clamp(var(--space-4), 10dvh, calc(var(--space-8) * 3));
-  flex-direction: column; width: min(560px, calc(100vw - var(--space-8))); max-height: calc(100dvh - var(--dialog-top) - var(--space-4));
-  margin: var(--dialog-top) auto auto; padding: 0;
-  border: 1px solid var(--line-float); border-radius: var(--r-xl); background: var(--elevated); color: var(--fg); box-shadow: var(--shadow);
+  flex-direction: column;
+  width: min(var(--dialog-width, 560px), calc(100vw - var(--space-8)));
+  max-height: calc(100dvh - var(--dialog-top) - var(--space-4));
+  margin: var(--dialog-top) auto auto;
+  padding: 0;
+  border: 1px solid var(--line-float);
+  border-radius: var(--r-xl);
+  background: var(--elevated);
+  color: var(--fg);
+  box-shadow: var(--shadow);
 }
 /* Lit like the view card: the shine on the edge (::after, effects.css) and the corner light (--glow, as .corner-glow
    draws it) behind the content. A modal is in the top layer, so it is already positioned and its own stacking context.
    Both lie inside the 1px border, so their radius is the dialog's (--r-xl) less 1px. */
 .dialog::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: calc(var(--r-xl) - 1px);
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: calc(var(--r-xl) - 1px);
   background: radial-gradient(200px 200px at 0 0, var(--glow) 0%, transparent 90%);
 }
-.dialog.confirm { width: min(420px, calc(100vw - var(--space-8))); }
+.dialog.confirm {
+  width: min(var(--dialog-width, 420px), calc(100vw - var(--space-8)));
+}
 /* Only `display` depends on [open]: it is held through the closing transition, so the layout can't change mid-fade. */
-.dialog[open] { display: flex; }
+.dialog[open] {
+  display: flex;
+}
 /* The film grain over the scrim, so the dimmed page reads as a surface rather than a flat tint. */
-.dialog::backdrop { background: var(--grain) 0 0 / 256px 256px, var(--scrim); backdrop-filter: blur(2px);}
-.dialog-head { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-bottom: 1px solid var(--line); }
-.dialog-head h2 { flex: 1; font: var(--w-semibold) 14px var(--font-display); }
-.dialog-body { display: grid; gap: var(--space-4); padding: var(--space-5); overflow-y: auto; }
-.dialog-foot { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3) var(--space-5); border-top: 1px solid var(--line); }
+.dialog::backdrop {
+  background:
+    var(--grain) 0 0 / 256px 256px,
+    var(--scrim);
+  backdrop-filter: blur(2px);
+}
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--line);
+}
+.dialog-head h2 {
+  flex: 1;
+  font: var(--w-semibold) 14px var(--font-display);
+}
+.dialog-body {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+.dialog-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line);
+}

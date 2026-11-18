@@ -12,15 +12,50 @@
    * it turns expandable again the card opens per `open`, so content that arrives unfolds by itself.
    * `loading` runs the working border (WorkingBorder): comets of colour circling the card's edge.
    */
-  import Icon from './Icon.svelte';
-  import WorkingBorder from './WorkingBorder.svelte';
+  import Icon from './Icon.svelte'
+  import WorkingBorder from './WorkingBorder.svelte'
 
-  let { title, open = true, variant = 'default', dimmed = false, expandable = true, loading = false, lead, meta, end, actions, children } = $props();
+  /**
+   * @typedef {object} Props
+   * @property {string} title
+   * @property {boolean} [open]
+   * @property {string} [variant]
+   * @property {boolean} [dimmed]
+   * @property {boolean} [expandable]
+   * @property {boolean} [loading]
+   * @property {import('svelte').Snippet} [lead]
+   * @property {import('svelte').Snippet} [meta]
+   * @property {import('svelte').Snippet} [end]
+   * @property {import('svelte').Snippet} [actions]
+   * @property {import('svelte').Snippet} [children]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
+  let {
+    title,
+    open = true,
+    variant = 'default',
+    dimmed = false,
+    expandable = true,
+    loading = false,
+    lead,
+    meta,
+    end,
+    actions,
+    class: className,
+    children,
+    ...rest
+  } = $props()
 </script>
 
-<div class="card" data-variant={variant} class:dimmed class:loading class:locked={!expandable} class:has-actions={!!actions}>
+<div class={['card', className]} {...rest} data-variant={variant} class:dimmed class:loading class:locked={!expandable} class:has-actions={!!actions}>
   <details open={expandable && open}>
-    <summary tabindex={expandable ? undefined : -1} aria-disabled={expandable ? undefined : 'true'} onclick={(e) => { if (!expandable) e.preventDefault(); }}>
+    <summary
+      tabindex={expandable ? undefined : -1}
+      aria-disabled={expandable ? undefined : 'true'}
+      onclick={(e) => {
+        if (!expandable) e.preventDefault()
+      }}
+    >
       <span class="chev"><Icon name="caretRight" size="sm" /></span>
       {#if lead}<span class="lead">{@render lead()}</span>{/if}
       <span class="title">{title}</span>
@@ -34,36 +69,104 @@
 </div>
 
 <style>
-  .card { position: relative; border: 1px solid var(--line-strong); border-radius: var(--r-xl); background: var(--fill-1); }
-  .card.dimmed { opacity: 0.6; }
-  .card[data-variant="active"] { border-color: var(--accent-line); }
-  .card.loading { border-color: var(--line); } /* neutral edge under the comets, even for 'active' */
-  .card[data-variant="empty"] { background: none; border-style: dashed; }
-  .card[data-variant="empty"] :is(.title, .meta) { color: var(--muted); }
+  .card {
+    position: relative;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-xl);
+    background: var(--fill-1);
+  }
+  .card.dimmed {
+    opacity: 0.6;
+  }
+  .card[data-variant='active'] {
+    border-color: var(--accent-line);
+  }
+  .card.loading {
+    border-color: var(--line);
+  } /* neutral edge under the comets, even for 'active' */
+  .card[data-variant='empty'] {
+    background: none;
+    border-style: dashed;
+  }
+  .card[data-variant='empty'] :is(.title, .meta) {
+    color: var(--muted);
+  }
 
-  details { overflow: hidden; border-radius: calc(var(--r-xl) - 1px); }
+  details {
+    overflow: hidden;
+    border-radius: calc(var(--r-xl) - 1px);
+  }
   summary {
-    display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; min-height: 40px; padding: var(--space-1) 16px;
-    list-style: none; cursor: pointer; font: var(--w-medium) 12.5px var(--font-data); color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    min-height: 40px;
+    padding: var(--space-1) 16px;
+    list-style: none;
+    cursor: pointer;
+    font: var(--w-medium) 12.5px var(--font-data);
+    color: var(--fg);
     transition: background-color var(--dur) var(--ease-out);
   }
-  .has-actions summary { padding-right: 40px; }
-  summary::-webkit-details-marker { display: none; }
-  summary:hover { background: var(--fill-2); }
-  summary:focus-visible { outline-offset: -2px; border-radius: var(--r-xl); }
-  details[open] > summary { border-bottom: 1px solid var(--line); }
-  .chev { display: inline-flex; color: var(--muted); transition: transform var(--dur) var(--ease-out); }
-  details[open] .chev { transform: rotate(90deg); }
-  .lead { display: inline-flex; }
-  .meta { font: 400 12px var(--font-body); color: var(--muted); }
-  .end { margin-left: auto; font: var(--w-medium) 11px var(--font-data); font-variant-numeric: tabular-nums; color: var(--muted); }
+  .has-actions summary {
+    padding-right: 40px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    background: var(--fill-2);
+  }
+  summary:focus-visible {
+    outline-offset: -2px;
+    border-radius: var(--r-xl);
+  }
+  details[open] > summary {
+    border-bottom: 1px solid var(--line);
+  }
+  .chev {
+    display: inline-flex;
+    color: var(--muted);
+    transition: transform var(--dur) var(--ease-out);
+  }
+  details[open] .chev {
+    transform: rotate(90deg);
+  }
+  .lead {
+    display: inline-flex;
+  }
+  .meta {
+    font: 400 12px var(--font-body);
+    color: var(--muted);
+  }
+  .end {
+    margin-left: auto;
+    font: var(--w-medium) 11px var(--font-data);
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
   /* Nothing inside: the header reads as a plain row, not a toggle. */
-  .locked summary { cursor: default; }
-  .locked summary:hover { background: none; }
-  .locked .chev { opacity: 0.3; }
+  .locked summary {
+    cursor: default;
+  }
+  .locked summary:hover {
+    background: none;
+  }
+  .locked .chev {
+    opacity: 0.3;
+  }
 
-  .actions { position: absolute; top: 6px; right: 6px; }
+  .actions {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+  }
 
   /* Body text lines up with the title, past the chevron. */
-  .body { display: grid; gap: var(--space-2); padding: var(--space-3) 16px 16px calc(16px + 22px); }
+  .body {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3) 16px 16px calc(16px + 22px);
+  }
 </style>

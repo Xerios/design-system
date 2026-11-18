@@ -10,6 +10,9 @@
    * disabled: shows the value but doesn't open, flat with no fill or caret (e.g. when there is only one choice).
    * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
+   * Other attributes (class…) and attachments go to the button.
+   *
+   *   <Select bind:value={region} options={REGIONS} id="region" label="Region" info="Where the files are served from." />
    */
   import { tick } from 'svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
@@ -18,6 +21,22 @@
   import { tooltip } from '../../lib/tooltip.js'
   import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
 
+  /**
+   * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string }} Option
+   * @typedef {object} Props
+   * @property {any} [value] bindable
+   * @property {Option[]} options
+   * @property {string} id
+   * @property {string} label
+   * @property {boolean} [hideLabel]
+   * @property {Record<string, { icon: string, label: string, run: () => void }>} [groupActions]
+   * @property {boolean | string} [loading]
+   * @property {string} [error]
+   * @property {string} [info]
+   * @property {boolean} [ghost]
+   * @property {boolean} [disabled]
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
     value = $bindable(),
     options,
@@ -30,6 +49,8 @@
     info = '',
     ghost = false,
     disabled = false,
+    class: className,
+    ...rest
   } = $props()
   let open = $state(false)
   let active = $state(0)
@@ -173,7 +194,8 @@
       {id}
       bind:this={button}
       type="button"
-      class="trigger"
+      class={['trigger', className]}
+      {...rest}
       class:shimmer={loading}
       class:ghost
       {disabled}

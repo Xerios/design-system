@@ -5,11 +5,35 @@
    * active inside". hideLabel keeps the label for screen readers only (when the trigger snippet says it already).
    * scrim dims the page behind the open panel (the header and status bar it opens from stay undimmed above it)
    * and swallows the outside press that closes it, so that press doesn't also hit whatever was under it.
+   *
+   *   <Popover id="filters" label="Filters" badge={active.length}>
+   *     {#snippet trigger()}<Icon name="funnel" />{/snippet}
+   *     {#snippet children({ close })}…<button type="button" class="btn" onclick={close}>Done</button>{/snippet}
+   *   </Popover>
+   *
+   * children receives { close }, which closes the panel and puts the focus back on the button.
+   * Other attributes (class…) and attachments go to the trigger button.
    */
   import { tick } from 'svelte'
   import { fly, fade } from '../lib/motion.js'
   import { portalNear } from '../lib/dom.js'
 
+  /**
+   * @typedef {object} Props
+   * @property {string} id
+   * @property {string} label
+   * @property {number | string | null} [badge]
+   * @property {boolean} [dot]
+   * @property {'start' | 'end'} [align]
+   * @property {'below' | 'above'} [placement]
+   * @property {boolean} [hideLabel]
+   * @property {number} [width] the panel's width in px
+   * @property {boolean} [scrim]
+   * @property {boolean} [open] bindable
+   * @property {import('svelte').Snippet} trigger
+   * @property {import('svelte').Snippet<[{ close: () => void }]>} children
+   */
+  /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
     id,
     label,
@@ -22,7 +46,9 @@
     scrim = false,
     open = $bindable(false),
     trigger,
+    class: className,
     children,
+    ...rest
   } = $props()
   let button = $state(),
     panel = $state()
@@ -55,7 +81,16 @@
 <svelte:document onpointerdowncapture={outside} />
 
 <div class="pop">
-  <button {id} bind:this={button} type="button" class="btn trigger" aria-expanded={open} aria-controls="{id}-panel" onclick={() => (open ? hide() : show())}>
+  <button
+    {id}
+    bind:this={button}
+    type="button"
+    class={['btn trigger', className]}
+    {...rest}
+    aria-expanded={open}
+    aria-controls="{id}-panel"
+    onclick={() => (open ? hide() : show())}
+  >
     {@render trigger()}
     <span class="label" class:sr-only={hideLabel}>{label}</span>
     {#if badge}<span class="badge">{badge}</span>{/if}

@@ -13,9 +13,16 @@
    * TextField, TextArea and Select draw a floating one themselves from their `error` prop.
    *
    * message: the text. id: so a control can point at it with aria-describedby. ondismiss: runs after the bubble
-   * is dismissed (the fields use it to take the focus back).
+   * is dismissed (the fields use it to take the focus back). Other attributes (class…) and attachments go to the <p>.
+   *
+   * @typedef {object} Props
+   * @property {string} [message]
+   * @property {string} [id]
+   * @property {boolean} [floating]
+   * @property {(() => void) | null} [ondismiss]
    */
-  let { message = '', id = undefined, floating = false, ondismiss = null } = $props()
+  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLParagraphElement>, keyof Props>} */
+  let { message = '', id = undefined, floating = false, ondismiss = null, class: className, ...rest } = $props()
   // Set by the dismiss button; a new message resets it, so that one shows again.
   let dismissed = $derived.by(() => {
     void message
@@ -25,7 +32,7 @@
 </script>
 
 {#if shown}
-  <p {id} class="error" class:floating data-tone="danger" role="alert">
+  <p {id} class={['error', className]} class:floating data-tone="danger" role="alert" {...rest}>
     <Icon name="warning" size="sm" />
     <span class="text">{message}</span>
     {#if floating}
