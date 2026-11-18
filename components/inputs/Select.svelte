@@ -68,24 +68,16 @@
     }, []),
   )
 
-  function place() {
-    if (!list || !button) return
-    const r = button.getBoundingClientRect()
-    list.style.minWidth = `${r.width}px`
-    list.style.maxWidth = `min(${Math.max(r.width, 440)}px, calc(100dvw - 32px))`
-    const h = list.offsetHeight,
-      w = list.offsetWidth
-    const above = r.bottom + h + 8 > innerHeight && r.top > h + 8
-    list.style.left = `${Math.max(8, Math.min(r.left, innerWidth - w - 8))}px`
-    list.style.top = `${above ? r.top - h - 4 : r.bottom + 4}px`
-  }
+  // The list is anchored to the button in CSS (anchor positioning): it sits below it, flips above or to the other side
+  // when there is no room, and follows it while the page scrolls. Each Select needs its own anchor name.
+  const uid = $props.id()
+  const anchor = `--select-${uid}`
 
   async function show() {
     if (disabled || loading || !options.length) return
     active = Math.max(0, options.indexOf(current))
     open = true
     await tick()
-    place()
     // Open on the current option: centred in the list when the list scrolls.
     const el = list.querySelector(`[data-i="${active}"]`)
     if (el) list.scrollTop = el.offsetTop - (list.clientHeight - el.offsetHeight) / 2
@@ -95,7 +87,6 @@
     action.run()
     await tick()
     active = Math.min(Math.max(0, options.indexOf(current)), options.length - 1)
-    place()
   }
   function hide(refocus = true) {
     open = false
@@ -151,14 +142,12 @@
     list.querySelector(`[data-i="${active}"]`)?.scrollIntoView({ block: 'nearest' })
   }
 
-  // While open: a press outside closes the list; scrolling or resizing keeps it against the button.
-  // The label counts as the button (its click toggles the list), so pressing it isn't an outside press.
+  // While open, a press outside closes the list. The label counts as the button (its click toggles the list), so pressing
+  // it isn't an outside press.
   const outside = (e) => open && !button.contains(e.target) && !list?.contains(e.target) && !e.target.closest?.(`label[for="${id}"]`) && hide(false)
-  const follow = (e) => open && e.target !== list && place()
 </script>
 
 <svelte:document onpointerdowncapture={outside} />
-<svelte:window onscrollcapture={follow} onresize={() => open && place()} />
 
 {#snippet option(o, i)}
   <!-- Keyboard is handled on the listbox (aria-activedescendant pattern); options only take pointer input. -->
@@ -195,6 +184,7 @@
       bind:this={button}
       type="button"
       class={['trigger', className]}
+      style:anchor-name={anchor}
       {...rest}
       class:shimmer={loading}
       class:ghost
@@ -219,6 +209,7 @@
     {#if open}
       <ul
         bind:this={list}
+        style:position-anchor={anchor}
         class="list"
         data-floating
         {@attach topLayer(button)}
@@ -360,12 +351,21 @@
   .caret.flip {
     rotate: 180deg;
   }
+  /* Anchored to the trigger: below it from its left edge, at least as wide; flipped above, or to end at its right edge,
+     when it would overflow the window. Hidden while the button is scrolled out of view. */
   .list {
     position: fixed;
     z-index: calc(var(--z-overlay) + 1);
-    top: 0;
-    left: 0;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      flip-block,
+      flip-inline,
+      flip-block flip-inline;
+    position-visibility: anchors-visible;
+    margin-block: 4px;
     width: max-content;
+    min-width: anchor-size(width);
+    max-width: min(max(anchor-size(width), 440px), calc(100dvw - 32px));
     max-height: min(280px, calc(100dvh - 16px));
     overflow-y: auto;
     overflow-x: hidden;
@@ -420,7 +420,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    height: 26px;
+    min-height: 26px;
     padding: 0 6px 0 8px;
     font: var(--w-medium) 11.5px var(--font-body);
     color: var(--muted);

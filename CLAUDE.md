@@ -17,7 +17,8 @@ Read it before building UI, and read a component's header comment before using i
   one allowance: 1px hairlines and fine optical offsets.
 - Hover, pressed and active states use the translucent fills (`--fill-2`, `--fill-3`, `--fill-4`), never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
-- Text is 13px (12px for secondary and labels, 11px for counts), weights `--w-medium` and `--w-semibold`.
+- Text is 13px (12px for secondary and labels, 11px for counts), in px, as are the breakpoints. A box holding text gets
+  `min-height`, not `height`. Weights `--w-medium` and `--w-semibold`.
   Numbers, counts, dates and code use `--font-data` with `font-variant-numeric: tabular-nums`. Sentence
   case, no uppercase labels.
 - Icons: `<Icon name="…" />` only. A new glyph is registered in the app (`registerIcons`, see the app's

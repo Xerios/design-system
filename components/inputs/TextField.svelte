@@ -4,6 +4,7 @@
   import InfoTip from '../InfoTip.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { validity } from '../../lib/validity.js'
+  import { composing } from '../../lib/dom.js'
   /**
    * Text input with optional search icon and shortcut hint; search fields (type 'search') also get a clear button, and Esc clears them. `compact`: 28px, for toolbars (see SearchField).
    * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints work the same way:
@@ -49,6 +50,8 @@
   export const focus = () => input?.focus()
 
   function onkeydown(e) {
+    // Enter and Esc inside an IME composition belong to the input method.
+    if (composing(e)) return
     if (e.key === 'Escape' && value && type === 'search') {
       e.preventDefault()
       e.stopPropagation()

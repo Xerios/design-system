@@ -217,3 +217,25 @@ kbd {
     transition: none !important;
   }
 }
+
+/* ---------- disclosure ---------- */
+/* Sizes may transition to and from keywords (auto, fit-content…), so a box can animate to its natural height. Inherited. */
+:root {
+  interpolate-size: allow-keywords;
+}
+/* <details> slides open and shut. Its body (::details-content) stays in the page while closed, hidden by the browser's
+   content-visibility, so find-in-page still reaches it and opens it; allow-discrete holds it visible until the slide
+   shut ends. Only without a reduced-motion preference. A browser without ::details-content or interpolate-size opens it
+   at once, as before. */
+@media (prefers-reduced-motion: no-preference) {
+  details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size var(--dur-slow) var(--ease-out),
+      content-visibility var(--dur-slow) allow-discrete;
+  }
+  details[open]::details-content {
+    block-size: auto;
+  }
+}

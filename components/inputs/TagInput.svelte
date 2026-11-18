@@ -23,6 +23,7 @@
   import InfoTip from '../InfoTip.svelte'
   import { flip, scale, durations } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
+  import { composing } from '../../lib/dom.js'
 
   /**
    * @typedef {object} Props
@@ -104,12 +105,16 @@
   }
 
   function oninput(e) {
+    // Text still being composed (IME) isn't split into tags until it is confirmed.
+    if (e.isComposing) return
     rejected = ''
     if (e.inputType === 'insertFromPaste') commit(true)
     else if (separator.test(draft)) commit(false)
   }
 
   function onInputKeydown(e) {
+    // Enter, Esc and Backspace inside an IME composition belong to the input method.
+    if (composing(e)) return
     const atStart = input.selectionStart === 0 && input.selectionEnd === 0
     if (e.key === 'Enter' && draft.trim()) {
       e.preventDefault()
@@ -229,7 +234,7 @@
     display: inline-flex;
     align-items: center;
     max-width: 100%;
-    height: 24px;
+    min-height: 24px;
     padding-left: 8px;
     cursor: default;
     border-radius: var(--r-pill);
