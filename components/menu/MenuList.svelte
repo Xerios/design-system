@@ -2,13 +2,16 @@
   /**
    * One level of the context menu. Renders its own submenu (recursively) to the side.
    * x/y: preferred top-left corner. flipX: right edge to align to when there is no room on the right.
+   * opener: the element it opens from. It is drawn in the top layer, inside that element's modal dialog if it has one, so
+   * a menu opened from a drawer or dialog sits above it and can still be used.
    */
   import { tick } from 'svelte'
   // oxlint-disable-next-line import/no-self-import -- a recursive component: importing itself is how Svelte 5 renders its own submenu
   import MenuList from './MenuList.svelte'
   import Icon from '../Icon.svelte'
+  import { topLayer } from '../../lib/dom.js'
 
-  let { items, x, y, flipX = x, label, level = 0, autofocus = true, onclose, onback = null } = $props()
+  let { items, x, y, flipX = x, label, opener = null, level = 0, autofocus = true, onclose, onback = null } = $props()
 
   let sub = $state(null) // { index, x, y, flipX }
   const buttons = []
@@ -103,7 +106,7 @@
   }
 </script>
 
-<div class="ctx-menu" role="menu" aria-label={label} tabindex="-1" {@attach place} {onkeydown} oncontextmenu={(e) => e.preventDefault()}>
+<div class="ctx-menu" role="menu" aria-label={label} tabindex="-1" {@attach topLayer(opener)} {@attach place} {onkeydown} oncontextmenu={(e) => e.preventDefault()}>
   {#each items as item, i (i)}
     {#if item.separator}
       <div class="sep" role="separator"></div>
@@ -159,6 +162,7 @@
       y={sub.y}
       flipX={sub.flipX}
       label={items[sub.index].label}
+      {opener}
       level={level + 1}
       autofocus={sub.focus}
       {onclose}

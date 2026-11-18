@@ -1,5 +1,5 @@
 <script>
-  /** Kitchen sink: collapsibles, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
+  /** Kitchen sink: collapsibles, a side menu, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Collapsible from '../components/Collapsible.svelte'
@@ -7,6 +7,8 @@
   import Icon from '../components/Icon.svelte'
   import Md from '../components/Md.svelte'
   import Splitter from '../components/Splitter.svelte'
+  import SideMenu from '../components/side-menu/index.js'
+  import Button from '../components/Button.svelte'
   import Table from '../components/Table.svelte'
   import { scrollFade } from '../lib/scroll-fade.js'
 
@@ -33,6 +35,8 @@
   let sort = $state(/** @type {{ key: string, dir: number } | null} */ ({ key: 'commits', dir: -1 }))
   let open = $state(true)
   let width = $state(260)
+  let picked = $state('starred')
+  let displaysOpen = $state(false)
   const LINES = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: scroll to see the edges fade while there is more.`)
 </script>
 
@@ -56,6 +60,38 @@
         {#snippet meta()}uploading{/snippet}
       </CollapsibleAdvanced>
       <CollapsibleAdvanced title="Smoke tests" variant="empty" expandable={false} />
+    </div>
+  </Demo>
+  <Demo label="Side menu: header with a main action, a count, folding groups and rows, nested rows with and without icons">
+    <div class="side-menu-stage">
+      <SideMenu label="Example menu">
+        {#snippet header()}<span class="brand"><Icon name="monitor" size="lg" />Workspace</span>{/snippet}
+        {#snippet actions()}
+          <Button iconOnly icon="search" label="Search" />
+          <Button iconOnly icon="plus" label="New item" />
+        {/snippet}
+        <SideMenu.Group>
+          <SideMenu.Item icon="history" label="Recent" count={3} current={picked === 'recent'} onclick={() => (picked = 'recent')} />
+          <SideMenu.Item icon="star" label="Starred" current={picked === 'starred'} onclick={() => (picked = 'starred')} />
+        </SideMenu.Group>
+        <SideMenu.Group title="Workspace">
+          <SideMenu.Item icon="calendar" label="Calendar" current={picked === 'calendar'} onclick={() => (picked = 'calendar')} />
+          <SideMenu.Item icon="monitor" label="Displays" bind:open={displaysOpen}>
+            <SideMenu.Item label="Main" current={picked === 'main'} onclick={() => (picked = 'main')} />
+            <SideMenu.Item label="Side" current={picked === 'side'} onclick={() => (picked = 'side')} />
+          </SideMenu.Item>
+          <SideMenu.Item icon="gear" label="Settings" open>
+            <SideMenu.Item icon="keyboard" label="Shortcuts" current={picked === 'keys'} onclick={() => (picked = 'keys')} />
+            <SideMenu.Item icon="eye" label="Appearance" current={picked === 'look'} onclick={() => (picked = 'look')}>
+              <SideMenu.Item label="Light" />
+              <SideMenu.Item label="Dark" />
+            </SideMenu.Item>
+          </SideMenu.Item>
+        </SideMenu.Group>
+        <SideMenu.Group title="Folded" open={false}>
+          <SideMenu.Item icon="star" label="Hidden until opened" />
+        </SideMenu.Group>
+      </SideMenu>
     </div>
   </Demo>
   <Demo label="Table: sortable columns, groups, row menu (right-click a row)" wide>
@@ -100,6 +136,28 @@
 </Section>
 
 <style>
+  .side-menu-stage {
+    width: 100%;
+    max-width: 280px;
+    height: 460px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--bg);
+    overflow: clip;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap);
+    min-height: 32px;
+    padding-inline: var(--bleed);
+    margin-inline-start: calc(var(--bleed) * -1);
+    color: var(--fg);
+    font: var(--w-semibold) 14px var(--font-display);
+  }
+  .brand > :global(.icon) {
+    color: var(--muted);
+  }
   .full {
     width: 100%;
     min-width: 0;

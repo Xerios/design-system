@@ -16,6 +16,6 @@
 
 {#if menu.open}
   {#key menu.items}
-    <MenuList items={menu.items} x={menu.x} y={menu.y} label={menu.label} onclose={() => closeMenu()} />
+    <MenuList items={menu.items} x={menu.x} y={menu.y} label={menu.label} opener={menu.trigger} onclose={() => closeMenu()} />
   {/key}
 {/if}

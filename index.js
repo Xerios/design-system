@@ -23,6 +23,7 @@ export { default as Toast } from './components/Toast.svelte'
 export { default as Dialogs } from './components/Dialogs.svelte'
 export { default as Modal } from './components/Modal.svelte'
 export { default as Drawer } from './components/Drawer.svelte'
+export { default as SideMenu, SideMenuGroup, SideMenuItem } from './components/side-menu/index.js'
 
 export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte'
 export { default as FileButton } from './components/inputs/FileButton.svelte'
