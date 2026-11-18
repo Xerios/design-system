@@ -76,6 +76,7 @@
   let { name, size = 'md', label = null } = $props();
 </script>
 
+<!-- allow-html: ICONS holds SVG markup bundled at build time or passed to registerIcons by app code, never user input -->
 <span class="icon {size}" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>{@html ICONS[name]}</span>
 
 <style>

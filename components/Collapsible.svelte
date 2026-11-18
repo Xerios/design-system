@@ -15,7 +15,8 @@
   import InfoTip from './InfoTip.svelte';
   import { slide } from '../lib/motion.js';
 
-  let { id = 'c' + Math.random().toString(36).slice(2, 8), title, open = $bindable(true), ontoggle, count = null, meta, info = '', children } = $props();
+  const uid = $props.id();
+  let { id = 'c-' + uid, title, open = $bindable(true), ontoggle, count = null, meta, info = '', children } = $props();
   const toggle = () => {
     open = !open;
     ontoggle?.(open);

@@ -16,12 +16,12 @@
    * is dismissed (the fields use it to take the focus back).
    */
   let { message = '', id = undefined, floating = false, ondismiss = null } = $props()
-  let dismissed = $state('') // the message that was dismissed; a different one shows again
-  const shown = $derived(message && !(floating && dismissed === message))
-
-  $effect(() => {
-    if (!message) dismissed = ''
+  // Set by the dismiss button; a new message resets it, so that one shows again.
+  let dismissed = $derived.by(() => {
+    void message
+    return false
   })
+  const shown = $derived(message && !(floating && dismissed))
 </script>
 
 {#if shown}
@@ -35,7 +35,7 @@
         aria-label="Dismiss"
         {@attach tooltip('Dismiss')}
         onclick={() => {
-          dismissed = message
+          dismissed = true
           ondismiss?.()
         }}><Icon name="x" size="sm" /></button
       >
@@ -69,9 +69,7 @@
     border: 1px solid var(--tone);
     border-radius: var(--r);
     /* Tinted red over the floating surface, so it reads as an error and not as an ordinary tooltip. */
-    background:
-      linear-gradient(var(--tone-soft), var(--tone-soft)),
-      var(--elevated);
+    background: linear-gradient(var(--tone-soft), var(--tone-soft)), var(--elevated);
     box-shadow: var(--shadow);
     color: var(--fg);
   }

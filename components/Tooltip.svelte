@@ -8,7 +8,8 @@
   import { topLayer } from '../lib/dom.js';
 
   let { tip, focusable = true, children } = $props();
-  const uid = 'tt-' + Math.random().toString(36).slice(2, 8);
+  const propsId = $props.id();
+  const uid = 'tt-' + propsId;
   let el = $state();
   let pos = $state(null); // { top, left?, right?, arrow } in viewport px while open; arrow is the arrow's --arrow-x
 
