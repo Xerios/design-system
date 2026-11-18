@@ -143,5 +143,5 @@ dialog[open] {
 }
 @starting-style { dialog[open] { opacity: 0; transform: scale(1.16); } }
 dialog::backdrop { opacity: 0; transition: opacity var(--dur-exit) var(--ease-exit), overlay var(--dur-exit) allow-discrete, display var(--dur-exit) allow-discrete; }
-dialog[open]::backdrop { opacity: 1; transition-duration: var(--dur-enter); transition-timing-function: var(--ease-enter), linear, linear; }
+dialog[open]::backdrop { opacity: 1; transition-duration: var(--dur-enter); transition-timing-function: var(--ease-enter), linear, linear; backdrop-filter: blur(2px); }
 @starting-style { dialog[open]::backdrop { opacity: 0; } }

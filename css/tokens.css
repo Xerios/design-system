@@ -10,7 +10,7 @@
   color-scheme: light dark;
   /* Surfaces, back to front (Linear's hero frame): --bg is the app frame the header and status line sit on; --view-bg the
      inset view card the layouts live in; --surface the cards and panes inside it; --elevated the floating layers. */
-  --bg: light-dark(#f3f3f4, #101112);
+  --bg: light-dark(#ebebeb, #101112); 
   --view-bg: light-dark(#fbfbfb, #121314);
   --surface: light-dark(#ffffff, #171819);
   --surface-2: light-dark(#f4f4f5, #1b1c1d);
