@@ -12,6 +12,7 @@
    *   </Popover>
    *
    * children receives { close }, which closes the panel and puts the focus back on the button.
+   * Once open, the panel stays where it opened even if the button changes size (say, its badge appears).
    * Other attributes (class…) and attachments go to the trigger button.
    */
   import { tick } from 'svelte'
@@ -51,7 +52,31 @@
     ...rest
   } = $props()
   let button = $state(),
-    panel = $state()
+    panel = $state(),
+    root = $state()
+
+  /**
+   * Attachment on the panel: holds it where it opened. It is placed against the button's edge (CSS); if the button then
+   * changes size while it is open (a count appearing in it), that edge moves, and the panel would jump sideways with it.
+   * So once it has opened, its horizontal place on the page is kept: whenever the popover's box moves or resizes, the
+   * panel's offset inside it is corrected by the difference. Only while it is absolutely placed (a narrow window spans
+   * it across the screen, which doesn't move).
+   * @param {HTMLElement} node
+   */
+  function pin(node) {
+    if (!root || getComputedStyle(node).position !== 'absolute') return
+    const host = root
+    const at = node.getBoundingClientRect().left - host.getBoundingClientRect().left
+    const page = host.getBoundingClientRect().left + scrollX + at
+    node.style.left = `${at}px`
+    node.style.right = 'auto'
+    const hold = () => {
+      node.style.left = `${page - (host.getBoundingClientRect().left + scrollX)}px`
+    }
+    const observer = new ResizeObserver(hold)
+    observer.observe(host)
+    return () => observer.disconnect()
+  }
 
   async function show() {
     open = true
@@ -80,7 +105,7 @@
 
 <svelte:document onpointerdowncapture={outside} />
 
-<div class="pop">
+<div class="pop" bind:this={root}>
   <button
     {id}
     bind:this={button}
@@ -111,6 +136,7 @@
       aria-label={label}
       tabindex="-1"
       {onkeydown}
+      {@attach pin}
       in:fly={{ y: placement === 'above' ? 6 : -6 }}
       out:fly={{ y: placement === 'above' ? 4 : -4 }}
     >

@@ -6,9 +6,10 @@ Read it before building UI, and read a component's header comment before using i
 
 ## Using it (when working in an app)
 
-- Look here first. Before writing a button, field, dropdown, menu, popover, tooltip, toggle, collapsible,
+- Look here first. Before writing a button (`Button`: icons, async actions with their pending and error states), field, dropdown, menu, popover, tooltip, toggle, collapsible,
   empty state, toast, modal dialog or resizable panel, use the one in `components/` or the class in `css/atoms.css`.
-  A modal is `<Modal>`, not a hand-built `<dialog class="dialog">`; a plain question is `confirmDialog`.
+  A modal is `<Modal>`, not a hand-built `<dialog class="dialog">`; a plain question is `confirmDialog`. A field's
+  error state is the `invalid` attachment (lib/invalid.js), never aria-invalid / aria-describedby written by hand.
 - Compose instead of copying: pass content as children and snippets, and add a class, attributes or an attachment
   straight on the component (`<Empty class="…" {@attach …}>`); they reach its main element.
 - Import by path: `import Select from '$ds/components/inputs/Select.svelte'`, helpers from `$ds/lib/…`.
@@ -50,7 +51,8 @@ Read it before building UI, and read a component's header comment before using i
   (`src/components/Collapsible.svelte` wraps `components/Collapsible.svelte` this way).
 - A new component belongs here only if another app could use it unchanged. Otherwise it goes in the app.
 - Start each component with a comment block: what it is for, a usage example, each prop, keyboard
-  behaviour. That comment is its documentation. Then add it to `index.js` and to the table in `README.md`.
+  behaviour. That comment is its documentation. Then add it to `index.js`, to the table in `README.md`, and a `Demo`
+  of it, in its states, to the kitchen sink area it belongs to (`kitchensink/`).
 - Type the props with a JSDoc `Props` typedef on `$props()`, intersected with the main element's attributes from
   `svelte/elements` (`Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props>`). Take `class: className` and
   `...rest`, and put `class={['own-class', className]} {...rest}` on that element, before the component's own event
@@ -72,4 +74,5 @@ Read it before building UI, and read a component's header comment before using i
 ## Checking a change
 
 There are no tests. Build the consuming app (`pnpm build` in the folder above) and look for new warnings,
-then check the affected component in light and dark, with the keyboard, and at a width under 860px.
+then check the affected component on the kitchen sink (`kitchensink/KitchenSink.svelte`; this app serves it at
+`/kitchensink`, linked in development) in light and dark, with the keyboard, and at a width under 860px.

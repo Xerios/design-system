@@ -100,9 +100,13 @@
 ></div>
 
 <style>
+  /* A 12px handle that straddles the edge between the panes, taking no room of its own (the negative margins), so its
+     line lands on that edge and not beside it. Above them, so all of it can be grabbed. */
   .splitter {
     position: relative;
+    z-index: 1;
     width: 12px;
+    margin-inline: -6px;
     flex: none;
     cursor: col-resize;
     touch-action: none;
@@ -112,21 +116,23 @@
   .splitter::after {
     content: '';
     position: absolute;
-    top: 8px;
-    bottom: 8px;
+    inset-block: 0;
     left: 50%;
     width: 2px;
     translate: -50% 0;
-    border-radius: 2px;
     background: transparent;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
+  /* Resting the pointer on it lights it in the accent after a moment (--delay-intent), so passing over it doesn't flash;
+     leaving fades it at once. Dragging or keyboard focus light it straight away. */
   .splitter:hover::after {
-    background: var(--line);
+    background: var(--accent);
+    transition-delay: var(--delay-intent);
   }
   .splitter.dragging::after,
   .splitter:focus-visible::after {
     background: var(--accent);
+    transition-delay: 0s;
   }
   .splitter:focus-visible {
     outline: none;

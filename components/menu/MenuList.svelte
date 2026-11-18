@@ -119,7 +119,9 @@
         onclick={() => activate(i)}
         onpointerenter={() => hover(i)}
       >
-        <span class="check" aria-hidden="true"></span>
+        <span class="check" aria-hidden="true"
+          >{#if item.icon}<Icon name={item.icon} size="sm" />{/if}</span
+        >
         <span class="label">{item.label}</span>
         <span class="hint"><Icon name="external" size="sm" /></span>
       </a>
@@ -140,7 +142,7 @@
         onpointerenter={() => hover(i)}
       >
         <span class="check"
-          >{#if item.checked}<Icon name="check" size="sm" />{/if}</span
+          >{#if item.checked}<Icon name="check" size="sm" />{:else if item.icon}<Icon name={item.icon} size="sm" />{/if}</span
         >
         <span class="label">{item.label}</span>
         {#if item.children}<span class="hint"><Icon name="caretRight" size="sm" /></span>{:else if item.hint}<span class="hint">{item.hint}</span>{/if}
@@ -226,6 +228,10 @@
   }
   .danger {
     color: var(--danger);
+  }
+  /* A danger item's icon is in its red too, not the muted grey of the others. */
+  .danger :global(.icon) {
+    color: currentColor;
   }
   .check {
     display: inline-flex;

@@ -10,6 +10,7 @@
   import ErrorMessage from '../ErrorMessage.svelte'
   import InfoTip from '../InfoTip.svelte'
   import { validity } from '../../lib/validity.js'
+  import { invalid } from '../../lib/invalid.js'
   /**
    * @typedef {object} Props
    * @property {string} [value] bindable
@@ -44,8 +45,7 @@
       bind:this={area}
       bind:value
       {...rest}
-      aria-invalid={problem ? 'true' : 'false'}
-      aria-describedby={problem ? `${id}-error` : undefined}
+      {@attach invalid(problem && `${id}-error`)}
       {@attach validity(
         () => error,
         (message) => (native = message),

@@ -22,16 +22,19 @@
   --line-float: light-dark(rgb(0 0 0 / 0.13), rgb(255 255 255 / 0.12));
   /* Edges (Linear's lit corner, their .edgeHighlightRing): a base hairline, plus --edge-hi stacked on it inside a 100px
      radial at the top-left corner (solid for the first 16%, then fading). --edge-shadow is the outer ring.
-     --edge-grad / --edge-grad-float paint the same edge as background layers, for scroll containers. */
+     --edge-grad / --edge-grad-float paint the same edge as background layers, for scroll containers: under a transparent
+     1px border, below a padding-box fill (effects.css). Each layer is placed and clipped on the border box (border-box)
+     and drawn once (no-repeat): placed on the padding box, as backgrounds are by default, the image is 2px smaller than
+     the box and repeats into the border, so the next tile's lit corner showed along the right and bottom hairlines. */
   --edge-hi: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
   --edge-r: 100px;
   --edge-plateau: 16%;
   --edge-grad:
-    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%),
-    linear-gradient(var(--line-strong), var(--line-strong));
+    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%) border-box no-repeat,
+    linear-gradient(var(--line-strong), var(--line-strong)) border-box no-repeat;
   --edge-grad-float:
-    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%),
-    linear-gradient(var(--line-float), var(--line-float));
+    radial-gradient(var(--edge-r) var(--edge-r) at 0 0, var(--edge-hi) 0%, var(--edge-hi) var(--edge-plateau), transparent 100%) border-box no-repeat,
+    linear-gradient(var(--line-float), var(--line-float)) border-box no-repeat;
   --edge-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), transparent), 0 0 0 1px light-dark(transparent, rgb(0 0 0 / 0.2));
   /* Shine (Linear's .shine): a 200px beam of brighter hairline on the view card's left edge, near the top. */
   --shine: light-dark(rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.4));
@@ -42,6 +45,9 @@
   /* Thinking shimmer (see Shimmer.svelte): the label rests at --shimmer-base and a band of --shimmer-hi sweeps across it. */
   --shimmer-base: var(--muted);
   --shimmer-hi: var(--fg);
+  /* How strongly the working sweep along a pill's edge shows (.shimmer: Select loading, a busy Button, status pills).
+     Its image is indigo and greys, so light surfaces need all of it, dark ones less: 1 here, 0.7 in dark (below). */
+  --shimmer-strength: 1;
   /* Raised relief (the chosen segment of a RadioGroup): the top inner edge catches the light and the bottom inner edge
      falls into shade, so the box reads as standing off the surface. Use both: inset 0 1px 0 …-edge, inset 0 -1px 0 …-base. */
   --raised-edge: light-dark(rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.12));
@@ -138,6 +144,8 @@
   --dur-enter: 120ms;
   --ease-exit: cubic-bezier(0.3, 0, 1, 1);
   --dur-exit: 80ms;
+  /* How long a pointer rests on something before it lights up (a splitter's edge), so merely passing over doesn't flash. */
+  --delay-intent: 300ms;
 
   /* Layers, lowest to highest. */
   --z-sticky: 10;
@@ -186,4 +194,11 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
+  --shimmer-strength: 0.7;
+}
+/* Dark values that aren't colours (light-dark() only takes colours), when the OS is dark and no theme is pinned. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --shimmer-strength: 0.7;
+  }
 }

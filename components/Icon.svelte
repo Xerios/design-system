@@ -47,6 +47,8 @@
   import spinner from '@phosphor-icons/core/regular/spinner-gap.svg?raw'
   import checkCircle from '@phosphor-icons/core/regular/check-circle.svg?raw'
   import warning from '@phosphor-icons/core/regular/warning-circle.svg?raw'
+  import calendar from '@phosphor-icons/core/regular/calendar-blank.svg?raw'
+  import caretLeft from '@phosphor-icons/core/regular/caret-left.svg?raw'
   import circleDashed from '@phosphor-icons/core/regular/circle-dashed.svg?raw'
   import minusCircle from '@phosphor-icons/core/regular/minus-circle.svg?raw'
   import stop from '@phosphor-icons/core/fill/stop-fill.svg?raw'
@@ -54,6 +56,8 @@
 
   const ICONS = {
     x,
+    calendar,
+    caretLeft,
     search,
     caretDown,
     caretRight,

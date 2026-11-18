@@ -5,6 +5,7 @@
   import { tooltip } from '../../lib/tooltip.js'
   import { validity } from '../../lib/validity.js'
   import { composing } from '../../lib/dom.js'
+  import { invalid } from '../../lib/invalid.js'
   /**
    * Text input with optional search icon and shortcut hint; search fields (type 'search') also get a clear button, and Esc clears them. `compact`: 28px, for toolbars (see SearchField).
    * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints work the same way:
@@ -87,8 +88,7 @@
       autocorrect="off"
       enterkeyhint={type === 'search' ? 'search' : undefined}
       {...rest}
-      aria-invalid={problem ? 'true' : 'false'}
-      aria-describedby={problem ? `${id}-error` : undefined}
+      {@attach invalid(problem && `${id}-error`)}
       {onkeydown}
       {@attach validity(
         () => error,

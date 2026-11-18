@@ -98,7 +98,8 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    touch-action: none;
+    /* Horizontal drags are the slider's; vertical ones still scroll the page. */
+    touch-action: pan-y;
     border-radius: 6px;
   }
   .slider:focus-visible {

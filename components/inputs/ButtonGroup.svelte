@@ -44,6 +44,8 @@
   /* One pill: the hairline rings the whole group, and each option after the first draws its divider on its left. */
   .group {
     display: inline-flex;
+    /* As wide as its options: a grid or column-flex parent would otherwise stretch the track past them. */
+    width: fit-content;
     max-width: 100%;
     border-radius: var(--r-pill);
     background: var(--fill-2);

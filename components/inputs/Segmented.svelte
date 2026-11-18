@@ -38,6 +38,8 @@
     display: inline-flex;
     flex-wrap: wrap;
     gap: 4px;
+    /* As wide as its options: a grid or column-flex parent would otherwise stretch the track past them. */
+    width: fit-content;
     max-width: 100%;
   }
   button {

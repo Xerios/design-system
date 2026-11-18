@@ -25,6 +25,7 @@
   import { tooltip } from '../../lib/tooltip.js'
   import { composing } from '../../lib/dom.js'
   import { announce } from '../../lib/announce.js'
+  import { invalid } from '../../lib/invalid.js'
 
   /**
    * @typedef {object} Props
@@ -200,8 +201,8 @@
       spellcheck="false"
       autocapitalize="none"
       autocorrect="off"
-      aria-invalid={problem ? 'true' : 'false'}
-      aria-describedby="{id}-keys{problem ? ` ${id}-error` : ''}"
+      aria-describedby="{id}-keys"
+      {@attach invalid(problem && `${id}-error`)}
       {oninput}
       onkeydown={onInputKeydown}
     />

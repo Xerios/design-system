@@ -81,8 +81,9 @@
 .btn-danger :where(.icon) {
   color: inherit;
 }
-/* Disabled: faded and flat (no raised edge, no drop shadow), and it doesn't answer the pointer. After the variants so it wins. */
-.btn:where(:disabled, [aria-disabled='true']) {
+/* Disabled: faded and flat (no raised edge, no drop shadow), and it doesn't answer the pointer. After the variants so it wins.
+   A busy button (aria-busy, Button while its action runs) is aria-disabled too, but it isn't faded: it shows its work. */
+.btn:where(:disabled, [aria-disabled='true']:not([aria-busy='true'])) {
   opacity: 0.5;
   box-shadow: none;
   filter: none;
@@ -133,7 +134,7 @@
 .icon-btn[aria-pressed='true'] {
   color: var(--warning);
 }
-.icon-btn:where(:disabled, [aria-disabled='true']) {
+.icon-btn:where(:disabled, [aria-disabled='true']:not([aria-busy='true'])) {
   opacity: 0.5;
   cursor: default;
 }

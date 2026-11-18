@@ -8,7 +8,7 @@
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
    * ghost: a flat button with no raised edges (for toolbars and dense rows); the default is raised.
    * disabled: shows the value but doesn't open, flat with no fill or caret (e.g. when there is only one choice).
-   * error: a message from the app; the button turns red (`data-invalid`) and shows it in a bubble underneath, which can be dismissed.
+   * error: a message from the app; the button turns red (aria-invalid, set by lib/invalid.js) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    * Other attributes (class…) and attachments go to the button.
    *
@@ -19,6 +19,7 @@
   import InfoTip from '../InfoTip.svelte'
   import Shimmer from '../Shimmer.svelte'
   import { tooltip } from '../../lib/tooltip.js'
+  import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
 
   /**
@@ -205,8 +206,7 @@
       aria-busy={loading || undefined}
       aria-disabled={loading || undefined}
       aria-labelledby="{id}-label {id}"
-      data-invalid={error ? '' : undefined}
-      aria-describedby={error ? `${id}-error` : undefined}
+      {@attach invalid(error && `${id}-error`)}
       onclick={() => (open ? hide() : show())}
       onkeydown={onButtonKey}
       {@attach tooltip(cut && !open ? current?.label : '')}
@@ -304,10 +304,12 @@
     background: var(--fill-3);
     color: var(--fg);
   }
-  /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text). */
+  /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text), on an
+     outlined box: no fill and no raised edge to drown it out, as a busy Button. */
   .trigger[aria-busy] {
+    --raise: 0 0 transparent;
     cursor: progress;
-    border-color: var(--line);
+    background: none;
   }
   .trigger[aria-busy] .caret {
     opacity: 0.5;
@@ -337,10 +339,11 @@
     box-shadow: var(--raise), var(--ring);
     outline: none;
   }
-  .trigger[data-invalid] {
+  /* :global: the attribute is set by the invalid attachment, at runtime, where Svelte can't see it. */
+  .trigger:global([aria-invalid='true']) {
     border-color: var(--danger);
   }
-  .trigger[data-invalid]:focus-visible {
+  .trigger:global([aria-invalid='true']):focus-visible {
     box-shadow:
       var(--raise),
       0 0 0 2px color-mix(in srgb, var(--danger) 30%, transparent);

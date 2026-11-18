@@ -74,6 +74,8 @@
     grid-auto-flow: column;
     grid-auto-columns: auto;
     gap: 2px;
+    /* As wide as its options: a grid or column-flex parent would otherwise stretch the track past them (`fill` stretches it on purpose). */
+    width: fit-content;
     max-width: 100%;
     padding: 2px;
     /* Sunken like a field (--sunken-*), so the raised thumb reads as sitting in a track. */
