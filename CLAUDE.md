@@ -4,6 +4,9 @@ This folder is a reusable, app-agnostic design system (Svelte 5 runes, plain Jav
 through the `$ds` alias. `README.md` here is the catalogue: tokens, global classes, components and their props.
 Read it before building UI, and read a component's header comment before using it.
 
+The source lives in `src/`. Paths in this file (`components/`, `css/tokens.css`, `lib/…`, `kitchensink/`, `index.js`)
+are relative to it; import paths leave it out (`$ds/components/…`), because the package exports map to `src/`.
+
 ## Using it (when working in an app)
 
 - Look here first. Before writing a button (`Button`: icons, async actions with their pending and error states), field, dropdown, menu, popover, tooltip, toggle, collapsible,

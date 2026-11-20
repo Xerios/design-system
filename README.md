@@ -22,12 +22,13 @@ the fonts and CSS.
    import { fileURLToPath } from 'node:url'
    export default defineConfig({
      plugins: [svelte()],
-     resolve: { alias: { $ds: fileURLToPath(new URL('./design-system', import.meta.url)) } },
+     resolve: { alias: { $ds: fileURLToPath(new URL('./design-system/src', import.meta.url)) } },
    })
    ```
 
    If the folder sits outside the project root, also add it to `server.fs.allow`. (It has a `package.json`,
-   so `"@local/design-system": "link:../design-system"` works too; then import from that name instead of `$ds`.)
+   so `"@local/design-system": "link:../design-system"` works too; then import from that name instead of `$ds`. Its
+   exports map `@local/design-system/components/…` and the rest to `src/`.)
 
 3. Load the global layer once, in the entry file, before your own CSS:
 
@@ -42,24 +43,27 @@ the fonts and CSS.
 5. Import components by path, `import Select from '$ds/components/inputs/Select.svelte'`, or by name from the
    barrel, `import { Select, Icon } from '$ds'`.
 
-For editors, `jsconfig.json` maps `$ds/*` to `design-system/*`.
+For editors, `jsconfig.json` maps `$ds/*` to `design-system/src/*`.
 
 ## What's in the folder
 
+The source lives in `src/`; the package exports and the `$ds` alias point there, so import paths leave it out
+(`$ds/components/…`, not `$ds/src/components/…`). Paths elsewhere in this README are relative to `src/`.
+
 ```
-css/index.css        imports the four files below, in order
-css/tokens.css       every token, light and dark
-css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
-css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, spotlight, dialog motion
-css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .chip-btn, .field-label, .new-dot, .prose
-components/          generic components (table below)
-components/inputs/   form controls
-components/menu/     the context menu layer
-components/tiles/    tiles and the tile group
-components/metadata/ labelled values (Metadata, Metadata.Row)
-lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, controls.js, inline-md.js, spotlight.js
-fonts.js             bundles the two typefaces
-index.js             named exports of everything
+src/css/index.css        imports the four files below, in order
+src/css/tokens.css       every token, light and dark
+src/css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
+src/css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, spotlight, dialog motion
+src/css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .chip-btn, .field-label, .new-dot, .prose
+src/components/          generic components (table below)
+src/components/inputs/   form controls
+src/components/menu/     the context menu layer
+src/components/tiles/    tiles and the tile group
+src/components/metadata/ labelled values (Metadata, Metadata.Row)
+src/lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, controls.js, inline-md.js, spotlight.js
+src/fonts.js             bundles the two typefaces
+src/index.js             named exports of everything
 ```
 
 ## Theme
