@@ -135,9 +135,17 @@
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div bind:this={box} class="box field-box" class:disabled style:anchor-name={anchor} onfocusout={onBoxFocusOut} onkeydown={onBoxKey}>
     {@render inputs()}
-    {#if onclear && hasValue && !disabled}
-      <button type="button" class="tool" aria-label="Clear {label}" {@attach tooltip('Clear')} onclick={() => (onclear(), box?.querySelector('input')?.focus())}
-        ><Icon name="x" size="sm" /></button
+    <!-- Kept in place while there is nothing to clear (hidden and disabled), so the field doesn't change width as a value
+         comes and goes. -->
+    {#if onclear}
+      <button
+        type="button"
+        class="tool"
+        class:hidden={!hasValue || disabled}
+        disabled={!hasValue || disabled}
+        aria-label="Clear {label}"
+        {@attach tooltip('Clear')}
+        onclick={() => (onclear(), box?.querySelector('input')?.focus())}><Icon name="x" size="sm" /></button
       >
     {/if}
     <button
@@ -201,6 +209,9 @@
     border-radius: 50%;
     background: none;
     color: var(--muted);
+  }
+  .tool.hidden {
+    visibility: hidden;
   }
   .tool:hover:not(:disabled),
   .tool[aria-expanded='true'] {

@@ -32,6 +32,9 @@
   let { value = $bindable(''), id, min = null, max = null, allowed = null, errorId, onopen, onproblem, placeholder, ...rest } = $props()
 
   const format = inputFormat()
+  // As wide as a date takes (the format, or a longer placeholder), in the data font's even-width characters: an input
+  // with no width set takes the browser's default of about 20 characters, far wider than a date.
+  const chars = $derived(Math.max(format.placeholder.length, (placeholder ?? '').length))
 
   /** Attachment: the format as the placeholder, set in the browser: the server's locale may write dates another way,
    *  and a placeholder rendered there would stay (hydration keeps attributes as they came). @param {HTMLInputElement} node */
@@ -86,6 +89,7 @@
   autocomplete="off"
   spellcheck="false"
   {...rest}
+  style:--chars={chars}
   {@attach invalid(errorId)}
   {@attach showFormat}
   onblur={commit}
@@ -94,9 +98,10 @@
 />
 
 <style>
+  /* Sized to a date (plus a character for the caret), growing when the field around it is stretched wider. */
   input {
-    flex: 1;
-    width: 100%;
+    flex: 1 1 auto;
+    width: calc((var(--chars) + 1) * 1ch + 2 * var(--space-2));
     min-width: 0;
     min-height: 30px;
     padding: 0 var(--space-2);
