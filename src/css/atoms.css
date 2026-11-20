@@ -2,7 +2,9 @@
 
 /* ---------- controls ---------- */
 /* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid indigo; icon buttons are ghost circles.
-   The solid buttons (primary, danger) are raised: their top inner edge catches the light. */
+   The solid buttons (primary, danger) are raised: their top inner edge catches the light.
+   A toggled secondary button (aria-pressed="true", Button's `pressed`) is flat: just its usual hairline, no fill at rest. It
+   still fills on hover and press (the rules below outrank it), and its text stays --fg. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -30,6 +32,11 @@
     color var(--dur) var(--ease-out),
     scale var(--dur) var(--ease-out),
     filter var(--dur) var(--ease-out);
+}
+
+.btn:where([aria-pressed='true']) {
+  background: none;
+  box-shadow: none;
 }
 
 .btn :where(.icon) {

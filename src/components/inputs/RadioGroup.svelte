@@ -78,12 +78,10 @@
     width: fit-content;
     max-width: 100%;
     padding: 2px;
-    /* Sunken like a field (--sunken-*), so the raised thumb reads as sitting in a track. */
+    /* A clear track under a hairline, so only the raised thumb is filled and casts a shadow. */
     border-radius: var(--r);
-    background: var(--control-2);
-    box-shadow:
-      inset 0 0 0 1px var(--line),
-      var(--shadow-sm);
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--line);
     /* The thumb sits at z-index -1 in here: under every segment's content, even while it slides across them. */
     isolation: isolate;
   }
@@ -120,7 +118,7 @@
       box-shadow var(--dur) var(--ease-out);
   }
   button:not([aria-checked='true']):hover {
-    background: var(--control-3);
+    background: var(--control-2);
   }
   [aria-checked='true'] {
     color: var(--fg);
@@ -132,8 +130,8 @@
     z-index: -1;
     border-radius: inherit;
     pointer-events: none;
-    /* Raised (--shadow-btn) out of the sunken track, with a hairline so light's white thumb has an edge. */
-    background: var(--elevated);
+    /* Filled like ButtonGroup's chosen option (--control-4) and raised (--shadow-btn), with a hairline for an edge. */
+    background: var(--control-4);
     box-shadow:
       inset 0 0 0 1px var(--line),
       var(--shadow-btn);

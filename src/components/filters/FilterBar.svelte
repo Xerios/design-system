@@ -3,7 +3,9 @@
    * A row of filters drawn from data (Linear's view filters): one FilterChip per filter, then a funnel button that adds
    * one. The button lists the fields (with a search field when there are many); picking one shows its value editor in
    * the same panel, and the filter joins the row as soon as it has a value. A field already filtered opens its chip
-   * instead, so each field has one filter. Unticking every value of a filter removes it as its panel closes.
+   * instead, so each field has one filter. A filter left with no value (every value unticked, every word removed) leaves
+   * `filters` at once, so nothing filters by it; its chip stays on the row until its panel closes, and picking a value
+   * again puts it back in its place.
    *
    *   <FilterBar bind:filters fields={[
    *     { key: 'status', label: 'Status', icon: 'circleDashed', options: [{ value: 'open', label: 'Open', icon: 'checkCircle', tone: 'success', hint: '12 items' }, …], plural: 'statuses' },
@@ -28,8 +30,9 @@
    * onchange(filters): after every edit. label: the row's accessible name ("Filters"). addLabel: the button's ("Add filter").
    * panel: snippet ({ filter, field, set, close }) for a custom field's editor: set(value) stores a value, close() closes.
    * summary: snippet ({ filter, field }) drawing a custom field's value on its chip (default: the value as text).
-   * Keyboard: the chips' parts and the add button are in the tab order. In the add panel, Backspace in an empty search
-   * goes from a field's values back to the field list. Removing a filter moves the focus to the next one, else the button.
+   * Keyboard: the chips' parts and the add button are in the tab order. In the add panel, Backspace on a field's values
+   * goes back to the field list, unless it deletes something there (typed text, a word). Removing a filter moves the focus
+   * to the next one, else the button.
    * Other attributes (class…) and attachments go to the row.
    */
   import { tick } from 'svelte'
@@ -40,6 +43,7 @@
   import TagInput from '../inputs/TagInput.svelte'
   import Panel from './Panel.svelte'
   import { tooltip } from '../../lib/tooltip.js'
+  import { composing } from '../../lib/dom.js'
   import { datePresets, formatDay, relativeDay } from '../../lib/dates.js'
 
   /**
@@ -78,6 +82,14 @@
   let openKey = $state(/** @type {string | null} */ (null))
   /** The add panel: closed, listing the fields, or showing one field's values. */
   let adding = $state(/** @type {null | { key: string | null }} */ (null))
+  /** A filter emptied while its panel is open: out of `filters`, but its chip stays on the row (at `at`) until it closes. */
+  let held = $state(/** @type {null | { at: number, filter: Filter }} */ (null))
+  /** The chips on the row: the filters, with the held one back in its place. */
+  const rows = $derived.by(() => {
+    if (!held || filters.some((x) => x.field === held?.filter.field)) return filters
+    const at = Math.min(held.at, filters.length)
+    return [...filters.slice(0, at), held.filter, ...filters.slice(at)]
+  })
 
   const byKey = $derived(new Map(fields.map((f) => [f.key, f])))
   /** @param {Field} f */
@@ -91,7 +103,9 @@
   /** @param {any} v */
   const isEmpty = (v) => v == null || v === '' || (Array.isArray(v) && !v.length)
   /** @param {string} key */
-  const find = (key) => filters.find((x) => x.field === key)
+  const find = (key) => rows.find((x) => x.field === key)
+  /** @param {string} key */
+  const isHeld = (key) => held?.filter.field === key
 
   /** @param {Filter[]} next */
   function commitAll(next) {
@@ -100,7 +114,24 @@
   }
   /** @param {string} key @param {Partial<Filter>} patch */
   function update(key, patch) {
-    commitAll(filters.map((x) => (x.field === key ? { ...x, ...patch } : x)))
+    if (held && isHeld(key)) {
+      const filter = { ...held.filter, ...patch }
+      if (isEmpty(filter.value)) held = { ...held, filter }
+      else {
+        const at = Math.min(held.at, filters.length)
+        held = null
+        commitAll([...filters.slice(0, at), filter, ...filters.slice(at)])
+      }
+      return
+    }
+    const at = filters.findIndex((x) => x.field === key)
+    if (at < 0) return
+    const filter = { ...filters[at], ...patch }
+    if (isEmpty(filter.value)) {
+      // Nothing to filter by: out of `filters` now, its chip held on the row until its panel closes.
+      held = { at, filter }
+      commitAll(filters.filter((_, i) => i !== at))
+    } else commitAll(filters.map((x, i) => (i === at ? filter : x)))
   }
   /** Stores a value for a field: on its filter, or as a new one once there is something to filter by. @param {string} key @param {any} value */
   function put(key, value) {
@@ -109,19 +140,21 @@
     if (find(key)) update(key, { value })
     else if (!isEmpty(value)) commitAll([...filters, { field: key, op: operatorsOf(field)[0], value }])
   }
-  /** Drops a field's filter if it has nothing left to filter by. @param {string} key */
+  /** Drops a field's chip if it has nothing left to filter by. @param {string} key */
   function prune(key) {
-    const f = find(key)
+    if (isHeld(key)) held = null
+    const f = filters.find((x) => x.field === key)
     if (f && isEmpty(f.value)) commitAll(filters.filter((x) => x !== f))
   }
   /** @param {string} key */
   async function remove(key) {
-    const at = filters.findIndex((x) => x.field === key)
+    const at = rows.findIndex((x) => x.field === key)
     if (at < 0) return
     if (openKey === key) openKey = null
+    if (isHeld(key)) held = null
     commitAll(filters.filter((x) => x.field !== key))
     await tick()
-    const next = filters[at] ?? filters[at - 1]
+    const next = rows[at] ?? rows[at - 1]
     if (next) chips[next.field]?.focus()
     else addButton?.focus()
   }
@@ -150,6 +183,26 @@
     })
   }
 
+  /** Attachment on the add panel's value step: Backspace goes back to the field list, whichever editor has the focus,
+   *  unless the editor used it (a TagInput removing a word) or it deletes text where it was pressed.
+   *  @param {() => void} back */
+  const NOT_TYPED = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file', 'image'])
+  const backOnBackspace = (back) => (/** @type {HTMLElement} */ node) => {
+    /** @param {KeyboardEvent} e */
+    const onkeydown = (e) => {
+      if (e.key !== 'Backspace' || e.defaultPrevented || composing(e) || e.ctrlKey || e.metaKey || e.altKey) return
+      const t = /** @type {HTMLElement} */ (e.target)
+      if (t.isContentEditable && t.textContent) return
+      // Text a Backspace would delete (a checkbox's or a button-like input's value isn't).
+      if (t instanceof HTMLTextAreaElement && t.value && !t.readOnly) return
+      if (t instanceof HTMLInputElement && t.value && !t.readOnly && !NOT_TYPED.has(t.type)) return
+      e.preventDefault()
+      back()
+    }
+    node.addEventListener('keydown', onkeydown)
+    return () => node.removeEventListener('keydown', onkeydown)
+  }
+
   /** @param {Filter} filter @param {Field} field */
   const presetOf = (filter, field) => (field.presets ?? datePresets()).find((p) => p.value === filter.value)
   /** @param {Filter} filter @param {Field} field */
@@ -164,7 +217,7 @@
   }
 </script>
 
-{#snippet editor(/** @type {Field} */ field, /** @type {Filter} */ current, /** @type {() => void} */ close, /** @type {(() => void) | undefined} */ back)}
+{#snippet editor(/** @type {Field} */ field, /** @type {Filter} */ current, /** @type {() => void} */ close)}
   {#if kindOf(field) === 'options'}
     <OptionList
       value={current.value ?? []}
@@ -172,7 +225,6 @@
       label={field.label}
       search={field.search ?? 'auto'}
       onchange={(v) => put(field.key, v)}
-      onback={back}
     />
   {:else if kindOf(field) === 'date'}
     <DateFilter
@@ -227,10 +279,10 @@
 {/snippet}
 
 <div class={['filter-bar', className]} role="group" aria-label={label} {...rest}>
-  {#each filters as filter (filter.field)}
+  {#each rows as filter (filter.field)}
     {@const field = byKey.get(filter.field)}
     {#if field}
-      {#snippet editPanel(/** @type {{ close: () => void }} */ { close })}{@render editor(field, filter, close, undefined)}{/snippet}
+      {#snippet editPanel(/** @type {{ close: () => void }} */ { close })}{@render editor(field, filter, close)}{/snippet}
       <FilterChip
         bind:this={chips[filter.field]}
         field={{ label: field.label, icon: field.icon }}
@@ -266,8 +318,15 @@
   <Panel anchor={addButton} name={anchor} label={field ? field.label : addLabel} onclose={closeAdding}>
     {#if field}
       {#key field.key}
-        <div class="step" {@attach focusIn}>
-          {@render editor(field, find(field.key) ?? { field: field.key, op: operatorsOf(field)[0], value: null }, () => closeAdding(true), () => (adding = { key: null }))}
+        <div
+          class="step"
+          {@attach focusIn}
+          {@attach backOnBackspace(() => {
+            prune(field.key)
+            adding = { key: null }
+          })}
+        >
+          {@render editor(field, find(field.key) ?? { field: field.key, op: operatorsOf(field)[0], value: null }, () => closeAdding(true))}
         </div>
       {/key}
     {:else}

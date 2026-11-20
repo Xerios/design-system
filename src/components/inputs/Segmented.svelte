@@ -50,10 +50,9 @@
     border: 0;
     border-radius: var(--r-pill);
     padding: 0 10px;
-    background: var(--control-2);
-    box-shadow:
-      inset 0 0 0 1px var(--line),
-      var(--shadow-btn);
+    /* Flat at rest; only the chosen option is raised. */
+    background: var(--control-1);
+    box-shadow: inset 0 0 0 1px var(--line);
     font-size: 12px;
     line-height: 14px;
     font-weight: var(--w-medium);
@@ -61,13 +60,17 @@
     color: var(--fg);
     transition:
       color var(--dur) var(--ease-out),
-      background-color var(--dur) var(--ease-out);
+      background-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
   }
   button:not([aria-checked='true']):hover {
-    background: var(--control-3);
+    background: var(--control-2);
   }
   [aria-checked='true'] {
     background: var(--control-4);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--shadow-btn);
   }
   /* Something finished behind this option (e.g. research done): its icon turns green. */
   [data-done] :global(.icon) {

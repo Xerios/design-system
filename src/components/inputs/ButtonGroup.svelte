@@ -48,10 +48,9 @@
     width: fit-content;
     max-width: 100%;
     border-radius: var(--r-pill);
-    background: var(--control-2);
-    box-shadow:
-      inset 0 0 0 1px var(--line),
-      var(--shadow-btn);
+    /* Flat at rest; only the chosen option is raised. */
+    background: var(--control-1);
+    box-shadow: inset 0 0 0 1px var(--line);
   }
   button {
     display: inline-flex;
@@ -72,7 +71,8 @@
     white-space: nowrap;
     transition:
       color var(--dur) var(--ease-out),
-      background-color var(--dur) var(--ease-out);
+      background-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
   }
   button + button {
     box-shadow: inset 1px 0 0 var(--line);
@@ -92,6 +92,12 @@
   }
   [aria-checked='true'] {
     background: var(--control-4);
+    box-shadow: var(--shadow-btn);
+  }
+  button + [aria-checked='true'] {
+    box-shadow:
+      inset 1px 0 0 var(--line),
+      var(--shadow-btn);
   }
   button :global(.icon) {
     flex: none;

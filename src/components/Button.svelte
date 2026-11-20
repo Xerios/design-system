@@ -7,6 +7,7 @@
    *   <Button iconOnly icon="refresh" label="Refresh" onclick={reload} />
    *   <Button type="submit" form="new-site" variant="primary" pending={submitting}>Create</Button>
    *   <Button href="/">Go to apps</Button>
+   *   <Button icon="eye" bind:pressed={showHidden}>Show hidden</Button>
    *
    * onclick may return a promise. Until it settles the button is busy, drawn as Select is while loading: it drops its
    * fill (a solid one becomes an outlined pill), the working sweep runs along its edge (.shimmer) and its label shimmers
@@ -19,6 +20,8 @@
    * pending: busy from outside, e.g. a form submit button while its form's request runs.
    *
    * variant: secondary (default) | primary | danger. small: the 24px size. icon: an Icon name, before the label.
+   * pressed: makes it a toggle button (aria-pressed); each press flips it before onclick runs, so use bind:pressed.
+   * Toggled on, a secondary button drops its fill and keeps only its hairline. Leave it undefined for an ordinary button.
    * iconOnly: the round .icon-btn showing just the icon; `label` is then required, and becomes its accessible name and
    * its tooltip. href: a link drawn as a button (navigation, never an action). disabled: as on any button.
    * Other attributes (class, form, autofocus…) and attachments go to the <button> (or <a>).
@@ -42,6 +45,7 @@
    * @property {boolean} [pending]
    * @property {string} [pendingLabel]
    * @property {(error: unknown) => void} [onerror]
+   * @property {boolean} [pressed] a toggle button's state (bindable); undefined for an ordinary button
    * @property {boolean} [disabled]
    * @property {import('svelte').Snippet} [children]
    */
@@ -58,6 +62,7 @@
     pending = false,
     pendingLabel,
     onerror,
+    pressed = $bindable(),
     disabled = false,
     class: className,
     children,
@@ -89,6 +94,7 @@
       return
     }
     error = ''
+    if (pressed !== undefined) pressed = !pressed
     const result = onclick?.(event)
     if (!(result instanceof Promise)) return
     running = true
@@ -122,6 +128,7 @@
     style:anchor-name={anchor}
     {disabled}
     aria-label={iconOnly ? label : undefined}
+    aria-pressed={pressed}
     aria-busy={busy || undefined}
     aria-disabled={busy || undefined}
     aria-describedby={error ? `${uid}-error` : undefined}
