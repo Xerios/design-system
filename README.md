@@ -176,7 +176,7 @@ wrapper for display components, the control itself (input, button) for inputs, P
 | `Md`                                                      | Inline markdown, no `{@html}`                                                                                                                                                                                        | `text`                                                                                                                                                                                              |
 | `menu/MenuButton`                                         | Visible ⋯ twin of a context menu                                                                                                                                                                                     | `items` (function), `label`                                                                                                                                                                         |
 | `Table`                                                   | Data table in a lit card: sortable columns, collapsible row groups, sticky header, row menu                                                                                                                          | `columns`, `rows` or `groups`, `key`, `cell` snippet, `sort` and `collapsed` (bindable), `selected`, `onselect`, `rowMenu`, `rowLabel`, `label`, `emptyGroup`                                       |
-| `Toast`                                                   | The one toast (app owns the state)                                                                                                                                                                                   | `toast`, `onhold`, `ondismiss`                                                                                                                                                                      |
+| `Toast`                                                   | The toast stack (app owns the list)                                                                                                                                                                                 | `toasts`, `onhold`, `ondismiss`                                                                                                                                                                    |
 | `inputs/TextField`, `SearchField`, `TextArea`             | Text entry                                                                                                                                                                                                           | `value` (bindable), `id`, `label`, `hideLabel`, `placeholder`, `shortcut`, `onenter`, `error`, `info`, native constraints (`required`, `pattern`…); `focus()`                                       |
 | `inputs/Select`                                           | Dropdown                                                                                                                                                                                                             | `value` (bindable), `options`, `id`, `label`, `groupActions`, `loading`, `error`, `info`, `ghost` (flat, not raised), `disabled`                                                                    |
 | `inputs/Segmented`, `ButtonGroup`, `RadioGroup`           | One choice of a few: separate pills; one joined pill; a track with the choice raised on it                                                                                                                           | `value`, `options`, `label`, `onchange`, `iconOnly`; RadioGroup: `fill`, `pill`                                                                                                                     |
@@ -184,8 +184,9 @@ wrapper for display components, the control itself (input, button) for inputs, P
 | `inputs/Switch`                                           | On/off                                                                                                                                                                                                               | `checked` (bindable), `id`, `label`, `hint`; other props and attachments go to the button                                                                                                           |
 | `inputs/Slider`                                           | Number in a range                                                                                                                                                                                                    | `value` (bindable), `min`, `max`, `step`, `id`, `label`, `format`                                                                                                                                   |
 | `inputs/RangeSlider`                                      | A range of numbers: two thumbs on one track that can't cross                                                                                                                                                         | `value` (bindable `[from, to]`), `min`, `max`, `step`, `gap`, `id`, `label`, `format`                                                                                                               |
-| `inputs/DatePicker`, `DateRangePicker`                    | A day, or a span of days: typed in the locale's numeric form (or ISO), or picked from a calendar under the field (ISO days, `lib/dates.js`); the range has a from and a to input, or takes two presses               | `value` (bindable: `'2026-11-18'`, or `[from, to]`), `id`, `label`, `min`, `max`, `placeholder`, `clearable`, `error`, `info`, `hideLabel`, `disabled`                                              |
-| `inputs/Calendar`, `inputs/DateField`, `inputs/DateInput` | The parts the pickers are made of (a month grid; the field and its panel), for a picker of your own                                                                                                                  | see their header comments                                                                                                                                                                           |
+| `inputs/DatePicker`, `DateRangePicker` | A day, or a span of days: typed in the locale's numeric form (or ISO), or picked from a calendar under the field (ISO days, `lib/dates.js`); the range has a from and a to input, or takes two presses, and ready-made spans (Last 7 days…) beside the calendar | `value` (bindable: `'2026-11-18'`, or `[from, to]`), `id`, `label`, `min`, `max`, `allowed` (DatePicker: the only days allowed), `shortcuts` (DateRangePicker), `placeholder`, `clearable`, `error`, `info`, `hideLabel`, `disabled` |
+| `inputs/DateRangeSelect` | A compact span between two of a given list of days or moments (irregular runs): a button opening the list, newest first, picked with two presses, and shortcuts (Most recent, Last 3, This month) | `value` (bindable: `[from, to]`), `dates`, `id`, `label`, `shortcuts`, `placeholder`, `error`, `info`, `hideLabel`, `disabled` |
+| `inputs/Calendar`, `inputs/DateField`, `inputs/DateInput`, `inputs/RangeShortcuts` | The parts the pickers are made of (a month grid; the field and its panel; the shortcut buttons), for a picker of your own                                                                                                                  | see their header comments                                                                                                                                                                           |
 | `inputs/FileButton`                                       | File picker                                                                                                                                                                                                          | `label`, `accept`, `multiple`, `onfiles`, `chosen` + `onclear` (the choice after it, with a ✕)                                                                                                      |
 | `menu/ContextMenu`                                        | The menu layer; mount once                                                                                                                                                                                           | none                                                                                                                                                                                                |
 | `Dialogs`                                                 | The layer for `alertDialog`, `confirmDialog` and `promptDialog`; mount once                                                                                                                                          | none                                                                                                                                                                                                |
@@ -266,21 +267,34 @@ makes the confirm button red and starts the focus on cancel. A prompt's `validat
 ### Toast
 
 ```js
-// app state
-let timer
+// app state: oldest first, newest last
+const timers = new Map()
+let held = false
+const arm = ({ id, ms }) => timers.set(id, setTimeout(() => dismiss(id), ms))
 export function toast(message, action = null, ms = 5000) {
-  app.toast = { id: Date.now(), message, action, ms }
-  hold(false)
+  const t = { id: crypto.randomUUID(), message, action, ms }
+  app.toasts.push(t)
+  if (!held) arm(t)
+}
+export function dismiss(id) {
+  clearTimeout(timers.get(id))
+  timers.delete(id)
+  app.toasts = app.toasts.filter((t) => t.id !== id)
 }
 export function hold(on) {
-  clearTimeout(timer)
-  if (!on && app.toast) timer = setTimeout(() => (app.toast = null), app.toast.ms)
+  held = on
+  for (const timer of timers.values()) clearTimeout(timer)
+  timers.clear()
+  if (!on) app.toasts.forEach(arm)
 }
 ```
 
 ```svelte
-<Toast toast={app.toast} onhold={hold} ondismiss={() => (app.toast = null)} />
+<Toast toasts={app.toasts} onhold={hold} ondismiss={dismiss} />
 ```
+
+The newest toast is in front with up to two older ones peeking out behind it; hovering or focusing the stack fans it
+out and holds every timer.
 
 ## Helpers (`lib/`)
 

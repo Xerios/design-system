@@ -6,7 +6,8 @@
    *
    *   <DateInput bind:value {id} {min} {max} errorId={problem && `${id}-error`} onopen={openCalendar} onproblem={(m) => (problem = m)} />
    *
-   * value (bindable): the ISO day, '' for none. min, max: the range a typed day must fall in.
+   * value (bindable): the ISO day, '' for none. min, max: the range a typed day must fall in. allowed: the only days
+   * it may be (or null for any).
    * onproblem(message): what is wrong with what was typed ('' once it reads); the picker shows it as the field's error.
    * onopen(focus): asks for the calendar: a click does (focus false: typing carries on), and ArrowDown does with the
    * focus moving onto it (focus true). errorId: as the invalid attachment's.
@@ -22,12 +23,13 @@
    * @property {string} id
    * @property {string | null} [min]
    * @property {string | null} [max]
+   * @property {string[] | null} [allowed]
    * @property {string | false | null | undefined} [errorId]
    * @property {(focus: boolean) => void} [onopen]
    * @property {(message: string) => void} [onproblem]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLInputAttributes, keyof Props>} */
-  let { value = $bindable(''), id, min = null, max = null, errorId, onopen, onproblem, placeholder, ...rest } = $props()
+  let { value = $bindable(''), id, min = null, max = null, allowed = null, errorId, onopen, onproblem, placeholder, ...rest } = $props()
 
   const format = inputFormat()
 
@@ -54,6 +56,7 @@
         min && max ? `from ${formatDay(min)} to ${formatDay(max)}` : min ? `from ${formatDay(min)} on` : `up to ${formatDay(/** @type {string} */ (max))}`
       return onproblem?.(`Pick a day ${range}.`)
     }
+    if (allowed && !allowed.includes(day)) return onproblem?.(`${formatDay(day)} isn't available. Pick a day from the calendar.`)
     onproblem?.('')
     value = day
     text = formatInput(day)

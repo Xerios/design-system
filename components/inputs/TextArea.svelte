@@ -60,7 +60,12 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    min-width: 0;
+    min-width: min(100%, 240px);
+  }
+  /* Its width doesn't follow the text (contain): field-sizing would otherwise widen it with every long line where
+     the field sizes to its content (a flex row). It keeps its 240px and grows only downward. */
+  .box {
+    contain: inline-size;
   }
   textarea {
     display: block;

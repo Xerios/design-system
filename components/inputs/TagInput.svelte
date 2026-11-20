@@ -217,10 +217,13 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    min-width: 0;
+    min-width: min(100%, 240px);
   }
-  /* The same box as TextField, wrapping its tags and the input onto as many rows as they need. */
+  /* The same box as TextField, wrapping its tags and the input onto as many rows as they need. Its width doesn't
+     follow the tags (contain): where the field sizes to its content (a flex row), it keeps its 240px and the tags
+     wrap, rather than widening with every tag added. */
   .box {
+    contain: inline-size;
     display: flex;
     flex-wrap: wrap;
     align-items: center;

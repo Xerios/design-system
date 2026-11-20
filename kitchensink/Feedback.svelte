@@ -17,23 +17,35 @@
   /** @type {{ toast?: (message: string, action?: { label: string, run: () => void }) => void }} */
   let { toast: hostToast } = $props()
 
-  // The host's toast when it passes one (the app's single region); otherwise a Toast of the kitchen sink's own, whose
-  // state and timer it keeps here, as an app would.
-  /** @type {{ id: number, message: string, action?: { label: string, run: () => void } } | null} */
-  let toast = $state(null)
+  // The host's toasts when it passes them (the app's single region); otherwise a Toast of the kitchen sink's own, whose
+  // list and timers it keeps here, as an app would.
+  /** @type {{ id: number, message: string, action?: { label: string, run: () => void } }[]} */
+  let toasts = $state([])
   let held = false
-  /** @type {ReturnType<typeof setTimeout> | undefined} */
-  let timer
+  /** @type {Map<number, ReturnType<typeof setTimeout>>} */
+  const timers = new Map()
   let shown = 0
+  /** @param {number} id */
+  const arm = (id) => timers.set(id, setTimeout(() => dismiss(id), 5000))
   /** @param {string} message @param {{ label: string, run: () => void }} [action] */
   function show(message, action) {
     if (hostToast) return hostToast(message, action)
-    toast = { id: ++shown, message, action }
-    restart()
+    const id = ++shown
+    toasts.push({ id, message, action })
+    if (!held) arm(id)
   }
-  function restart() {
-    clearTimeout(timer)
-    timer = setTimeout(() => !held && (toast = null), 5000)
+  /** @param {number} id */
+  function dismiss(id) {
+    clearTimeout(timers.get(id))
+    timers.delete(id)
+    toasts = toasts.filter((t) => t.id !== id)
+  }
+  /** @param {boolean} on */
+  function hold(on) {
+    held = on
+    for (const timer of timers.values()) clearTimeout(timer)
+    timers.clear()
+    if (!on) for (const t of toasts) arm(t.id)
   }
   let floating = $state('That name is taken.')
 </script>
@@ -60,8 +72,12 @@
     <span class="label-chip shimmer"><Shimmer>Deploying</Shimmer></span>
     <div class="busy">A card at work<WorkingBorder /></div>
   </Demo>
-  <Demo label="Toast (bottom of the window)">
+  <Demo label="Toast (bottom of the window; hover the stack to fan it out)">
     <Button onclick={() => show('Saved.')}>Show a toast</Button>
+    <Button
+      onclick={() => ['Build started.', 'Uploaded 12 files.', 'Cache cleared.', 'Saved.'].forEach((m, i) => setTimeout(() => show(m), i * 300))}
+      >Show several</Button
+    >
     <Button onclick={() => show('Deleted 3 items.', { label: 'Undo', run: () => show('Restored.') })}>With an action</Button>
   </Demo>
   <Demo label="Spotlight">
@@ -79,7 +95,7 @@
 </Section>
 
 {#if !hostToast}
-  <Toast {toast} onhold={(on) => ((held = on), !on && restart())} ondismiss={() => (toast = null)} />
+  <Toast {toasts} onhold={hold} ondismiss={(id) => dismiss(Number(id))} />
 {/if}
 
 <style>

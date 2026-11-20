@@ -10,12 +10,16 @@
    * On the calendar the first press starts a new range; while choosing the second, the days up to the pointer (or the
    * keyboard focus) are tinted, and a second press before the first swaps them. Closing before the second press keeps
    * the old range. A hint in the panel says which press is next, read out as it changes. Keyboard: as DatePicker's.
+   * shortcuts: ready-made spans beside the calendar, [{ label, range() }] with range() giving [from, to]; one press sets
+   * it and closes. Default: Last 7 days, Last 30 days, This month, Last month (rangeShortcuts in lib/dates.js); [] for
+   * none. A span reaching past min or max is cut to them, and one wholly outside is disabled.
    * Other attributes and attachments go to the field's wrapper.
    */
   import Calendar from './Calendar.svelte'
   import DateField from './DateField.svelte'
   import DateInput from './DateInput.svelte'
-  import { clamp, compare, formatDay, monthOf, today } from '../../lib/dates.js'
+  import RangeShortcuts from './RangeShortcuts.svelte'
+  import { clamp, compare, formatDay, monthOf, rangeShortcuts, today } from '../../lib/dates.js'
 
   /**
    * @typedef {object} Props
@@ -24,6 +28,7 @@
    * @property {string} label
    * @property {string | null} [min]
    * @property {string | null} [max]
+   * @property {{ label: string, range: () => [string, string] }[]} [shortcuts]
    * @property {string} [placeholder]
    * @property {boolean} [clearable]
    * @property {boolean} [hideLabel]
@@ -32,7 +37,7 @@
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
-  let { value = $bindable(['', '']), id, label, min = null, max = null, placeholder, clearable = true, error = '', disabled = false, ...field } = $props()
+  let { value = $bindable(['', '']), id, label, min = null, max = null, shortcuts = rangeShortcuts(), placeholder, clearable = true, error = '', disabled = false, ...field } = $props()
 
   /** @type {DateField | undefined} */
   let dateField = $state()
@@ -47,6 +52,23 @@
   let typed = $state(['', ''])
   const problem = $derived(error || typed[0] || typed[1])
   const tint = $derived(/** @type {[string, string] | null} */ (first ? [first, pointed ?? first] : value[0] && value[1] ? [value[0], value[1]] : null))
+
+  /** The shortcuts' spans, cut to min and max; null for one wholly outside them. */
+  const presets = $derived(
+    shortcuts.map((shortcut) => {
+      const [from, to] = shortcut.range()
+      const outside = (min && to < min) || (max && from > max)
+      return { label: shortcut.label, range: outside ? null : /** @type {[string, string]} */ ([clamp(from, min, max), clamp(to, min, max)]) }
+    }),
+  )
+
+  /** @param {[string, string]} range @param {() => void} close */
+  function choose(range, close) {
+    value = range
+    first = null
+    typed = ['', '']
+    close()
+  }
 
   /** Sets one end from typing; ends the wrong way round swap. @param {0 | 1} end @param {string} day */
   function setEnd(end, day) {
@@ -68,10 +90,7 @@
       pointed = day
       return
     }
-    value = /** @type {[string, string]} */ ([first, day].toSorted(compare))
-    first = null
-    typed = ['', '']
-    close()
+    choose(/** @type {[string, string]} */ ([first, day].toSorted(compare)), close)
   }
 </script>
 
@@ -118,7 +137,11 @@
     />
   {/snippet}
   {#snippet panel(close)}
-    <div class="range">
+    <div class="range" class:split={shortcuts.length > 0}>
+      {#if shortcuts.length}
+        <RangeShortcuts vertical class="presets" items={presets} {value} onpick={(range) => choose(range, close)} />
+      {/if}
+      <div class="days">
       <p class="hint small muted" aria-live="polite">{first ? `From ${formatDay(first)}: pick the last day` : 'Pick the first day'}</p>
       <Calendar
         bind:month
@@ -131,6 +154,7 @@
         onpoint={(day) => first && (pointed = day)}
         onpick={(day) => pick(day, close)}
       />
+      </div>
     </div>
   {/snippet}
 </DateField>
@@ -140,8 +164,29 @@
     flex: none;
     color: var(--muted);
   }
-  .range {
+  .range,
+  .days {
     display: grid;
     gap: var(--space-2);
+  }
+  .range.split {
+    grid-template-columns: auto auto;
+    align-items: start;
+    gap: var(--space-3);
+  }
+  .split > :global(.presets) {
+    align-self: stretch;
+    padding-inline-end: var(--space-3);
+    border-inline-end: 1px solid var(--line);
+  }
+  @media (max-width: 480px) {
+    .range.split {
+      grid-template-columns: auto;
+    }
+    .split > :global(.presets) {
+      padding: 0 0 var(--space-2);
+      border-inline-end: 0;
+      border-block-end: 1px solid var(--line);
+    }
   }
 </style>

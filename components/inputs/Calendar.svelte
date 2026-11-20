@@ -8,9 +8,10 @@
    * month (bindable): any day in the month shown. focus (bindable): the day that holds the keyboard focus.
    * selected: the chosen days. range: [from, to] to tint the days between (a range picker), or null.
    * min, max: the first and last day that can be picked; others show but can't be picked.
+   * allowed: the only days that can be picked (within min and max), or null for every day.
    * onpick(day). onpoint(day): the day under the pointer or focus, for a range picker's preview.
    * autofocus: take the focus (on `focus`) when it appears. label: names the grid with the month.
-   * The previous / next arrows stop at the first and last page holding a day between min and max.
+   * The previous / next arrows stop at the first and last page holding a day that can be picked.
    * Keyboard, as the ARIA date picker grid: arrows move a day or a week, Home / End to the week's ends, PageUp /
    * PageDown a month (with Shift a year), Enter or Space picks. Moving past the month turns the page.
    * The month and the year in the head are buttons: they swap the grid for the twelve months, or a page of twelve
@@ -30,6 +31,7 @@
    * @property {[string, string] | null} [range]
    * @property {string | null} [min]
    * @property {string | null} [max]
+   * @property {string[] | null} [allowed]
    * @property {(day: string) => void} onpick
    * @property {(day: string) => void} [onpoint]
    * @property {boolean} [autofocus]
@@ -43,6 +45,7 @@
     range = null,
     min = null,
     max = null,
+    allowed = null,
     onpick,
     onpoint,
     autofocus = false,
@@ -54,6 +57,11 @@
   const weeks = $derived(monthGrid(month))
   const names = $derived(weekdayNames(weeks[0]))
   const span = $derived(range ? range.toSorted(compare) : null)
+  /** The allowed days within min and max, or null when every day in them is. */
+  const open = $derived(allowed ? allowed.filter((day) => within(day, min, max)) : null)
+  const openSet = $derived(open ? new Set(open) : null)
+  /** @param {string} day */
+  const can = (day) => (openSet ? openSet.has(day) : within(day, min, max))
   /** @type {HTMLTableElement | undefined} */
   let table = $state()
   /** @type {HTMLDivElement | undefined} */
@@ -87,10 +95,11 @@
   /** Whether any day of month m (0–11) of year y can be picked. @param {number} y @param {number} m */
   function monthOpen(y, m) {
     const first = `${y}-${String(m + 1).padStart(2, '0')}-01`
+    if (open) return open.some((day) => day.startsWith(first.slice(0, 8)))
     return !(max && first > max) && !(min && addDays(addMonths(first, 1), -1) < min)
   }
   /** @param {number} y */
-  const yearOpen = (y) => !(max && `${y}-01-01` > max) && !(min && `${y}-12-31` < min)
+  const yearOpen = (y) => (open ? open.some((day) => day.startsWith(`${y}-`)) : true) && !(max && `${y}-01-01` > max) && !(min && `${y}-12-31` < min)
 
   /** Switches the grid and puts the focus on its focus cell. @param {'days' | 'months' | 'years'} next */
   async function showView(next) {
@@ -167,7 +176,7 @@
       root?.querySelector(`[data-turn="${-n}"]`)?.focus()
     }
   }
-  /** Whether the page before (-1) or after (1) holds a day that can be picked, within min and max. @param {number} n */
+  /** Whether the page before (-1) or after (1) holds a day that can be picked. @param {number} n */
   function canTurn(n) {
     if (view === 'years') return yearOpen(n < 0 ? yearsFrom - 1 : yearsFrom + 12)
     if (view === 'months') return yearOpen(yearOf(month) + n)
@@ -200,7 +209,7 @@
 
   /** @param {string} day */
   function pick(day) {
-    if (!within(day, min, max)) return
+    if (!can(day)) return
     focus = day
     onpick(day)
   }
@@ -290,7 +299,7 @@
                 tabindex={day === focus ? 0 : -1}
                 aria-label={speakDay(day)}
                 aria-current={day === now ? 'date' : undefined}
-                aria-disabled={within(day, min, max) ? undefined : 'true'}
+                aria-disabled={can(day) ? undefined : 'true'}
                 onclick={() => pick(day)}
                 onpointerenter={() => onpoint?.(day)}
                 onfocus={() => onpoint?.(day)}>{Number(day.slice(8))}</button

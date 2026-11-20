@@ -16,6 +16,7 @@
   import RangeSlider from '../components/inputs/RangeSlider.svelte'
   import DatePicker from '../components/inputs/DatePicker.svelte'
   import DateRangePicker from '../components/inputs/DateRangePicker.svelte'
+  import DateRangeSelect from '../components/inputs/DateRangeSelect.svelte'
   import { fieldErrors } from '../lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '../lib/invalid.js'
   import { addDays, today } from '../lib/dates.js'
@@ -33,6 +34,11 @@
   let price = $state(/** @type {[number, number]} */ ([20, 80]))
   let due = $state('')
   let stay = $state(/** @type {[string, string]} */ (['', '']))
+  let slot = $state('')
+  let runs = $state(/** @type {[string, string]} */ (['', '']))
+  // Some days ahead to choose from, and some irregular moments in the past weeks.
+  const SLOTS = [2, 3, 6, 9, 13, 20, 27].map((n) => addDays(today(), n))
+  const RUNS = [0, 1, 3, 4, 8, 15, 22, 31, 45].map((n, i) => `${addDays(today(), -n)}T${String(6 + ((i * 5) % 14)).padStart(2, '0')}:${i % 2 ? '30' : '05'}:00Z`)
 
   const REGIONS = [
     { value: 'eu', label: 'Europe', hint: 'Frankfurt', group: 'Close by' },
@@ -146,6 +152,12 @@
   </Demo>
   <Demo label="Date range picker">
     <DateRangePicker bind:value={stay} id="ks-stay" label="Stay" />
+  </Demo>
+  <Demo label="Date picker, only some days">
+    <DatePicker bind:value={slot} id="ks-slot" label="Slot" allowed={SLOTS} />
+  </Demo>
+  <Demo label="Range from a list of dates">
+    <DateRangeSelect bind:value={runs} dates={RUNS} id="ks-runs" label="Runs" />
   </Demo>
   <Demo label="A form: errors only after Submit" wide>
     <form class="form" novalidate onsubmit={submit}>
