@@ -293,7 +293,7 @@
     padding: 0 8px 0 10px;
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
-    background: var(--fill-2);
+    background: var(--control-2);
     color: var(--fg-2);
     font: 400 13px var(--font-data);
     font-variant-numeric: tabular-nums;
@@ -307,11 +307,11 @@
       box-shadow var(--dur) var(--ease-out);
   }
   .trigger:hover:not(:disabled) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .trigger[aria-expanded='true'] {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
     box-shadow: none;
   }
@@ -431,7 +431,7 @@
     cursor: pointer;
   }
   [role='option']:hover:not(.edge) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .between {

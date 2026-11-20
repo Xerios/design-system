@@ -125,7 +125,7 @@
     display: flex;
     min-width: 0;
     border: 1px solid var(--line-strong);
-    background: var(--fill-1);
+    background: var(--control-1);
     color: var(--fg-2);
     transition:
       border-radius var(--dur) var(--ease-out),
@@ -149,7 +149,7 @@
     border-style: dashed;
   }
   .filled {
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .main {
     display: flex;
@@ -191,14 +191,14 @@
     transition: color var(--dur) var(--ease-out);
   }
   .empty:has(> button.main:hover:not(:disabled)) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .empty:has(> button.main:hover:not(:disabled)) .main > :global(.icon) {
     color: inherit;
   }
   .empty:has(> button.main:active:not(:disabled)) {
-    background: var(--fill-4);
+    background: var(--control-4);
   }
   img {
     display: block;
@@ -231,7 +231,7 @@
       color var(--dur) var(--ease-out);
   }
   .clear:hover:not(:disabled) {
-    background: linear-gradient(var(--fill-4), var(--fill-4)), var(--surface);
+    background: linear-gradient(var(--control-4), var(--control-4)), var(--surface);
     color: var(--fg);
   }
   .clear:disabled {

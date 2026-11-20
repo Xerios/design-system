@@ -99,16 +99,16 @@
     height: var(--trail);
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
-    background: var(--fill-1);
+    background: var(--control-1);
     box-shadow: var(--shadow-btn);
     color: var(--fg-2);
   }
   .actions > :global(.icon-btn:last-child:hover) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .actions > :global(.icon-btn:last-child:active) {
-    background: var(--fill-4);
+    background: var(--control-4);
   }
   .scroll {
     flex: 1;

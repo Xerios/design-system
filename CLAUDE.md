@@ -23,7 +23,8 @@ Read it before building UI, and read a component's header comment before using i
 - An icon beside text that can wrap aligns to the top, with the first line, never to the middle of the block: give the
   icon a box one line tall (`height: 1lh`) and `align-items: flex-start` on the row. The same goes for a trailing
   button (dismiss, clear) beside wrapping text.
-- Hover, pressed and active states use the translucent fills (`--fill-2`, `--fill-3`, `--fill-4`), never
+- Controls (anything you press, type into or drag) take the tinted control fills (`--control-1` … `--control-4`) at
+  rest and for hover, pressed and active; non-interactive things use the neutral `--fill-*`. Both are translucent, never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
 - Text is 13px (12px for secondary and labels, 11px for counts), in px, as are the breakpoints. A box holding text gets
   `min-height`, not `height`. Weights `--w-medium` and `--w-semibold`.

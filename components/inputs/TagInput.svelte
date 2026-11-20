@@ -282,7 +282,7 @@
   }
   .remove:hover {
     color: var(--fg);
-    background-color: var(--fill-4);
+    background-color: var(--control-4);
   }
   input {
     all: unset;

@@ -86,7 +86,7 @@
     padding: var(--space-4);
     border: 1px dashed var(--line-strong);
     border-radius: var(--r-lg);
-    background: var(--fill-1);
+    background: var(--control-1);
     transition:
       border-color var(--dur) var(--ease-out),
       background-color var(--dur) var(--ease-out);

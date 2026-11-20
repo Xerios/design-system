@@ -240,7 +240,7 @@
   }
   .item:focus,
   .item.open {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
     outline: none;
   }
@@ -285,7 +285,7 @@
     width: 28px;
     height: 16px;
     border-radius: var(--r-pill);
-    background: var(--fill-4);
+    background: var(--control-4);
     box-shadow:
       inset 0 0 0 1px var(--line),
       var(--sunken-shadow);

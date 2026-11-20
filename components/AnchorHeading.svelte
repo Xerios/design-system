@@ -60,7 +60,7 @@
     opacity: 1;
   }
   .anchor:hover {
-    background: var(--fill-2);
+    background: var(--control-2);
     color: var(--fg-2);
   }
   @media (hover: none) {

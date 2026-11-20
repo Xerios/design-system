@@ -111,7 +111,7 @@
     width: 100%;
     height: 4px;
     border-radius: var(--r-pill);
-    background: var(--fill-4);
+    background: var(--control-4);
     overflow: clip;
   }
   .fill {

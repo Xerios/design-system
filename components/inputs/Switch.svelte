@@ -59,7 +59,7 @@
     width: 28px;
     height: 16px;
     border-radius: var(--r-pill);
-    background: var(--fill-4);
+    background: var(--control-4);
     /* Sunken, like the fields: the track the knob slides in. */
     box-shadow:
       inset 0 0 0 1px var(--line),

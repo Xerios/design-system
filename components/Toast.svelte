@@ -265,7 +265,7 @@
   }
   .action:hover,
   .close:hover {
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .close:hover {
     color: var(--fg);

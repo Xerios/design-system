@@ -67,10 +67,10 @@
     transition: background-color var(--dur) var(--ease-out);
   }
   .action:hover {
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .action:active {
-    background: var(--fill-4);
+    background: var(--control-4);
   }
   .values {
     display: flex;

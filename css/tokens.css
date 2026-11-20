@@ -4,6 +4,7 @@
    (JetBrains Mono for data), and one indigo accent.
    Text: --fg (primary), --fg-2 (secondary), --muted (tertiary), --faint (quaternary).
    Fills (translucent, stack on any surface): --fill-1 resting, --fill-2 hover, --fill-3 pressed/raised, --fill-4 active.
+   Controls take the same steps tinted with the brand hue (--control-1..4), so they stand apart from neutral surfaces.
    Theme: follows the OS; <html data-theme="light|dark"> overrides it. Colours are light-dark(light, dark) pairs. */
 :root {
   /* Each colour is light-dark(light, dark), resolved by color-scheme (set below). */
@@ -81,6 +82,15 @@
   --fill-2: light-dark(rgb(0 0 0 / 0.035), rgb(255 255 255 / 0.035));
   --fill-3: light-dark(rgb(0 0 0 / 0.055), rgb(255 255 255 / 0.05));
   --fill-4: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
+  /* Control fills: the --fill-* scale with a faint cast of the brand hue, for anything you can press, type into or drag
+     (buttons, fields, triggers, segments, tracks, menu items). Surfaces and their fills stay neutral grey, so a control
+     reads apart from the elevation it sits on. --control-hue is a deep indigo on light, a pale one on dark, so the
+     cast darkens light surfaces and lightens dark ones as the plain fills do. */
+  --control-hue: light-dark(color-mix(in lch, var(--brand), black 25%), color-mix(in lch, var(--brand), white 20%));
+  --control-1: color-mix(in lch, var(--control-hue) 5%, transparent);
+  --control-2: color-mix(in lch, var(--control-hue) 8%, transparent);
+  --control-3: color-mix(in lch, var(--control-hue) 11%, transparent);
+  --control-4: color-mix(in lch, var(--control-hue) 15%, transparent);
   --fg: light-dark(#282a30, #f7f8f8);
   --fg-2: light-dark(#3c4149, #d0d6e0);
   --muted: light-dark(#6f6e77, #8a8f98);
@@ -113,8 +123,8 @@
      inside, a contact ring and a soft drop outside. Dark rings the control in near-black against the frame; light has
      no use for the inner ring, takes a stronger top light and a quieter contact ring and drop. */
   --shadow-btn:
-    inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.03)), inset 0 1px 0 light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.04)),
-    0 0 0 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.6)), 0 4px 4px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.1));
+    inset 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.03)), inset 0 1px 0 light-dark(rgb(255 255 255 / 0.17), rgb(255 255 255 / 0.04)),
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.6)), 0 4px 4px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.1));
   --shadow:
     0 0 0 1px light-dark(rgb(0 0 0 / 0.02), rgb(0 0 0 / 0.2)), 0 2px 32px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.25)),
     0 4px 12px light-dark(rgb(0 0 0 / 0.05), transparent), 0 8px 16px light-dark(transparent, rgb(0 0 0 / 0.2));

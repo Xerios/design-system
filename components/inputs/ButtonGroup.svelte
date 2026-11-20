@@ -48,7 +48,7 @@
     width: fit-content;
     max-width: 100%;
     border-radius: var(--r-pill);
-    background: var(--fill-2);
+    background: var(--control-2);
     box-shadow:
       inset 0 0 0 1px var(--line),
       var(--shadow-btn);
@@ -89,10 +89,10 @@
   }
   button:not([aria-checked='true']):hover {
     color: var(--fg-2);
-    background: var(--fill-2);
+    background: var(--control-2);
   }
   [aria-checked='true'] {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
   }
   button :global(.icon) {

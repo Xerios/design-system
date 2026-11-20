@@ -189,7 +189,7 @@
   }
   /* Tiles you can press are raised like a button (its faint fill and relief); content-only tiles stay flat. */
   .interactive {
-    background: var(--fill-1);
+    background: var(--control-1);
     box-shadow: var(--shadow-btn);
   }
   /* A checkbox lights up only while its top row, the part that toggles it, is under the pointer. */
@@ -199,13 +199,13 @@
   }
   .interactive:hover:not(.off, .on, .checkbox)::before,
   .checkbox:not(.off, .on):has(> .head:hover)::before {
-    background: var(--fill-2);
+    background: var(--control-2);
   }
   .interactive:not(.off):has(> .hit:active) {
     translate: 0 1px;
   }
   .interactive:not(.off):has(> .hit:active)::before {
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .on {
     border-color: var(--accent);
@@ -309,7 +309,7 @@
     margin-inline-start: var(--space-3);
     border: 1px solid var(--faint);
     border-radius: calc(var(--r-sm) - 2px);
-    background: var(--fill-1);
+    background: var(--control-1);
     color: var(--accent-ink);
     transition:
       background-color var(--dur) var(--ease-out),

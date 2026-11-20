@@ -80,7 +80,7 @@
     padding: 2px;
     /* Sunken like a field (--sunken-*), so the raised thumb reads as sitting in a track. */
     border-radius: var(--r);
-    background: var(--fill-2);
+    background: var(--control-2);
     box-shadow:
       inset 0 0 0 1px var(--line),
       var(--shadow-sm);
@@ -121,7 +121,7 @@
   }
   button:not([aria-checked='true']):hover {
     color: var(--fg-2);
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   [aria-checked='true'] {
     color: var(--fg);

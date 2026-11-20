@@ -350,7 +350,7 @@
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .pick:hover {
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .pick:focus-visible,
   .cell:focus-visible {
@@ -379,7 +379,7 @@
     font-variant-numeric: tabular-nums;
   }
   .cell:hover:not([aria-disabled='true']) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .cell[aria-disabled='true'] {
@@ -415,7 +415,7 @@
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .day:hover:not([aria-disabled='true']) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .outside {

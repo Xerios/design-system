@@ -167,6 +167,6 @@
   }
   .clear:hover {
     color: var(--fg);
-    background: var(--fill-3);
+    background: var(--control-3);
   }
 </style>

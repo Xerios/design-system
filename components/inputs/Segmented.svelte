@@ -50,7 +50,7 @@
     border: 0;
     border-radius: var(--r-pill);
     padding: 0 10px;
-    background: var(--fill-2);
+    background: var(--control-2);
     box-shadow:
       inset 0 0 0 1px var(--line),
       var(--shadow-btn);
@@ -65,10 +65,10 @@
   }
   button:not([aria-checked='true']):hover {
     color: var(--fg-2);
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   [aria-checked='true'] {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
   }
   /* Something finished behind this option (e.g. research done): its icon turns green. */

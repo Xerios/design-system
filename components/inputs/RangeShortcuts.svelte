@@ -57,7 +57,7 @@
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .shortcut:hover:not(:disabled) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .shortcut[aria-current='true'] {

@@ -150,7 +150,7 @@
     position: relative;
   }
   .trigger[aria-expanded='true'] {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
   }
   .badge {

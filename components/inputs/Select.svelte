@@ -293,7 +293,7 @@
     font-size: 13px;
     font-weight: var(--w-medium);
     color: var(--fg-2);
-    background: var(--fill-2);
+    background: var(--control-2);
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
     cursor: pointer;
@@ -307,7 +307,7 @@
       box-shadow var(--dur) var(--ease-out);
   }
   .trigger:hover:not([aria-busy], :disabled) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text), on an
@@ -321,7 +321,7 @@
     opacity: 0.5;
   }
   .trigger[aria-expanded='true'] {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
     box-shadow: none;
   }
@@ -415,7 +415,7 @@
     white-space: nowrap;
   }
   li.active {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .tick {
@@ -462,7 +462,7 @@
     cursor: pointer;
   }
   .group-action:hover {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .hint {

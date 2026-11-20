@@ -117,7 +117,7 @@
     display: none;
   }
   summary:hover {
-    background: var(--fill-2);
+    background: var(--control-2);
   }
   summary:focus-visible {
     outline-offset: -2px;

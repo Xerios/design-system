@@ -144,14 +144,14 @@
     transition: color var(--dur) var(--ease-out);
   }
   .row:hover {
-    background: var(--fill-2);
+    background: var(--control-2);
     color: var(--fg);
   }
   .row:hover > :global(.icon) {
     color: var(--fg-2);
   }
   .row[aria-current] {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .row[aria-current] > :global(.icon) {

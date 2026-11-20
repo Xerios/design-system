@@ -131,7 +131,7 @@
     min-width: 0;
     max-width: 100%;
     border: 1px solid var(--line-strong);
-    background: var(--fill-1);
+    background: var(--control-1);
     color: var(--fg-2);
     transition:
       border-radius var(--dur) var(--ease-out),
@@ -183,14 +183,14 @@
     transition: color var(--dur) var(--ease-out);
   }
   .card:has(> button.main:hover:not(:disabled, [aria-disabled='true'])) {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg);
   }
   .card:has(> button.main:hover:not(:disabled, [aria-disabled='true'])) .main > :global(.icon) {
     color: inherit;
   }
   .card:has(> button.main:active:not(:disabled, [aria-disabled='true'])) {
-    background: var(--fill-4);
+    background: var(--control-4);
   }
   /* The card: the icon in a square inset by the same space all round, then the name over the detail. */
   .filled .main {
@@ -272,7 +272,7 @@
       color var(--dur) var(--ease-out);
   }
   .clear:hover:not(:disabled) {
-    background: var(--fill-4);
+    background: var(--control-4);
     color: var(--fg);
   }
   .clear:disabled {

@@ -90,7 +90,7 @@
   }
   h3:has(> .hit:hover) {
     color: var(--fg-2);
-    background: var(--fill-2);
+    background: var(--control-2);
   }
   .hit {
     position: absolute;

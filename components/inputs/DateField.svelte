@@ -207,7 +207,7 @@
   }
   .tool:hover:not(:disabled),
   .tool[aria-expanded='true'] {
-    background: var(--fill-3);
+    background: var(--control-3);
     color: var(--fg-2);
   }
   /* Anchored under the field, flipping above or to its other side when there's no room. */

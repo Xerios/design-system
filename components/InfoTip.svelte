@@ -134,7 +134,7 @@
   .info:focus-visible,
   .info.pinned {
     color: var(--fg-2);
-    background: var(--fill-3);
+    background: var(--control-3);
   }
   .tip {
     position: fixed;

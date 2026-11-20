@@ -377,7 +377,7 @@
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .group-head:hover {
-    background: var(--fill-2);
+    background: var(--control-2);
   }
   /* The toggle's hit area covers the whole header row; the ⓘ sits above it. */
   .group-head > button {
