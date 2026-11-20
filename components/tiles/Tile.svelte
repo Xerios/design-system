@@ -187,6 +187,11 @@
     pointer-events: none;
     transition: background-color var(--dur) var(--ease-out);
   }
+  /* Tiles you can press are raised like a button (its faint fill and relief); content-only tiles stay flat. */
+  .interactive {
+    background: var(--fill-1);
+    box-shadow: var(--shadow-btn);
+  }
   /* A checkbox lights up only while its top row, the part that toggles it, is under the pointer. */
   .interactive:hover:not(.off, .on, .checkbox),
   .checkbox:not(.off, .on):has(> .head:hover) {

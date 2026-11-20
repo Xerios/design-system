@@ -267,11 +267,15 @@
 </div>
 
 <style>
+  /* min-width: 0 lets it shrink in a flex or grid parent; otherwise a long value's unwrapped width holds it open and
+     the trigger runs past its container instead of cutting the value off. */
   .field {
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 3px;
+    min-width: 0;
+    max-width: 100%;
   }
   .wrap {
     position: relative;
@@ -336,9 +340,10 @@
     border-color: var(--line);
     cursor: default;
   }
+  /* Focused, it sits flat inside the ring: the raise's outer contact ring would draw a dark line through it. */
   .trigger:focus-visible {
     border-color: var(--accent-line);
-    box-shadow: var(--raise), var(--ring);
+    box-shadow: var(--ring);
     outline: none;
   }
   /* :global: the attribute is set by the invalid attachment, at runtime, where Svelte can't see it. */
@@ -346,9 +351,7 @@
     border-color: var(--danger);
   }
   .trigger:global([aria-invalid='true']):focus-visible {
-    box-shadow:
-      var(--raise),
-      0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
   }
   /* Long values (model ids…) are cut with an ellipsis on one line; the full text is in the tooltip. */
   .trigger :global(.value),
