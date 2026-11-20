@@ -20,6 +20,7 @@
   let picked = $state('nothing yet')
   let pending = $state(false)
   let pressed = $state('nothing yet')
+  let compact = $state(false)
 
   const menuItems = () => [
     { label: 'Open', icon: 'eye', action: () => (picked = 'Open') },
@@ -34,6 +35,8 @@
       ],
     },
     { label: 'Documentation', href: 'https://developer.mozilla.org/' },
+    { separator: true },
+    { label: 'Compact rows', toggle: true, checked: compact, action: (/** @type {boolean} */ on) => (compact = on) },
     { separator: true },
     { label: 'Locked action', disabled: true },
     { label: 'Delete', icon: 'xBold', danger: true, action: () => (picked = 'Delete') },
@@ -79,7 +82,7 @@
   <Demo label="Context menu and its ⋯ twin">
     <button type="button" class="target" {@attach contextMenu(menuItems, 'Demo item')}>Right-click, Shift+F10 or the Menu key</button>
     <MenuButton items={menuItems} label="Demo item" />
-    <span class="small muted">Picked: {picked}</span>
+    <span class="small muted">Picked: {picked}, compact rows {compact ? 'on' : 'off'}</span>
   </Demo>
   <Demo label="Tile" span={2}>
     <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">

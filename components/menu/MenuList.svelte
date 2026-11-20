@@ -17,6 +17,9 @@
   let { items, x, y, flipX = x, label, opener = null, level = 0, autofocus = true, onclose, onback = null } = $props()
 
   let sub = $state(null) // { index, x, y, flipX }
+  // Toggle items flipped while the menu is open (by index), so the switch moves without the caller rebuilding the items.
+  let toggled = $state([])
+  const isOn = (i) => toggled[i] ?? !!items[i].checked
   // What it grows out of: the button it opened from, else the point. Taken as it opens, since closing clears the menu state.
   const origin = untrack(() => (level === 0 && opener ? opener : { x, y }))
   const buttons = []
@@ -58,6 +61,13 @@
     if (item.children) {
       e?.preventDefault()
       return openSub(i, true)
+    }
+    // A toggle flips in place and the menu stays open, so its switch can be seen to move and pressed again.
+    if (item.toggle) {
+      const on = !isOn(i)
+      toggled[i] = on
+      item.action?.(on)
+      return
     }
     item.action?.()
     onclose()
@@ -150,8 +160,8 @@
         class="item"
         class:danger={item.danger}
         class:open={sub?.index === i}
-        role={item.checked !== undefined ? 'menuitemradio' : 'menuitem'}
-        aria-checked={item.checked}
+        role={item.toggle ? 'menuitemcheckbox' : item.checked !== undefined ? 'menuitemradio' : 'menuitem'}
+        aria-checked={item.toggle ? isOn(i) : item.checked}
         aria-haspopup={item.children ? 'menu' : undefined}
         aria-expanded={item.children ? sub?.index === i : undefined}
         disabled={item.disabled}
@@ -160,10 +170,10 @@
         onpointerenter={() => hover(i)}
       >
         <span class="check"
-          >{#if item.checked}<Icon name="check" size="sm" />{:else if item.icon}<Icon name={item.icon} size="sm" />{/if}</span
+          >{#if item.checked && !item.toggle}<Icon name="check" size="sm" />{:else if item.icon}<Icon name={item.icon} size="sm" />{/if}</span
         >
         <span class="label">{item.label}</span>
-        {#if item.children}<span class="hint"><Icon name="caretRight" size="sm" /></span>{:else if item.hint}<span class="hint">{item.hint}</span>{/if}
+        {#if item.toggle}<span class="knob" aria-hidden="true"></span>{:else if item.children}<span class="hint"><Icon name="caretRight" size="sm" /></span>{:else if item.hint}<span class="hint">{item.hint}</span>{/if}
       </button>
     {/if}
   {/each}
@@ -247,9 +257,10 @@
   .danger {
     color: var(--danger);
   }
-  /* A danger item's icon is in its red too, not the muted grey of the others. */
+  /* A danger item's icon is in its red too, not the muted grey of the others. Named, not currentColor: the icon sits
+     in .check, which is in the accent colour. */
   .danger :global(.icon) {
-    color: currentColor;
+    color: var(--danger);
   }
   .check {
     display: inline-flex;
@@ -267,6 +278,39 @@
     font-weight: 400;
     font-family: var(--font-data);
     font-variant-numeric: tabular-nums;
+  }
+  /* A toggle item's switch: the track and knob of inputs/Switch, which can't be used itself (a button inside a button). */
+  .knob {
+    position: relative;
+    width: 28px;
+    height: 16px;
+    border-radius: var(--r-pill);
+    background: var(--fill-4);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--sunken-shadow);
+    transition:
+      background var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--knob);
+    box-shadow: var(--knob-shadow);
+    transition: translate var(--dur) var(--ease-out);
+  }
+  [aria-checked='true'] > .knob {
+    background: var(--brand);
+    box-shadow: none;
+  }
+  [aria-checked='true'] > .knob::after {
+    translate: 12px 0;
   }
   .sep {
     height: 1px;

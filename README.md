@@ -236,8 +236,9 @@ browser's drag and right-click menu. Content, toasts, alerts, text fields and li
 gets the browser's menu. To make a component's own chrome behave this way, give it `user-select: none`; to keep a part
 selectable, `user-select: text`.
 
-Items: `{ label, icon?, action?, href?, hint?, checked?, disabled?, danger?, children? }` or `{ separator: true }`. `icon` sits in
-the column on the left (a checked item shows its check there instead).
+Items: `{ label, icon?, action?, href?, hint?, checked?, toggle?, disabled?, danger?, children? }` or `{ separator: true }`. `icon` sits in
+the column on the left (a checked item shows its check there instead). A `toggle` item shows `checked` as a switch on the right;
+pressing it flips the switch, calls `action(on)` with the new state and leaves the menu open.
 Right-click, Shift+F10 and the Menu key open it; text fields keep the browser's menu. Always pair a context
 menu with a `MenuButton`, so nothing is reachable by right-click only.
 

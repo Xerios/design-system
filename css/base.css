@@ -294,19 +294,19 @@ kbd {
     background: Highlight !important;
     color: HighlightText !important;
   }
-  [role='switch'] .knob {
+  :is([role='switch'], [role='menuitemcheckbox']) .knob {
     outline: 1px solid CanvasText !important;
     outline-offset: -1px;
   }
-  [role='switch'] .knob::after,
+  :is([role='switch'], [role='menuitemcheckbox']) .knob::after,
   [role='slider'] .thumb {
     background: CanvasText !important;
   }
-  [role='switch'][aria-checked='true'] .knob,
+  :is([role='switch'], [role='menuitemcheckbox'])[aria-checked='true'] .knob,
   [role='slider'] .fill {
     background: Highlight !important;
   }
-  [role='switch'][aria-checked='true'] .knob::after {
+  :is([role='switch'], [role='menuitemcheckbox'])[aria-checked='true'] .knob::after {
     background: HighlightText !important;
   }
   [role='slider'] .track {
