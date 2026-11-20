@@ -224,10 +224,11 @@
     opacity: 0;
     pointer-events: none;
   }
+  /* The buttons stay at the top, beside the first line, when the message wraps. */
   .body {
     display: flex;
     gap: var(--space-2);
-    align-items: center;
+    align-items: flex-start;
     padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
     transition: opacity var(--dur) var(--ease-out);
   }
@@ -254,6 +255,8 @@
     font-weight: var(--w-medium);
     padding: 0 var(--space-2);
     white-space: nowrap;
+    /* Centred on the message's first line (its padding and one line), not on the whole block. */
+    margin-top: calc((var(--space-2) * 2 + 1lh - 32px) / 2);
   }
   .close {
     color: var(--muted);

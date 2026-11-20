@@ -14,6 +14,7 @@
   import caretRight from '@phosphor-icons/core/regular/caret-right.svg?raw'
   import check from '@phosphor-icons/core/regular/check.svg?raw'
   import external from '@phosphor-icons/core/regular/arrow-square-out.svg?raw'
+  import link from '@phosphor-icons/core/regular/link-simple.svg?raw'
   import star from '@phosphor-icons/core/regular/star.svg?raw'
   import starFill from '@phosphor-icons/core/fill/star-fill.svg?raw'
   import more from '@phosphor-icons/core/regular/dots-three.svg?raw'
@@ -63,6 +64,7 @@
     caretRight,
     check,
     external,
+    link,
     star,
     starFill,
     more,

@@ -20,11 +20,13 @@
 
 <style>
   .demo {
+    /* Its padding, which a Case's separator reaches through to the edges. */
+    --demo-pad: var(--space-3);
     display: grid;
     gap: var(--space-2);
     min-width: 0;
     margin: 0;
-    padding: var(--space-3);
+    padding: var(--demo-pad);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: var(--surface);
@@ -32,7 +34,12 @@
   .wide {
     grid-column: 1 / -1;
   }
+  /* A rule under the caption, edge to edge through the padding, spaced like the rules between Cases (the gap below
+     plus the margin matches the padding above). */
   figcaption {
+    margin: 0 calc(var(--demo-pad) * -1) var(--space-1);
+    padding: 0 var(--demo-pad) var(--space-3);
+    border-bottom: 1px solid var(--line);
     font-size: 12px;
     font-weight: var(--w-medium);
     color: var(--muted);

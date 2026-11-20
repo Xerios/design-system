@@ -1,13 +1,13 @@
 <script>
-  /** Kitchen sink: buttons and their states, links, the context menu with its visible ⋯ twin, chips and small atoms. */
+  /** Kitchen sink: Button in all its states, the file button, the context menu with its visible ⋯ twin, and tiles. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Button from '../components/Button.svelte'
-  import Icon from '../components/Icon.svelte'
   import FileButton from '../components/inputs/FileButton.svelte'
   import MenuButton from '../components/menu/MenuButton.svelte'
+  import Tile from '../components/tiles/Tile.svelte'
   import { contextMenu } from '../lib/menu.svelte.js'
-  import { tooltip } from '../lib/tooltip.js'
 
   /** @param {number} ms */
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -19,6 +19,7 @@
   let files = $state('')
   let picked = $state('nothing yet')
   let pending = $state(false)
+  let pressed = $state('nothing yet')
 
   const menuItems = () => [
     { label: 'Open', icon: 'eye', action: () => (picked = 'Open') },
@@ -44,33 +45,33 @@
   title="Actions"
   intro="Button runs async work itself: a spinner while the promise runs, presses ignored meanwhile, a rejection shown under it."
 >
-  <Demo label="Variants">
-    <Button>Secondary</Button>
-    <Button variant="primary" icon="plus">Primary</Button>
-    <Button variant="danger" icon="trash">Danger</Button>
-    <Button small icon="cloud">Small</Button>
-  </Demo>
-  <Demo label="Async: resolves after 1.5s">
-    <Button icon="refresh" pendingLabel="Refreshing…" onclick={() => wait(1500)}>Refresh</Button>
-    <Button iconOnly icon="refresh" label="Refresh" onclick={() => wait(1500)} />
-  </Demo>
-  <Demo label="Async: rejects (bubble under the button)">
-    <Button variant="primary" icon="rocket" pendingLabel="Deploying…" onclick={fail}>Deploy</Button>
-  </Demo>
-  <Demo label="Pending from outside, disabled">
-    <Button variant="primary" {pending} pendingLabel="Saving…">Save</Button>
-    <Button onclick={() => (pending = !pending)}>{pending ? 'Stop' : 'Start'} pending</Button>
-    <Button disabled>Disabled</Button>
-  </Demo>
-  <Demo label="Icon buttons (tooltip = name)">
-    <Button iconOnly icon="gear" label="Settings" />
-    <Button iconOnly icon="star" label="Star" />
-    <Button iconOnly icon="x" label="Close" />
-  </Demo>
-  <Demo label="Links">
-    <Button href="#actions">A link drawn as a button</Button>
-    <button type="button" class="linklike">A button that reads as a link</button>
-    <a href="#actions">A plain link</a>
+  <Demo label="Button">
+    <Case label="Variants">
+      <Button>Secondary</Button>
+      <Button variant="primary" icon="plus">Primary</Button>
+      <Button variant="danger" icon="trash">Danger</Button>
+      <Button small icon="cloud">Small</Button>
+    </Case>
+    <Case label="Async: resolves after 1.5s">
+      <Button icon="refresh" pendingLabel="Refreshing…" onclick={() => wait(1500)}>Refresh</Button>
+      <Button iconOnly icon="refresh" label="Refresh" onclick={() => wait(1500)} />
+    </Case>
+    <Case label="Async: rejects (bubble under the button)">
+      <Button variant="primary" icon="rocket" pendingLabel="Deploying…" onclick={fail}>Deploy</Button>
+    </Case>
+    <Case label="Pending from outside, disabled">
+      <Button variant="primary" {pending} pendingLabel="Saving…">Save</Button>
+      <Button onclick={() => (pending = !pending)}>{pending ? 'Stop' : 'Start'} pending</Button>
+      <Button disabled>Disabled</Button>
+    </Case>
+    <Case label="Icon buttons (tooltip = name)">
+      <Button iconOnly icon="gear" label="Settings" />
+      <Button iconOnly icon="star" label="Star" />
+      <Button iconOnly icon="x" label="Close" />
+    </Case>
+    <Case label="As a link">
+      <Button href="#actions">A link drawn as a button</Button>
+    </Case>
   </Demo>
   <Demo label="File button">
     <FileButton label="Choose files" multiple chosen={files} onfiles={(list) => (files = list.map((f) => f.name).join(', '))} onclear={() => (files = '')} />
@@ -80,21 +81,63 @@
     <MenuButton items={menuItems} label="Demo item" />
     <span class="small muted">Picked: {picked}</span>
   </Demo>
-  <Demo label="Label chips and tones">
-    {#each ['success', 'info', 'warning', 'neutral', 'danger'] as tone (tone)}
-      <span class="label-chip" data-tone={tone}><span class="label-dot"></span>{tone}</span>
-    {/each}
-    <span class="label-chip"><Icon name="lock" size="sm" />With an icon</span>
-    <span class="label-chip icon-only" {@attach tooltip('Starred')} aria-label="Starred" role="img"><Icon name="star" size="sm" /></span>
-  </Demo>
-  <Demo label="Counts, keys, dots">
-    <span class="count">12</span>
-    <kbd>⌘</kbd><kbd>K</kbd>
-    <span class="new-dot" aria-hidden="true"></span><span class="small muted">new</span>
+  <Demo label="Tile" wide>
+    <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
+      <div class="tiles">
+        <Tile title="Typography" icon="document" href="#typography" cta="See the styles">Headings, lists, quotes and code for long-form text.</Tile>
+        <Tile title="Phosphor icons" icon="star" href="https://phosphoricons.com">The icon set, in its regular weight.</Tile>
+        <Tile title="Foundations" icon="eye" href="#foundations" arrow={false}>Colours, type, radii and spacing, without an arrow.</Tile>
+      </div>
+    </Case>
+    <Case label="Buttons, holding more than a line of text">
+      <div class="tiles">
+        <Tile title="New project" icon="plus" cta="Start" onclick={() => (pressed = 'New project')}>An empty project with the defaults.</Tile>
+        <Tile title="Production" icon="cloud" onclick={() => (pressed = 'Production')}>
+          <div class="meta">
+            <span class="label-chip" data-tone="success"><span class="label-dot"></span>Healthy</span>
+            <span class="data">3 regions · 42 ms</span>
+          </div>
+        </Tile>
+        <Tile title="Import" icon="upload" disabled onclick={() => (pressed = 'Import')}>Paused while another import runs.</Tile>
+      </div>
+      <span class="small muted" role="status">Pressed: {pressed}</span>
+    </Case>
+    <Case label="Horizontal, for a list">
+      <div class="list">
+        <Tile horizontal title="Keyboard shortcuts" icon="keyboard" href="#actions">Every key the page answers to.</Tile>
+        <Tile horizontal title="Appearance" icon="monitor" arrow onclick={() => (pressed = 'Appearance')}>Theme, density and motion.</Tile>
+      </div>
+    </Case>
+    <Case label="Content only, not interactive">
+      <div class="tiles">
+        <Tile title="Storage" icon="folder"><span class="data">12.4 GB</span> of 50 GB used.</Tile>
+      </div>
+    </Case>
   </Demo>
 </Section>
 
 <style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: var(--space-2);
+    width: 100%;
+  }
+  .list {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .data {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+  }
   .target {
     padding: var(--space-2) var(--space-3);
     background: none;

@@ -16,6 +16,13 @@ Read it before building UI, and read a component's header comment before using i
 - Style with tokens only: colours, radii, spacing, durations, z-index and shadows all come from
   `css/tokens.css`. No hex or rgb values, pixel radii or millisecond durations in component styles, with
   one allowance: 1px hairlines and fine optical offsets.
+- Separators run edge to edge by default: a horizontal or vertical rule dividing a container's areas reaches its
+  borders, not its padding. Pull the divided part out through the padding with a negative margin and pad it back
+  (`margin-inline: calc(var(--page-inset) * -1); padding-inline: var(--page-inset)`), or put the padding on the parts
+  instead of the container. Inset a rule only when it belongs to one item rather than dividing the whole (rows in a list).
+- An icon beside text that can wrap aligns to the top, with the first line, never to the middle of the block: give the
+  icon a box one line tall (`height: 1lh`) and `align-items: flex-start` on the row. The same goes for a trailing
+  button (dismiss, clear) beside wrapping text.
 - Hover, pressed and active states use the translucent fills (`--fill-2`, `--fill-3`, `--fill-4`), never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
 - Text is 13px (12px for secondary and labels, 11px for counts), in px, as are the breakpoints. A box holding text gets
@@ -52,7 +59,10 @@ Read it before building UI, and read a component's header comment before using i
 - A new component belongs here only if another app could use it unchanged. Otherwise it goes in the app.
 - Start each component with a comment block: what it is for, a usage example, each prop, keyboard
   behaviour. That comment is its documentation. Then add it to `index.js`, to the table in `README.md`, and a `Demo`
-  of it, in its states, to the kitchen sink area it belongs to (`kitchensink/`).
+  of it to the kitchen sink area it belongs to (`kitchensink/`): one `Demo` per component, each of its states in a
+  captioned `Case` inside it. Areas run
+  from what you interact with (Actions, Inputs, Overlays), through what shows content and state (Content, Feedback),
+  to Atoms and Foundations last; within an area, interactive demos come before view-only ones.
 - Type the props with a JSDoc `Props` typedef on `$props()`, intersected with the main element's attributes from
   `svelte/elements` (`Props & Omit<HTMLAttributes<HTMLDivElement>, keyof Props>`). Take `class: className` and
   `...rest`, and put `class={['own-class', className]} {...rest}` on that element, before the component's own event

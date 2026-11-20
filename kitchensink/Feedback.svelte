@@ -2,6 +2,7 @@
   /** Kitchen sink: notices, errors, working states, empty states, the toast and the spotlight. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Button from '../components/Button.svelte'
   import Empty from '../components/empty/index.js'
   import ErrorMessage from '../components/ErrorMessage.svelte'
@@ -58,14 +59,16 @@
       {/each}
     </div>
   </Demo>
-  <Demo label="Error: inline (an alert)">
-    <ErrorMessage message="Couldn't save. The server didn't answer." />
-  </Demo>
-  <Demo label="Error: floating, under its control">
-    <div class="anchor">
-      <Button onclick={() => (floating = floating ? '' : 'That name is taken.')}>Toggle the bubble</Button>
-      <ErrorMessage floating message={floating} />
-    </div>
+  <Demo label="Error message">
+    <Case label="Inline (an alert)">
+      <ErrorMessage message="Couldn't save. The server didn't answer." />
+    </Case>
+    <Case label="Floating, under its control">
+      <div class="anchor">
+        <Button onclick={() => (floating = floating ? '' : 'That name is taken.')}>Toggle the bubble</Button>
+        <ErrorMessage floating message={floating} />
+      </div>
+    </Case>
   </Demo>
   <Demo label="Working">
     <Shimmer>Checking the server…</Shimmer>
@@ -85,12 +88,14 @@
     <span id="ks-spot" class="spot">The target</span>
   </Demo>
   <Demo label="Empty">
-    <Empty title="Nothing here yet" body="Things you add show up here.">
-      <div><Button variant="primary" icon="plus">Add one</Button></div>
-    </Empty>
-  </Demo>
-  <Demo label="Empty.Error (retry is async)">
-    <Empty.Error title="Couldn't load the list" message="The server took too long to answer." onretry={() => wait(1500)} />
+    <Case label="Empty">
+      <Empty title="Nothing here yet" body="Things you add show up here.">
+        <div><Button variant="primary" icon="plus">Add one</Button></div>
+      </Empty>
+    </Case>
+    <Case label="Empty.Error (retry is async)">
+      <Empty.Error title="Couldn't load the list" message="The server took too long to answer." onretry={() => wait(1500)} />
+    </Case>
   </Demo>
 </Section>
 

@@ -12,15 +12,19 @@
    * the kitchen sink mounts a Toast of its own (a second live region: fine standalone, redundant inside an app).
    * nav (default true): a row of links to the areas at the top. Turn it off when the page shows KitchenSinkNav instead
    * (a sidebar menu that follows the scroll).
-   * Each area is its own component in this folder (Foundations, Actions, Feedback, Inputs, Overlays, Content), made of
-   * Section and Demo; a new component gets a Demo in the area it belongs to.
+   * Each area is its own component in this folder, made of Section and Demo; a new component gets one Demo in the area
+   * it belongs to, with each of its cases in a captioned Case inside it. The areas run from what you interact with (Actions, Inputs, Overlays),
+   * through what shows content and state (Content, Feedback), to what everything is built from (Atoms, Typography, Foundations).
+   * Section rules run edge to edge: set --page-inset on the scroll area to its side padding so they reach through it.
    */
-  import Foundations from './Foundations.svelte'
   import Actions from './Actions.svelte'
-  import Feedback from './Feedback.svelte'
   import Inputs from './Inputs.svelte'
   import Overlays from './Overlays.svelte'
   import Content from './Content.svelte'
+  import Feedback from './Feedback.svelte'
+  import Atoms from './Atoms.svelte'
+  import Typography from './Typography.svelte'
+  import Foundations from './Foundations.svelte'
   import { AREAS, jump } from './areas.js'
 
   /** @type {{ toast?: (message: string, action?: { label: string, run: () => void }) => void, nav?: boolean }} */
@@ -35,12 +39,14 @@
       {/each}
     </nav>
   {/if}
-  <Foundations />
   <Actions />
-  <Feedback {toast} />
   <Inputs />
   <Overlays />
   <Content />
+  <Feedback {toast} />
+  <Atoms />
+  <Typography />
+  <Foundations />
 </div>
 
 <style>

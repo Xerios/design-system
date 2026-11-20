@@ -2,6 +2,7 @@
   /** Kitchen sink: tooltips, ⓘ tips, the popover, a modal with an unsaved-input guard, and alert / confirm / prompt. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Button from '../components/Button.svelte'
   import Icon from '../components/Icon.svelte'
   import InfoTip from '../components/InfoTip.svelte'
@@ -30,15 +31,17 @@
 </script>
 
 <Section id="overlays" title="Overlays" intro="Everything that floats draws in the top layer, so it shows above modal dialogs too.">
-  <Demo label="Tooltip attachment (hover or keyboard focus)">
-    <button type="button" class="icon-btn" aria-label="Copy" {@attach tooltip('Copy')}><Icon name="external" /></button>
-    <button type="button" class="btn" {@attach tooltip('Search everything', { shortcut: '/' })}>With a shortcut</button>
-  </Demo>
-  <Demo label="Tooltip around content">
-    <Tooltip>
-      {#snippet tip()}<strong>Build 1,024</strong><span>Finished 2 minutes ago</span>{/snippet}
-      <span class="label-chip" data-tone="success"><span class="label-dot"></span>Live</span>
-    </Tooltip>
+  <Demo label="Tooltip">
+    <Case label="Attachment (hover or keyboard focus)">
+      <button type="button" class="icon-btn" aria-label="Copy" {@attach tooltip('Copy')}><Icon name="external" /></button>
+      <button type="button" class="btn" {@attach tooltip('Search everything', { shortcut: '/' })}>With a shortcut</button>
+    </Case>
+    <Case label="Around content">
+      <Tooltip>
+        {#snippet tip()}<strong>Build 1,024</strong><span>Finished 2 minutes ago</span>{/snippet}
+        <span class="label-chip" data-tone="success"><span class="label-dot"></span>Live</span>
+      </Tooltip>
+    </Case>
   </Demo>
   <Demo label="ⓘ tips: hover, and pinnable (click to keep it open)">
     <span class="field-head"

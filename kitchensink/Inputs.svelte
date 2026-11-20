@@ -1,7 +1,8 @@
 <script>
-  /** Kitchen sink: every field and choice control, and a form with submit-first validation (fieldErrors). */
+  /** Kitchen sink: every field and choice control (tiles among them), and a form with submit-first validation (fieldErrors). */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Button from '../components/Button.svelte'
   import TextField from '../components/inputs/TextField.svelte'
   import SearchField from '../components/inputs/SearchField.svelte'
@@ -17,6 +18,8 @@
   import DatePicker from '../components/inputs/DatePicker.svelte'
   import DateRangePicker from '../components/inputs/DateRangePicker.svelte'
   import DateRangeSelect from '../components/inputs/DateRangeSelect.svelte'
+  import Tile from '../components/tiles/Tile.svelte'
+  import TileGroup from '../components/tiles/TileGroup.svelte'
   import { fieldErrors } from '../lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '../lib/invalid.js'
   import { addDays, today } from '../lib/dates.js'
@@ -36,9 +39,20 @@
   let stay = $state(/** @type {[string, string]} */ (['', '']))
   let slot = $state('')
   let runs = $state(/** @type {[string, string]} */ (['', '']))
+  let plan = $state('team')
+  let topics = $state(['deploys', 'mentions'])
+  let backups = $state(true)
+  let keep = $state('30')
+  const KEEP = [
+    { value: '7', label: '7 days' },
+    { value: '30', label: '30 days' },
+    { value: '90', label: '90 days' },
+  ]
   // Some days ahead to choose from, and some irregular moments in the past weeks.
   const SLOTS = [2, 3, 6, 9, 13, 20, 27].map((n) => addDays(today(), n))
-  const RUNS = [0, 1, 3, 4, 8, 15, 22, 31, 45].map((n, i) => `${addDays(today(), -n)}T${String(6 + ((i * 5) % 14)).padStart(2, '0')}:${i % 2 ? '30' : '05'}:00Z`)
+  const RUNS = [0, 1, 3, 4, 8, 15, 22, 31, 45].map(
+    (n, i) => `${addDays(today(), -n)}T${String(6 + ((i * 5) % 14)).padStart(2, '0')}:${i % 2 ? '30' : '05'}:00Z`,
+  )
 
   const REGIONS = [
     { value: 'eu', label: 'Europe', hint: 'Frankfurt', group: 'Close by' },
@@ -78,10 +92,12 @@
   intro="Every field has a label, an optional ⓘ, and one way of showing its error (the invalid attachment and a bubble under it)."
 >
   <Demo label="Text field">
-    <TextField bind:value={name} id="ks-name" label="Name" type="text" placeholder="Ada Lovelace" info="What people call you. Shown on your profile." />
-  </Demo>
-  <Demo label="Text field with an error">
-    <TextField value="ada@" id="ks-email" label="Email" type="text" error="Enter a whole email address." />
+    <Case label="With an ⓘ">
+      <TextField bind:value={name} id="ks-name" label="Name" type="text" placeholder="Ada Lovelace" info="What people call you. Shown on your profile." />
+    </Case>
+    <Case label="With an error">
+      <TextField value="ada@" id="ks-email" label="Email" type="text" error="Enter a whole email address." />
+    </Case>
   </Demo>
   <Demo label="Search (Esc clears, / focuses)">
     <SearchField bind:value={search} id="ks-search" label="Search" placeholder="Search" shortcut="/" />
@@ -89,13 +105,15 @@
   <Demo label="Text area (grows with its text)">
     <TextArea bind:value={notes} id="ks-notes" label="Notes" placeholder="Anything worth writing down" />
   </Demo>
-  <Demo label="Select, grouped">
-    <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
-  </Demo>
-  <Demo label="Select: loading, ghost, error">
-    <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
-    <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
-    <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
+  <Demo label="Select">
+    <Case label="Grouped">
+      <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
+    </Case>
+    <Case label="Loading, ghost, error">
+      <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
+      <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
+      <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
+    </Case>
   </Demo>
   <Demo label="Tags (Enter or comma adds)">
     <TagInput
@@ -148,16 +166,64 @@
     </div>
   </Demo>
   <Demo label="Date picker">
-    <DatePicker bind:value={due} id="ks-due" label="Due date" min={today()} max={addDays(today(), 90)} info="Within the next 90 days." />
+    <Case label="Within the next 90 days">
+      <DatePicker bind:value={due} id="ks-due" label="Due date" min={today()} max={addDays(today(), 90)} info="Within the next 90 days." />
+    </Case>
+    <Case label="Only some days">
+      <DatePicker bind:value={slot} id="ks-slot" label="Slot" allowed={SLOTS} />
+    </Case>
   </Demo>
   <Demo label="Date range picker">
     <DateRangePicker bind:value={stay} id="ks-stay" label="Stay" />
   </Demo>
-  <Demo label="Date picker, only some days">
-    <DatePicker bind:value={slot} id="ks-slot" label="Slot" allowed={SLOTS} />
-  </Demo>
   <Demo label="Range from a list of dates">
     <DateRangeSelect bind:value={runs} dates={RUNS} id="ks-runs" label="Runs" />
+  </Demo>
+  <Demo label="Tile group" wide>
+    <Case label="One choice: arrows move and choose">
+      <div class="full">
+        <TileGroup label="Plan" bind:value={plan} columns={3} info="Change it any time. The new price starts on the day it changes.">
+          <Tile value="hobby" title="Hobby" icon="flask">
+            <p class="price"><span class="data">€0</span> a month</p>
+            <ul class="ticks">
+              <li>One project</li>
+              <li>Community support</li>
+            </ul>
+          </Tile>
+          <Tile value="team" title="Team" icon="rocket">
+            <p class="price"><span class="data">€12</span> a seat, a month</p>
+            <ul class="ticks">
+              <li>Unlimited projects</li>
+              <li>Shared settings and roles</li>
+              <li>Support within a day</li>
+            </ul>
+          </Tile>
+          <Tile value="custom" title="Custom" icon="lock" disabled>Agreed with us first, so it can't be chosen here.</Tile>
+        </TileGroup>
+      </div>
+      <span class="small muted">Plan: {plan}</span>
+    </Case>
+    <Case label="Several: checkbox tiles, horizontal">
+      <div class="full">
+        <TileGroup label="Notify me about" multiple bind:value={topics} columns={2}>
+          <Tile horizontal value="deploys" title="Deploys" icon="rocket">When one starts, finishes or fails.</Tile>
+          <Tile horizontal value="builds" title="Builds" icon="code">Only the ones that fail.</Tile>
+          <Tile horizontal value="mentions" title="Mentions" icon="star">When someone names you in a comment.</Tile>
+          <Tile horizontal value="billing" title="Billing" icon="document">Invoices and changes to the plan.</Tile>
+        </TileGroup>
+      </div>
+      <span class="small muted">Chosen: {topics.join(', ') || 'none'}</span>
+    </Case>
+    <Case label="A checkbox tile on its own: its top row toggles it, the field under it doesn't">
+      <div class="one-tile">
+        <Tile title="Nightly backups" icon="history" bind:checked={backups}>
+          <div class="stack">
+            <p>A copy of every database at 02:00.</p>
+            {#if backups}<Select bind:value={keep} options={KEEP} id="ks-keep" label="Keep for" />{/if}
+          </div>
+        </Tile>
+      </div>
+    </Case>
   </Demo>
   <Demo label="A form: errors only after Submit" wide>
     <form class="form" novalidate onsubmit={submit}>
@@ -177,6 +243,29 @@
   .stack {
     display: grid;
     gap: var(--space-3);
+  }
+  .price {
+    color: var(--fg-2);
+  }
+  .data {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+  .ticks {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    padding-inline-start: var(--space-4);
+    list-style: disc;
+  }
+  .full {
+    width: 100%;
+    min-width: 0;
+  }
+  .one-tile {
+    width: 100%;
+    max-width: 320px;
   }
   .form {
     display: grid;

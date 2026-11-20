@@ -21,10 +21,13 @@
 </section>
 
 <style>
+  /* Its rule runs edge to edge: out through the side padding of the scroll area it sits in (--page-inset, set by the
+     host), with the content kept where it was. */
   .section {
     display: grid;
     gap: var(--space-3);
-    padding-block: var(--space-6);
+    margin-inline: calc(var(--page-inset, 0px) * -1);
+    padding: var(--space-6) var(--page-inset, 0px);
     border-top: 1px solid var(--line);
     scroll-margin-top: var(--space-6);
   }

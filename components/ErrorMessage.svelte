@@ -74,7 +74,7 @@
     font-size: 12px;
     color: var(--tone);
   }
-  /* One line tall, so the icon sits centred on the first line of text. */
+  /* One line tall, so the icon sits centred on the first line of text and stays at the top when the text wraps. */
   .error > :global(.icon) {
     flex: none;
     height: 1lh;
@@ -84,9 +84,10 @@
     top: calc(100% + var(--space-2));
     left: 0;
     z-index: var(--z-sticky);
+    /* As wide as its text, up to a cap of its own rather than the control's width, so a narrow field doesn't squeeze the
+       message into a column of short lines. */
     width: max-content;
-    max-width: 100%;
-    align-items: center;
+    max-width: min(320px, calc(100dvw - 32px));
     padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2);
     border: 1px solid var(--tone);
     border-radius: var(--r);
@@ -114,6 +115,11 @@
   }
   .floating .text {
     padding-right: var(--space-1);
+  }
+  /* The icon and the first line of text centre on the 24px dismiss button; all three stay at the top as the text wraps. */
+  .floating > :global(.icon),
+  .floating .text {
+    margin-block: calc((24px - 1lh) / 2);
   }
   .dismiss {
     display: inline-grid;

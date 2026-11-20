@@ -107,26 +107,15 @@
       />
     </div>
   </Demo>
-  <Demo label="Plain .data-table">
-    <div class="data-table full">
-      <table>
-        <thead><tr><th scope="col">Region</th><th scope="col" class="num">Latency</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Frankfurt</th><td class="num">12 ms</td></tr>
-          <tr><th scope="row">Singapore</th><td class="num">184 ms</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </Demo>
-  <Demo label="Inline markdown, no {'{@html}'}">
-    <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
-  </Demo>
   <Demo label="Splitter (drag, arrows, double-click resets)" wide>
     <div class="split">
       <div class="pane">Main</div>
       <Splitter value={width} min={160} max={480} defaultValue={260} side="end" oninput={(w) => (width = w)} />
       <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
+  </Demo>
+  <Demo label="Inline markdown, no {'{@html}'}">
+    <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
   </Demo>
   <Demo label="Scroll fade">
     <ul class="scroll full" {@attach scrollFade({ size: 24 })}>
