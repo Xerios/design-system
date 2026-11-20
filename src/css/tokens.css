@@ -100,6 +100,9 @@
   --accent-ink: #ffffff;
   --accent-soft: light-dark(color-mix(in lch, var(--accent) 10%, transparent), color-mix(in lch, var(--brand) 18%, transparent));
   --accent-line: light-dark(color-mix(in lch, var(--accent) 36%, transparent), color-mix(in lch, var(--accent) 45%, transparent));
+  /* Link text (a, .linklike): a brighter, more vivid indigo than --accent so links stand out from accented text.
+     AA on every surface: 5.2:1 on light --surface, 6.7:1 on dark --surface. */
+  --link: light-dark(#4c5ce8, #8f95ff);
 
   /* Semantic tones (separate from the accent): Linear's green / blue / yellow / grey / red. Each has a translucent -soft
      fill for chips and tinted rows. Set data-tone="success|info|warning|neutral|danger" on an element to get --tone / --tone-soft. */

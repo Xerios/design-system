@@ -158,12 +158,12 @@ summary {
   overflow: visible;
 }
 a {
-  color: var(--accent);
+  color: var(--link);
   text-decoration-thickness: from-font;
   text-underline-offset: 2px;
 }
 a:hover {
-  color: color-mix(in lch, var(--accent) 80%, var(--fg));
+  color: color-mix(in lch, var(--link) 80%, var(--fg));
 }
 :focus-visible {
   outline: 2px solid var(--accent);

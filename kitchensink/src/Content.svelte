@@ -1,5 +1,5 @@
 <script>
-  /** Kitchen sink: collapsibles, a side menu, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
+  /** Kitchen sink: collapsibles, a side menu, breadcrumbs, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Collapsible from '@xerios/design-system/components/Collapsible.svelte'
@@ -8,10 +8,13 @@
   import Md from '@xerios/design-system/components/Md.svelte'
   import Splitter from '@xerios/design-system/components/Splitter.svelte'
   import SideMenu from '@xerios/design-system/components/side-menu/index.js'
+  import Breadcrumbs from '@xerios/design-system/components/Breadcrumbs.svelte'
   import Button from '@xerios/design-system/components/Button.svelte'
   import Table from '@xerios/design-system/components/Table.svelte'
   import Metadata from '@xerios/design-system/components/metadata/index.js'
   import Case from './Case.svelte'
+  import Canvas from '@xerios/design-system/components/Canvas.svelte'
+  import { theme } from './theme.svelte.js'
   import { scrollFade } from '@xerios/design-system/lib/scroll-fade.js'
 
   const PEOPLE = [
@@ -44,6 +47,55 @@
     { name: 'Core experience', tone: 'warning' },
   ])
   let displaysOpen = $state(false)
+
+  // Canvas: the drawings read their colour from the canvas's CSS `color` (var(--accent)), so they follow the theme; the
+  // still ones read theme.value as well, so switching it redraws them.
+  /** @typedef {{ width: number, height: number, time: number, canvas: HTMLCanvasElement }} Frame */
+  let waving = $state(true)
+  /** @param {CanvasRenderingContext2D} ctx @param {Frame} f */
+  function wave(ctx, { width, height, time, canvas }) {
+    ctx.strokeStyle = getComputedStyle(canvas).color
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    for (let x = 0; x <= width; x += 2) ctx.lineTo(x, height / 2 + Math.sin(x / 32 + time / 500) * Math.sin(time / 1700) * height * 0.4)
+    ctx.stroke()
+  }
+  const randomBars = () => Array.from({ length: 12 }, () => 0.15 + Math.random() * 0.85)
+  let bars = $state(randomBars())
+  /** @param {CanvasRenderingContext2D} ctx @param {Frame} f */
+  function drawBars(ctx, { width, height, canvas }) {
+    void theme.value
+    ctx.fillStyle = getComputedStyle(canvas).color
+    const gap = 4
+    const w = (width - gap * (bars.length - 1)) / bars.length
+    bars.forEach((v, i) => {
+      ctx.beginPath()
+      ctx.roundRect(i * (w + gap), height * (1 - v), w, height * v, 2)
+      ctx.fill()
+    })
+  }
+  /** @type {Canvas | undefined} */
+  let intro = $state()
+  /** @param {CanvasRenderingContext2D} ctx @param {Frame} f */
+  function ring(ctx, { width, height, time, canvas }) {
+    void theme.value
+    const eased = 1 - (1 - Math.min(1, time / 1000)) ** 3
+    ctx.strokeStyle = getComputedStyle(canvas).color
+    ctx.lineWidth = 6
+    ctx.lineCap = 'round'
+    ctx.beginPath()
+    ctx.arc(width / 2, height / 2, Math.min(width, height) / 2 - 4, -Math.PI / 2, -Math.PI / 2 + eased * Math.PI * 1.6)
+    ctx.stroke()
+  }
+  const PATH = [
+    { label: 'Workspace', icon: 'monitor', href: '#content' },
+    { label: 'Projects', href: '#content' },
+    { label: 'Atlas', href: '#content' },
+    { label: 'Releases', href: '#content' },
+    { label: 'Spring release', href: '#content' },
+    { label: 'Release notes for the spring release, second draft' },
+  ]
+  let level = $state('Display')
   const LINES = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: scroll to see the edges fade while there is more.`)
 </script>
 
@@ -101,6 +153,21 @@
         {#snippet footer()}<Button small icon="keyboard">Shortcuts</Button>{/snippet}
       </SideMenu>
     </div>
+  </Demo>
+  <Demo label="Breadcrumbs">
+    <Case label="Links, an icon on the first level, the current page last">
+      <Breadcrumbs items={PATH.slice(0, 3).concat({ label: 'Settings' })} />
+    </Case>
+    <Case label="A long path: the middle folds behind …, which shows it in place; long labels are cut short">
+      <Breadcrumbs items={PATH} max={3} />
+    </Case>
+    <Case label="Buttons instead of links, and a trail that stops at the parent (current={false})">
+      <Breadcrumbs
+        current={false}
+        items={['Settings', 'Appearance', 'Display'].map((label) => ({ label, onclick: () => (level = label) }))}
+      />
+      <p class="small muted">Picked: {level}</p>
+    </Case>
   </Demo>
   <Demo label="Table: sortable columns, groups, row menu (right-click a row)" wide>
     <div class="full">
@@ -170,6 +237,20 @@
       </div>
     </Case>
   </Demo>
+  <Demo label="Canvas" span={2}>
+    <Case label="Animated, paused off screen; running holds the frame">
+      <div class="sketch"><Canvas draw={wave} running={waving} /></div>
+      <Button onclick={() => (waving = !waving)}>{waving ? 'Pause' : 'Play'}</Button>
+    </Case>
+    <Case label="Static: redrawn when the $state its draw reads changes">
+      <div class="sketch"><Canvas animate={false} draw={drawBars} label="Twelve random values, as bars" /></div>
+      <Button onclick={() => (bars = randomBars())}>Shuffle</Button>
+    </Case>
+    <Case label="An intro that settles after a second; restart() plays it again">
+      <div class="sketch"><Canvas bind:this={intro} duration={1000} draw={ring} /></div>
+      <Button onclick={() => intro?.restart()}>Replay</Button>
+    </Case>
+  </Demo>
   <Demo label="Inline markdown, no {'{@html}'}">
     <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
   </Demo>
@@ -209,6 +290,11 @@
   }
   .described {
     margin-top: var(--space-8);
+  }
+  .sketch {
+    flex: 1 0 100%;
+    height: 96px;
+    color: var(--accent);
   }
   .narrow {
     width: 100%;

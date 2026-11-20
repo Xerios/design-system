@@ -18,6 +18,7 @@
   import { tick } from 'svelte'
   import { fly, fade } from '../lib/motion.js'
   import { portalNear } from '../lib/dom.js'
+  import { observeSize } from '../lib/observe.js'
 
   /**
    * @typedef {object} Props
@@ -73,9 +74,7 @@
     const hold = () => {
       node.style.left = `${page - (host.getBoundingClientRect().left + scrollX)}px`
     }
-    const observer = new ResizeObserver(hold)
-    observer.observe(host)
-    return () => observer.disconnect()
+    return observeSize(host, hold)
   }
 
   async function show() {

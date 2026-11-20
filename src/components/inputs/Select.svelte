@@ -21,6 +21,7 @@
   import Shimmer from '../Shimmer.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { invalid } from '../../lib/invalid.js'
+  import { observeSize } from '../../lib/observe.js'
   import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
   import { pop } from '../../lib/motion.js'
 
@@ -83,10 +84,9 @@
   let cut = $state(false)
   const watchCut = (_text) => (node) => {
     const check = () => (cut = node.scrollWidth > node.clientWidth)
-    const observer = new ResizeObserver(check)
-    observer.observe(node)
+    const stop = observeSize(node, check)
     check()
-    return () => observer.disconnect()
+    return stop
   }
 
   async function show() {

@@ -8,6 +8,8 @@
 // The mask fades everything the element paints, its own background and border included, so put it on a scroller
 // without either (wrap the scroller in the card instead). Scrollbars are kept out of the mask.
 
+import { observeSize } from './observe.js';
+
 /** @param {{ size?: number }} [opts] fade height in px (default: --scroll-fade, 48px) */
 export function scrollFade({ size } = {}) {
   return (node) => {
@@ -38,11 +40,15 @@ export function scrollFade({ size } = {}) {
     const schedule = () => { frame ||= requestAnimationFrame(update); };
 
     // The content can grow without the box resizing, so watch the children too (and the ones added later).
-    const resize = new ResizeObserver(schedule);
+    /** @type {(() => void)[]} */
+    let sized = [];
+    const unwatch = () => {
+      for (const stop of sized) stop();
+      sized = [];
+    };
     const watch = () => {
-      resize.disconnect();
-      resize.observe(node);
-      for (const child of node.children) resize.observe(child);
+      unwatch();
+      sized = [node, ...node.children].map((el) => observeSize(el, schedule));
       schedule();
     };
     const mutations = new MutationObserver(watch);
@@ -52,7 +58,7 @@ export function scrollFade({ size } = {}) {
 
     return () => {
       cancelAnimationFrame(frame);
-      resize.disconnect();
+      unwatch();
       mutations.disconnect();
       node.removeEventListener('scroll', schedule);
       node.removeAttribute('data-scroll-fade');
