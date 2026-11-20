@@ -1,7 +1,7 @@
 <script>
   /**
-   * A typed day, the text part of DatePicker and DateRangePicker (use those). It shows the value in the locale's numeric
-   * form ('18/11/2026') and reads what is typed when the field is left or Enter is pressed: that form with any
+   * A typed day, the text part of DatePicker and DateRangePicker (use those). It shows the value as DD/MM/YYYY
+   * ('18/11/2026') and reads what is typed when the field is left or Enter is pressed: that form with any
    * separators, two-digit years, or ISO ('2026-11-18'). See lib/dates.js.
    *
    *   <DateInput bind:value {id} {min} {max} errorId={problem && `${id}-error`} onopen={openCalendar} onproblem={(m) => (problem = m)} />

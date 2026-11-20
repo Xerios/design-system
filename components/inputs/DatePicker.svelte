@@ -7,7 +7,7 @@
    * value (bindable): an ISO day ('2026-11-18'), or '' for none. min, max: the first and last day allowed.
    * allowed: the only days that can be chosen (ISO days), or null for any; the calendar strikes out the rest and opens
    * on the nearest one, and typing another is the field's error.
-   * Typing: the locale's numeric form ('18/11/2026'; the placeholder shows it), with any separators, two-digit years or
+   * Typing: DD/MM/YYYY ('18/11/2026'; the placeholder shows it), with any separators, two-digit years or
    * ISO; read when the field is left or Enter is pressed. Something that doesn't read, or falls outside min / max, is
    * the field's error until fixed (Esc puts the value back). placeholder: in place of the format.
    * clearable (default true): a ✕ to empty it. error, info, hideLabel, disabled: as on the other fields.

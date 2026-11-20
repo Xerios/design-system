@@ -11,7 +11,7 @@
    * keyboard focus) are tinted, and a second press before the first swaps them. Closing before the second press keeps
    * the old range. A hint in the panel says which press is next, read out as it changes. Keyboard: as DatePicker's.
    * shortcuts: ready-made spans beside the calendar, [{ label, range() }] with range() giving [from, to]; one press sets
-   * it and closes. Default: Last 7 days, Last 30 days, This month, Last month (rangeShortcuts in lib/dates.js); [] for
+   * it and closes. Default: Last 7, 30, 60 and 90 days, This year (rangeShortcuts in lib/dates.js); [] for
    * none. A span reaching past min or max is cut to them, and one wholly outside is disabled.
    * Other attributes and attachments go to the field's wrapper.
    */
@@ -37,7 +37,19 @@
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
-  let { value = $bindable(['', '']), id, label, min = null, max = null, shortcuts = rangeShortcuts(), placeholder, clearable = true, error = '', disabled = false, ...field } = $props()
+  let {
+    value = $bindable(['', '']),
+    id,
+    label,
+    min = null,
+    max = null,
+    shortcuts = rangeShortcuts(),
+    placeholder,
+    clearable = true,
+    error = '',
+    disabled = false,
+    ...field
+  } = $props()
 
   /** @type {DateField | undefined} */
   let dateField = $state()
@@ -142,18 +154,18 @@
         <RangeShortcuts vertical class="presets" items={presets} {value} onpick={(range) => choose(range, close)} />
       {/if}
       <div class="days">
-      <p class="hint small muted" aria-live="polite">{first ? `From ${formatDay(first)}: pick the last day` : 'Pick the first day'}</p>
-      <Calendar
-        bind:month
-        bind:focus
-        {min}
-        {max}
-        {label}
-        selected={first ? [first] : value.filter(Boolean)}
-        range={tint}
-        onpoint={(day) => first && (pointed = day)}
-        onpick={(day) => pick(day, close)}
-      />
+        <p class="hint small muted" aria-live="polite">{first ? `From ${formatDay(first)}: pick the last day` : 'Pick the first day'}</p>
+        <Calendar
+          bind:month
+          bind:focus
+          {min}
+          {max}
+          {label}
+          selected={first ? [first] : value.filter(Boolean)}
+          range={tint}
+          onpoint={(day) => first && (pointed = day)}
+          onpick={(day) => pick(day, close)}
+        />
       </div>
     </div>
   {/snippet}
@@ -183,8 +195,10 @@
     .range.split {
       grid-template-columns: auto;
     }
+    /* Widened over DateField's panel padding (--space-3) so the hairline runs edge to edge. */
     .split > :global(.presets) {
-      padding: 0 0 var(--space-2);
+      margin-inline: calc(-1 * var(--space-3));
+      padding: 0 var(--space-3) var(--space-2);
       border-inline-end: 0;
       border-block-end: 1px solid var(--line);
     }

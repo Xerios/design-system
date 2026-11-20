@@ -420,10 +420,13 @@
     color: var(--accent);
   }
   /* Group headings: small muted labels, a hairline between groups. */
+  /* Square, and widened over the list's 4px padding so the hairline runs edge to edge. */
   .group {
     display: block;
-    padding: 0;
+    margin-inline: -4px;
+    padding: 0 4px;
     min-height: 0;
+    border-radius: 0;
     cursor: default;
   }
   .group + .group,

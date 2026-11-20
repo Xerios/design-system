@@ -7,7 +7,8 @@
    *
    * value (bindable): [from, to], each one of `dates`, from ≤ to (equal for one date); ['', ''] for none.
    * dates: ISO days ('2026-11-18') or ISO moments ('2026-11-18T14:30:00Z'), in any order; they are ordered as text, so
-   * keep to one form and one offset. The list shows them newest first as DD/MM/YYYY, moments with the time in the user's
+   * keep to one form and one offset. The list shows them newest first as DD/MM/YYYY, under a heading per month when
+   * they span more than one (monthRuns in lib/dates.js), moments with the time in the user's
    * time zone. The button shows a moment's time only where the day alone is ambiguous: both ends on the same day, or
    * another date on that end's day. The year shows once, at the end, when both ends are in the same past year; not at
    * all when it is this year; on both ends when they differ.
@@ -17,7 +18,7 @@
    * placeholder: the button's text with no value. error, info, hideLabel, disabled: as Select's.
    * The button opens a panel with the shortcuts and the list. The first press in the list starts a new span, the second
    * ends it (either way round; the same date again picks it alone) and closes; the dates between are tinted as the
-   * pointer or the keyboard moves. Closing before the second press keeps the old span. A hint above the list says which
+   * pointer or the keyboard moves. Closing before the second press keeps the old span. A hint at the top of the panel says which
    * press is next, read out as it changes.
    * Keyboard: ArrowDown, ArrowUp, Enter or Space on the button opens the panel with the focus on the list. In the list,
    * ArrowUp / ArrowDown move a date, PageUp / PageDown ten, Home / End to the newest / oldest, Enter or Space picks.
@@ -32,7 +33,7 @@
   import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
-  import { compare, dateListShortcuts, dayOf, formatWhen, today } from '../../lib/dates.js'
+  import { compare, dateListShortcuts, dayOf, formatWhen, monthRuns, today } from '../../lib/dates.js'
 
   /**
    * @typedef {object} Props
@@ -81,6 +82,8 @@
 
   const oldest = $derived([...new Set(dates)].toSorted(compare))
   const newest = $derived(oldest.toReversed())
+  /** The list's months, newest first; headed only when there is more than one. */
+  const months = $derived(monthRuns(newest))
   const presets = $derived(shortcuts.map(({ label: name, range }) => ({ label: name, range: range(oldest) })))
   /** The span drawn in the list: the one being chosen, else the value. */
   const span = $derived(
@@ -180,6 +183,26 @@
 
 <svelte:document onpointerdowncapture={outside} />
 
+{#snippet option(/** @type {string} */ day, /** @type {number} */ i)}
+  {@const inSpan = !!span && day >= span[0] && day <= span[1]}
+  {@const edge = !!span && (day === span[0] || day === span[1])}
+  <!-- Keyboard is handled on the listbox (aria-activedescendant pattern); options only take pointer input. -->
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <li
+    id="{id}-opt-{i}"
+    data-i={i}
+    role="option"
+    aria-selected={inSpan}
+    class:active={i === active}
+    class:edge
+    class:between={inSpan && !edge}
+    onpointerenter={() => ((active = i), first && (pointed = day))}
+    onclick={() => pick(day)}
+  >
+    {formatWhen(day)}
+  </li>
+{/snippet}
+
 <div class="field">
   {#snippet fieldLabel()}<label for={id} class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</label>{/snippet}
   {#if info}
@@ -218,12 +241,12 @@
       transition:pop={{ from: button }}
       onkeydown={onPanelKey}
     >
-      {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
       <p class="hint small muted" id="{id}-hint" aria-live="polite">{first ? `From ${formatWhen(first)}: pick the last date` : 'Pick the first date'}</p>
-      <!-- Keyboard is handled on the listbox (aria-activedescendant pattern); options only take pointer input. -->
+      {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
       <ul
         bind:this={list}
         class="list"
+        class:grouped={months.length > 1}
         role="listbox"
         tabindex="0"
         aria-multiselectable="true"
@@ -232,24 +255,18 @@
         aria-activedescendant="{id}-opt-{active}"
         onkeydown={onListKey}
       >
-        {#each newest as day, i (day)}
-          {@const inSpan = !!span && day >= span[0] && day <= span[1]}
-          {@const edge = !!span && (day === span[0] || day === span[1])}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <li
-            id="{id}-opt-{i}"
-            data-i={i}
-            role="option"
-            aria-selected={inSpan}
-            class:active={i === active}
-            class:edge
-            class:between={inSpan && !edge}
-            onpointerenter={() => ((active = i), first && (pointed = day))}
-            onclick={() => pick(day)}
-          >
-            {formatWhen(day)}
-          </li>
-        {/each}
+        {#if months.length > 1}
+          {#each months as month (month.key)}
+            <li class="group" role="group" aria-labelledby="{id}-month-{month.key}">
+              <div class="group-head" id="{id}-month-{month.key}">{month.label}</div>
+              <ul role="none">
+                {#each month.items as { item: day, index } (day)}{@render option(day, index)}{/each}
+              </ul>
+            </li>
+          {/each}
+        {:else}
+          {#each newest as day, i (day)}{@render option(day, i)}{/each}
+        {/if}
       </ul>
     </div>
   {/if}
@@ -369,11 +386,39 @@
     overscroll-behavior: contain;
     list-style: none;
     border-radius: var(--r);
+    /* Positioned: the options' offsetTop (opening on the value) counts from the list. */
+    position: relative;
+    --head: 26px;
+  }
+  .list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Keyboard scrolling (scrollIntoView) stops short of the sticky heading, so it never covers the active date. */
+  .list.grouped {
+    scroll-padding-top: var(--head);
+  }
+  /* A month's heading, kept at the top while its dates scroll under it. */
+  .group-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    min-height: var(--head);
+    padding: 0 var(--space-2);
+    background: var(--elevated);
+    color: var(--muted);
+    font: var(--w-medium) 12px var(--font-body);
+  }
+  .group + .group {
+    margin-top: 4px;
   }
   .list:focus {
     outline: none;
   }
-  li {
+  [role='option'] {
     display: flex;
     align-items: center;
     min-height: 30px;
@@ -385,7 +430,7 @@
     white-space: nowrap;
     cursor: pointer;
   }
-  li:hover:not(.edge) {
+  [role='option']:hover:not(.edge) {
     background: var(--fill-3);
     color: var(--fg);
   }
@@ -398,12 +443,12 @@
     background: var(--brand);
     color: var(--accent-ink);
   }
-  .list:focus-visible li.active {
+  .list:focus-visible .active {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
   @media (pointer: coarse) {
-    li {
+    [role='option'] {
       min-height: 44px;
     }
   }
