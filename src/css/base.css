@@ -294,8 +294,7 @@ kbd {
   [role='radio'][aria-checked='true'],
   [role='option'].active,
   [role^='menuitem']:focus,
-  .icon-btn:is([aria-pressed='true'], [aria-expanded='true']),
-  .btn[aria-pressed='true'] {
+  .icon-btn:is([aria-pressed='true'], [aria-expanded='true']) {
     background: Highlight !important;
     color: HighlightText !important;
   }

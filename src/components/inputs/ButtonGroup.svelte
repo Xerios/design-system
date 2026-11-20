@@ -63,7 +63,8 @@
     border: 0;
     border-radius: 0;
     background: none;
-    color: var(--fg);
+    /* Unchosen options are dimmed until hovered; the chosen one is clear. */
+    color: var(--muted);
     font-size: 12px;
     line-height: 14px;
     font-weight: var(--w-medium);
@@ -89,8 +90,10 @@
   }
   button:not([aria-checked='true']):hover {
     background: var(--control-2);
+    color: var(--fg);
   }
   [aria-checked='true'] {
+    color: var(--fg);
     background: var(--control-4);
     box-shadow: var(--shadow-btn);
   }

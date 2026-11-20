@@ -141,7 +141,7 @@
 {/if}
 
 <style>
-  /* Segments on one faint control fill, split by hairlines that run the pill's full height. */
+  /* Segments on one light control fill, split by hairlines that run the pill's full height. */
   /* Chrome, not content: its field name and condition are plain spans, which base.css doesn't cover. */
   .filter-chip {
     user-select: none;
@@ -151,7 +151,7 @@
     max-width: 100%;
     min-height: 26px;
     border-radius: var(--r-sm);
-    background: var(--control-1);
+    background: var(--control-2);
     font: var(--w-medium) 12px/14px var(--font-body);
     white-space: nowrap;
   }

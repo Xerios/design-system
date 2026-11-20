@@ -2,9 +2,7 @@
 
 /* ---------- controls ---------- */
 /* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid indigo; icon buttons are ghost circles.
-   The solid buttons (primary, danger) are raised: their top inner edge catches the light.
-   A toggled secondary button (aria-pressed="true", Button's `pressed`) is flat: just its usual hairline, no fill at rest. It
-   still fills on hover and press (the rules below outrank it), and its text stays --fg. */
+   The solid buttons (primary, danger) are raised: their top inner edge catches the light. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -32,11 +30,6 @@
     color var(--dur) var(--ease-out),
     scale var(--dur) var(--ease-out),
     filter var(--dur) var(--ease-out);
-}
-
-.btn:where([aria-pressed='true']) {
-  background: none;
-  box-shadow: none;
 }
 
 .btn :where(.icon) {
@@ -591,6 +584,15 @@
   width: min(var(--dialog-width, 420px), calc(100% - var(--space-8)));
 }
 
+/* On a phone a question sits at the bottom of the screen, within the thumb's reach, and the full width less the gutters. */
+@media (max-width: 860px) {
+  .dialog.confirm {
+    width: calc(100% - var(--space-8));
+    max-height: calc(100dvh - var(--space-8));
+    margin: auto auto var(--space-4);
+  }
+}
+
 /* Only `display` depends on [open]: it is held through the closing transition, so the layout can't change mid-fade. */
 .dialog[open] {
   display: flex;
@@ -602,6 +604,8 @@
     var(--grain) 0 0 / 256px 256px,
     var(--scrim);
   backdrop-filter: blur(2px);
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .dialog-head {

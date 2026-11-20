@@ -57,7 +57,8 @@
     line-height: 14px;
     font-weight: var(--w-medium);
     cursor: pointer;
-    color: var(--fg);
+    /* Unchosen options are dimmed until hovered; the chosen one is clear. */
+    color: var(--muted);
     transition:
       color var(--dur) var(--ease-out),
       background-color var(--dur) var(--ease-out),
@@ -65,8 +66,10 @@
   }
   button:not([aria-checked='true']):hover {
     background: var(--control-2);
+    color: var(--fg);
   }
   [aria-checked='true'] {
+    color: var(--fg);
     background: var(--control-4);
     box-shadow:
       inset 0 0 0 1px var(--line),

@@ -17,8 +17,6 @@
 
   let picked = $state('nothing yet')
   let pending = $state(false)
-  let showHidden = $state(true)
-  let wrap = $state(false)
   let pressed = $state('nothing yet')
   let compact = $state(false)
 
@@ -66,10 +64,6 @@
       <Button variant="primary" {pending} pendingLabel="Saving…">Save</Button>
       <Button onclick={() => (pending = !pending)}>{pending ? 'Stop' : 'Start'} pending</Button>
       <Button disabled>Disabled</Button>
-    </Case>
-    <Case label="Toggle (pressed): hairline only, no fill while on">
-      <Button icon="eye" bind:pressed={showHidden}>Show hidden</Button>
-      <Button small bind:pressed={wrap}>Wrap lines</Button>
     </Case>
     <Case label="Icon buttons (tooltip = name)">
       <Button iconOnly icon="gear" label="Settings" />

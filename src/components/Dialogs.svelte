@@ -116,6 +116,18 @@
   .dialog-form {
     display: contents;
   }
+  /* Cancel and confirm held apart, so a quick tap can't land on the wrong one. On a phone they share the row equally. */
+  .dialog-foot {
+    gap: var(--space-4);
+  }
+  @media (max-width: 860px) {
+    .spacer {
+      display: none;
+    }
+    .dialog-foot > :global(.btn) {
+      flex: 1;
+    }
+  }
   .body {
     overflow-wrap: anywhere;
     white-space: pre-line;

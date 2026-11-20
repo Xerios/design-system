@@ -1,6 +1,6 @@
 {
   "name": "@xerios/design-system",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Linear-style design system for Svelte 5: theme tokens, global CSS and generic components",
   "keywords": [
     "svelte",
@@ -19,7 +19,8 @@
   "bugs": "https://github.com/Xerios/design-system/issues",
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "./dist/fonts.js",
