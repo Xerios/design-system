@@ -2,7 +2,7 @@
   /** Kitchen sink: the tokens (colour, type, radius, spacing, elevation) and every registered icon. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
-  import Icon, { iconNames } from '../components/Icon.svelte'
+  import Icon, { iconNames } from '@xerios/design-system/components/Icon.svelte'
 
   const COLOURS = [
     { group: 'Surfaces', tokens: ['--bg', '--view-bg', '--surface', '--surface-2', '--surface-3', '--elevated'] },

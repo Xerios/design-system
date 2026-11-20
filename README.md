@@ -1,76 +1,65 @@
-# Design system
+# @xerios/design-system
 
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
 
-Nothing in this folder knows about the app that uses it. It was extracted from the Jobhunt viewer, which now
-consumes it through the `$ds` alias; anything job-specific (statuses, verdicts, scores) stays in the app.
+Nothing in it knows about the apps that use it: anything domain-specific stays in the app.
 
-Plain JavaScript, Svelte 5 runes, Vite. No build step of its own: the app's bundler compiles it.
+Plain JavaScript with JSDoc types, Svelte 5 runes. It ships as Svelte source (compiled by your bundler, like any
+Svelte library) with generated `.d.ts` files, so TypeScript apps get props and helpers checked.
 
 ## Use it in an app
 
-**In this repo** it is already wired up: `vite.config.js` aliases `$ds` to this folder and `src/main.js` loads
-the fonts and CSS.
+1. Install it (Svelte 5.29+ is a peer dependency):
 
-**In another project**, copy or symlink this folder in, then:
-
-1. Install what it needs: `pnpm add -D svelte @sveltejs/vite-plugin-svelte vite @phosphor-icons/core @fontsource-variable/inter @fontsource-variable/jetbrains-mono`
-2. Alias it in `vite.config.js`:
-
-   ```js
-   import { fileURLToPath } from 'node:url'
-   export default defineConfig({
-     plugins: [svelte()],
-     resolve: { alias: { $ds: fileURLToPath(new URL('./design-system/src', import.meta.url)) } },
-   })
+   ```sh
+   pnpm add @xerios/design-system
    ```
 
-   If the folder sits outside the project root, also add it to `server.fs.allow`. (It has a `package.json`,
-   so `"@local/design-system": "link:../design-system"` works too; then import from that name instead of `$ds`. Its
-   exports map `@local/design-system/components/…` and the rest to `src/`.)
+   Any Svelte 5 setup works: SvelteKit, or Vite with `@sveltejs/vite-plugin-svelte`.
 
-3. Load the global layer once, in the entry file, before your own CSS:
+2. Load the global layer once, in the entry file (or root `+layout.svelte`), before your own CSS:
 
    ```js
-   import '$ds/fonts.js' // Inter + JetBrains Mono, bundled (optional: see Fonts)
-   import '$ds/css/index.css' // tokens, base, effects, atoms
+   import '@xerios/design-system/fonts.js' // Inter + JetBrains Mono, bundled (optional: see Fonts)
+   import '@xerios/design-system/css/index.css' // tokens, base, effects, atoms
    import './app.css' // yours, after
    ```
 
-4. Mount the singletons at the root: `<ContextMenu />` (any `contextMenu` attachment or `MenuButton`; it also keeps
+3. Mount the singletons at the root: `<ContextMenu />` (any `contextMenu` attachment or `MenuButton`; it also keeps
    the browser's drag and right-click menu off controls, see `lib/controls.js`), and if you use them `<Dialogs />` (`alertDialog`, `confirmDialog`, `promptDialog`) and `<Toast … />`.
-5. Import components by path, `import Select from '$ds/components/inputs/Select.svelte'`, or by name from the
-   barrel, `import { Select, Icon } from '$ds'`.
+4. Import components by name from the package root, `import { Select, Icon } from '@xerios/design-system'`, or by
+   path, `import Select from '@xerios/design-system/components/inputs/Select.svelte'` (helpers under `/lib/…`).
 
-For editors, `jsconfig.json` maps `$ds/*` to `design-system/src/*`.
+## What's in the package
 
-## What's in the folder
-
-The source lives in `src/`; the package exports and the `$ds` alias point there, so import paths leave it out
-(`$ds/components/…`, not `$ds/src/components/…`). Paths elsewhere in this README are relative to `src/`.
+The source lives in `src/` and is published from `dist/` (the same tree plus `.d.ts` files); import paths leave both
+out (`@xerios/design-system/components/…`). Paths elsewhere in this README are relative to `src/`.
 
 ```
-src/css/index.css        imports the four files below, in order
-src/css/tokens.css       every token, light and dark
-src/css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
-src/css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, spotlight, dialog motion
-src/css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .chip-btn, .field-label, .new-dot, .prose
-src/components/          generic components (table below)
-src/components/inputs/   form controls
-src/components/menu/     the context menu layer
-src/components/tiles/    tiles and the tile group
-src/components/metadata/ labelled values (Metadata, Metadata.Row)
-src/lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, controls.js, inline-md.js, spotlight.js
-src/fonts.js             bundles the two typefaces
-src/index.js             named exports of everything
+css/index.css        imports the four files below, in order
+css/tokens.css       every token, light and dark
+css/base.css         reset, body type, selection rules, scrollbars, links, focus rings, kbd, utilities
+css/effects.css      scroll fades, lit edge, corner glow, shine, shell atmosphere, shimmer, spotlight, dialog motion
+css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .chip-btn, .field-label, .new-dot, .prose
+components/          generic components (table below)
+components/inputs/   form controls
+components/menu/     the context menu layer
+components/tiles/    tiles and the tile group
+components/metadata/ labelled values (Metadata, Metadata.Row)
+components/icons.js  the built-in glyphs as SVG strings (generated by scripts/icons.js)
+lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, controls.js, inline-md.js, spotlight.js
+fonts.js             bundles the two typefaces
+index.js             named exports of everything
 ```
+
+The repo also holds `kitchensink/` (a private preview app, see Kitchen sink) and `scripts/`; neither is published.
 
 ## Theme
 
 Light by default, dark when the OS asks for it. `<html data-theme="light">` or `data-theme="dark"` overrides
 the OS. To avoid a flash, set the attribute from a small inline script in `index.html` before the page paints
-(the viewer's `index.html` shows how). Each colour token is one `light-dark(light, dark)` pair, and the theme
+(`kitchensink/index.html` shows how). Each colour token is one `light-dark(light, dark)` pair, and the theme
 only sets `color-scheme`. A non-colour value that differs by theme can't use `light-dark()`; it would be set per theme.
 
 ## Tokens
@@ -100,7 +89,7 @@ Tokens an app may set: `--toast-offset` (how far toasts sit above the bottom edg
 of `Collapsible`s: its side padding), `--scroll-fade` (fade height on a scroll area), `--page-inset` (on a page's
 scroll area: its side padding, so separators inside run through it to the edges).
 
-**App-specific colours** belong in the app's CSS, built on these. The viewer names its verdicts this way:
+**App-specific colours** belong in the app's CSS, built on these. For example, an app naming its own tones:
 
 ```css
 :root {
@@ -147,21 +136,21 @@ popovers) can't host `.edge`; they paint it as background layers, as described i
 
 ## Kitchen sink
 
-`kitchensink/KitchenSink.svelte` shows every token, atom and component in its states, grouped as Actions, Inputs,
-Overlays, Content, Feedback, Atoms, Typography and Foundations (one component each, built from `Section` and `Demo`; one `Demo`
-per component, each of its states in a captioned `Case` inside it). Set `--page-inset` on the scroll area it sits in so its section rules run
-edge to edge. Mount it in
-a page of the app, under its h1, with the app's `<ContextMenu />` and `<Dialogs />` mounted as usual:
+`kitchensink/` (at the repo root) is a small Vite app, separate from the library and never published, that shows
+every token, atom and component in its states, grouped as Actions, Inputs, Overlays, Content, Feedback, Atoms,
+Typography and Foundations (one component each in `kitchensink/src/`, built from `Section` and `Demo`; one `Demo`
+per component, each of its states in a captioned `Case` inside it). A sidebar lists the areas and switches the theme
+(system, light, dark).
 
-```svelte
-<script>
-  import KitchenSink from '$ds/kitchensink/KitchenSink.svelte'
-</script>
-
-<KitchenSink />
+```sh
+pnpm install
+pnpm dev                  # the kitchen sink, with hot reload
+pnpm build:kitchensink    # a static build in kitchensink/dist
 ```
 
-Check a change there, in both themes, with the keyboard and at a narrow width. A new component gets a `Demo`.
+It imports the library by its package name, exactly as an app does, and its Vite config resolves that name to `src/`
+rather than `dist/`, so an edit to a component shows at once. Check a change there, in both themes, with the keyboard
+and at a narrow width. A new component gets a `Demo`.
 
 ## Components
 
@@ -219,12 +208,13 @@ and `group` for `Select`, `done` for `Segmented`, `info` for `RadioGroup`.
 `iconNames()` lists them). An app registers the rest once, before it mounts:
 
 ```js
-import { registerIcons } from '$ds/components/Icon.svelte'
-import trophy from '@phosphor-icons/core/regular/trophy.svg?raw'
+import { registerIcons } from '@xerios/design-system'
+import trophy from '@phosphor-icons/core/regular/trophy.svg?raw' // add @phosphor-icons/core to the app
 registerIcons({ trophy })
 ```
 
-One family, regular weight. The `?raw` import is Vite's.
+One family, regular weight. The `?raw` import is Vite's; elsewhere pass the SVG markup as a string. The built-in set
+is listed in `scripts/icons.js`: add a glyph there and run `pnpm icons` to regenerate `components/icons.js`.
 
 ### Context menus
 
@@ -377,7 +367,22 @@ assume a variable font.
 - Browser support: current Chromium, Firefox and Safari (`color-mix()`, `@property`, `@starting-style`,
   `offset-path`, Svelte 5.29+ for `{@attach}`).
 
+## Developing and publishing
+
+```sh
+pnpm install
+pnpm dev          # kitchen sink on the live source
+pnpm build        # svelte-package: src/ → dist/ with .d.ts files, then publint checks the package
+pnpm icons        # regenerate components/icons.js after editing scripts/icons.js
+```
+
+To release: bump `version` in `package.json` (a renamed or removed token, class, prop or export is a breaking change),
+then `pnpm publish`. `prepack` rebuilds `dist/` first, and only `dist/`, this README and the license are published.
+
+To try an unreleased build in an app, link it (`"@xerios/design-system": "link:../design-system"`) and run
+`pnpm build` here after each change, or `pnpm pack` and install the tarball.
+
 ## Adding to it
 
-See `CLAUDE.md` in this folder for the rules (they apply to people as well). The test for whether something
+See `CLAUDE.md` in the repo for the rules (they apply to people as well). The test for whether something
 belongs here: could a different app use it without changing it?

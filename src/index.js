@@ -1,8 +1,8 @@
-// Everything the design system exports, by name. Apps may also import a single file by path
-// ($ds/components/Select.svelte), which is what this repo does.
+// Everything the design system exports, by name: import { Button, tooltip } from '@xerios/design-system'.
+// Single files can also be imported by path (@xerios/design-system/components/inputs/Select.svelte).
 // The global CSS and the fonts are side-effect imports and are not included here:
-//   import '$ds/fonts.js';
-//   import '$ds/css/index.css';
+//   import '@xerios/design-system/fonts.js';
+//   import '@xerios/design-system/css/index.css';
 
 export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte'
 export { default as Empty, EmptyError } from './components/empty/index.js'

@@ -1,0 +1,20 @@
+{
+  "name": "kitchensink",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Kitchen sink for @xerios/design-system: every token, atom and component in its states. Not published.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@xerios/design-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.58.0",
+    "vite": "^8.3.8"
+  }
+}

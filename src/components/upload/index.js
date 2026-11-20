@@ -4,7 +4,7 @@
 //   <Upload.Folder> a folder's files   <Upload.Image> one image        <Upload.Images> any number, as a grid
 // <Upload.Zone> around one of them gives it a larger place to drop on: a dashed area, or with `bare` any area at all.
 //
-//   import Upload from '$ds/components/upload/index.js'
+//   import Upload from '@xerios/design-system/components/upload/index.js'
 //   <Upload.File bind:file accept=".pdf" />
 //   <Upload.Zone><Upload.Images bind:files /></Upload.Zone>
 import UploadFile from './UploadFile.svelte'

@@ -3,11 +3,11 @@
    * The kitchen sink: every token, atom and component of the design system on one page, in its states, to try by hand
    * (light and dark, keyboard, narrow widths, contrast settings) and to check a change against.
    *
-   *   import KitchenSink from '$ds/kitchensink/KitchenSink.svelte'
    *   <KitchenSink />
    *
-   * Mount it inside a page (it brings no page chrome: its section headings are h2, under the page's h1). The host
-   * mounts the singletons it uses, as an app does anyway: <ContextMenu /> and <Dialogs />.
+   * It lives in the kitchensink app beside the library (not in the published package); App.svelte gives it its page.
+   * It brings no page chrome: its section headings are h2, under the page's h1. The host mounts the singletons it
+   * uses, as an app does anyway: <ContextMenu /> and <Dialogs />.
    * toast(message, action?): the host's way of showing a toast, so the demos use the app's one toast region. Without it
    * the kitchen sink mounts a Toast of its own (a second live region: fine standalone, redundant inside an app).
    * nav (default true): a row of links to the areas at the top. Turn it off when the page shows KitchenSinkNav instead

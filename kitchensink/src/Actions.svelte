@@ -3,10 +3,10 @@
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
-  import Button from '../components/Button.svelte'
-  import MenuButton from '../components/menu/MenuButton.svelte'
-  import Tile from '../components/tiles/Tile.svelte'
-  import { contextMenu } from '../lib/menu.svelte.js'
+  import Button from '@xerios/design-system/components/Button.svelte'
+  import MenuButton from '@xerios/design-system/components/menu/MenuButton.svelte'
+  import Tile from '@xerios/design-system/components/tiles/Tile.svelte'
+  import { contextMenu } from '@xerios/design-system/lib/menu.svelte.js'
 
   /** @param {number} ms */
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

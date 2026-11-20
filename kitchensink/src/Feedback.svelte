@@ -3,14 +3,14 @@
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
-  import Button from '../components/Button.svelte'
-  import Empty from '../components/empty/index.js'
-  import ErrorMessage from '../components/ErrorMessage.svelte'
-  import Notice from '../components/Notice.svelte'
-  import Shimmer from '../components/Shimmer.svelte'
-  import Toast from '../components/Toast.svelte'
-  import WorkingBorder from '../components/WorkingBorder.svelte'
-  import { spotlight } from '../lib/spotlight.js'
+  import Button from '@xerios/design-system/components/Button.svelte'
+  import Empty from '@xerios/design-system/components/empty/index.js'
+  import ErrorMessage from '@xerios/design-system/components/ErrorMessage.svelte'
+  import Notice from '@xerios/design-system/components/Notice.svelte'
+  import Shimmer from '@xerios/design-system/components/Shimmer.svelte'
+  import Toast from '@xerios/design-system/components/Toast.svelte'
+  import WorkingBorder from '@xerios/design-system/components/WorkingBorder.svelte'
+  import { spotlight } from '@xerios/design-system/lib/spotlight.js'
 
   /** @param {number} ms */
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

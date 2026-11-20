@@ -3,7 +3,7 @@
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
-  import AnchorHeading from '../components/AnchorHeading.svelte'
+  import AnchorHeading from '@xerios/design-system/components/AnchorHeading.svelte'
 
   const CODE = `// Group the entries by version, newest first.
 export function byVersion(entries) {

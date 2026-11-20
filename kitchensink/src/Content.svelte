@@ -2,17 +2,17 @@
   /** Kitchen sink: collapsibles, a side menu, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
-  import Collapsible from '../components/Collapsible.svelte'
-  import CollapsibleAdvanced from '../components/CollapsibleAdvanced.svelte'
-  import Icon from '../components/Icon.svelte'
-  import Md from '../components/Md.svelte'
-  import Splitter from '../components/Splitter.svelte'
-  import SideMenu from '../components/side-menu/index.js'
-  import Button from '../components/Button.svelte'
-  import Table from '../components/Table.svelte'
-  import Metadata from '../components/metadata/index.js'
+  import Collapsible from '@xerios/design-system/components/Collapsible.svelte'
+  import CollapsibleAdvanced from '@xerios/design-system/components/CollapsibleAdvanced.svelte'
+  import Icon from '@xerios/design-system/components/Icon.svelte'
+  import Md from '@xerios/design-system/components/Md.svelte'
+  import Splitter from '@xerios/design-system/components/Splitter.svelte'
+  import SideMenu from '@xerios/design-system/components/side-menu/index.js'
+  import Button from '@xerios/design-system/components/Button.svelte'
+  import Table from '@xerios/design-system/components/Table.svelte'
+  import Metadata from '@xerios/design-system/components/metadata/index.js'
   import Case from './Case.svelte'
-  import { scrollFade } from '../lib/scroll-fade.js'
+  import { scrollFade } from '@xerios/design-system/lib/scroll-fade.js'
 
   const PEOPLE = [
     { id: 1, name: 'Ada Lovelace', team: 'Engines', commits: 128, joined: '2025-03-02' },

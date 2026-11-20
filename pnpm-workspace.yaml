@@ -1,3 +1,7 @@
+# The library is the root package; the kitchen sink is a private app beside it that is never published.
+packages:
+  - kitchensink
+
 # pnpm settings live here (pnpm 10.6+ reads this file; pnpm 11 requires it).
 
 # Build scripts are opt-in. Every entry below is a package you have authorised

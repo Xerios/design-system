@@ -6,8 +6,8 @@
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
-  import Icon from '../components/Icon.svelte'
-  import { tooltip } from '../lib/tooltip.js'
+  import Icon from '@xerios/design-system/components/Icon.svelte'
+  import { tooltip } from '@xerios/design-system/lib/tooltip.js'
 </script>
 
 <Section id="atoms" title="Atoms" intro="Classes for plain elements, for the small things that don't need a component.">

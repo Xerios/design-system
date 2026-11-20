@@ -1,11 +1,13 @@
 # Design system: rules for working with it
 
-This folder is a reusable, app-agnostic design system (Svelte 5 runes, plain JavaScript, Vite). Apps import it
-through the `$ds` alias. `README.md` here is the catalogue: tokens, global classes, components and their props.
-Read it before building UI, and read a component's header comment before using it.
+This folder is a reusable, app-agnostic design system (Svelte 5 runes, plain JavaScript), published to npm as
+`@xerios/design-system`. Apps import it by that name. `README.md` here is the catalogue: tokens, global classes,
+components and their props. Read it before building UI, and read a component's header comment before using it.
 
-The source lives in `src/`. Paths in this file (`components/`, `css/tokens.css`, `lib/…`, `kitchensink/`, `index.js`)
-are relative to it; import paths leave it out (`$ds/components/…`), because the package exports map to `src/`.
+The library source lives in `src/`; `pnpm build` (svelte-package) copies it to `dist/` with `.d.ts` files generated
+from the JSDoc, and the package exports map there. Paths in this file (`components/`, `css/tokens.css`, `lib/…`,
+`index.js`) are relative to `src/`; import paths leave it out (`@xerios/design-system/components/…`).
+The kitchen sink is a separate, private app in `kitchensink/` at the repo root (not published); `pnpm dev` runs it.
 
 ## Using it (when working in an app)
 
@@ -15,7 +17,8 @@ are relative to it; import paths leave it out (`$ds/components/…`), because th
   error state is the `invalid` attachment (lib/invalid.js), never aria-invalid / aria-describedby written by hand.
 - Compose instead of copying: pass content as children and snippets, and add a class, attributes or an attachment
   straight on the component (`<Empty class="…" {@attach …}>`); they reach its main element.
-- Import by path: `import Select from '$ds/components/inputs/Select.svelte'`, helpers from `$ds/lib/…`.
+- Import by path: `import Select from '@xerios/design-system/components/inputs/Select.svelte'`, helpers from
+  `@xerios/design-system/lib/…`, or by name from the package root.
 - Style with tokens only: colours, radii, spacing, durations, z-index and shadows all come from
   `css/tokens.css`. No hex or rgb values, pixel radii or millisecond durations in component styles, with
   one allowance: 1px hairlines and fine optical offsets.
@@ -67,7 +70,7 @@ are relative to it; import paths leave it out (`$ds/components/…`), because th
 - A new component belongs here only if another app could use it unchanged. Otherwise it goes in the app.
 - Start each component with a comment block: what it is for, a usage example, each prop, keyboard
   behaviour. That comment is its documentation. Then add it to `index.js`, to the table in `README.md`, and a `Demo`
-  of it to the kitchen sink area it belongs to (`kitchensink/`): one `Demo` per component, each of its states in a
+  of it to the kitchen sink area it belongs to (`kitchensink/src/` at the repo root): one `Demo` per component, each of its states in a
   captioned `Case` inside it. Areas run
   from what you interact with (Actions, Inputs, Overlays), through what shows content and state (Content, Feedback),
   to Atoms and Foundations last; within an area, interactive demos come before view-only ones.
@@ -81,16 +84,19 @@ are relative to it; import paths leave it out (`$ds/components/…`), because th
   differ by theme (shadows: one `light-dark()` per layer colour, `transparent` for a layer one theme lacks), and
   in the README's token table. A non-colour value that differs needs its dark value twice below the
   block: in `[data-theme="dark"]` and in a `@media (prefers-color-scheme: dark)` rule on `:root:not([data-theme="light"])`. Check contrast (AA) in both themes.
-- Renaming or removing a token, class, prop or export breaks every app using it: search the consumers
-  (`grep -rn` in `src/`) and update them in the same change.
+- Renaming or removing a token, class, prop or export breaks every app using it: it needs a major version bump
+  (minor while on 0.x), a note in the release, and the kitchen sink updated in the same change.
 - Global CSS goes in the matching file (`base`, `effects`, `atoms`); component styles stay scoped in the
   `.svelte` file. Keep selectors low-specificity so apps can override them.
-- Relative imports only inside this folder (`../lib/dom.js`), never `$ds/…`, so it also works when linked
-  as a package.
-- Dependencies: Svelte, Phosphor icons and the two fontsource packages. Do not add others without asking.
+- Relative imports only inside `src/` (`../lib/dom.js`), never the package name, so the built `dist/` stays
+  self-contained. The kitchen sink is the opposite: it imports the library only by package name, as an app would.
+- No bundler-specific imports in `src/` (no Vite `?raw`, `?url`, `import.meta.glob`): the package must work in any
+  bundler. The built-in icons are inlined in `components/icons.js`, generated by `scripts/icons.js` (`pnpm icons`).
+- Dependencies: Svelte (peer), the two fontsource packages, and Phosphor icons (dev only, for `pnpm icons`).
+  Do not add others without asking. Only `dist/` is published (`files` in `package.json`).
 
 ## Checking a change
 
-There are no tests. Build the consuming app (`pnpm build` in the folder above) and look for new warnings,
-then check the affected component on the kitchen sink (`kitchensink/KitchenSink.svelte`; this app serves it at
-`/kitchensink`, linked in development) in light and dark, with the keyboard, and at a width under 860px.
+There are no tests. Run `pnpm build` (svelte-package, then publint) and `pnpm build:kitchensink`, and look for new
+warnings. Then check the affected component in the kitchen sink (`pnpm dev`; it resolves the package name to `src/`,
+so edits hot-reload) in light and dark (the theme switch in its sidebar), with the keyboard, and at a width under 860px.
