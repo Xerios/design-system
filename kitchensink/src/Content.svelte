@@ -69,7 +69,7 @@
       <CollapsibleAdvanced title="Smoke tests" variant="empty" expandable={false} />
     </div>
   </Demo>
-  <Demo label="Side menu: header with a main action, a count, folding groups and rows, nested rows with and without icons">
+  <Demo label="Side menu: header with a main action, a count, folding groups and rows, nested rows with and without icons, a footer">
     <div class="side-menu-stage">
       <SideMenu label="Example menu">
         {#snippet header()}<span class="brand"><Icon name="monitor" size="lg" />Workspace</span>{/snippet}
@@ -98,6 +98,7 @@
         <SideMenu.Group title="Folded" open={false}>
           <SideMenu.Item icon="star" label="Hidden until opened" />
         </SideMenu.Group>
+        {#snippet footer()}<Button small icon="keyboard">Shortcuts</Button>{/snippet}
       </SideMenu>
     </div>
   </Demo>

@@ -4,7 +4,7 @@
 //   import '@xerios/design-system/fonts.js';
 //   import '@xerios/design-system/css/index.css';
 
-export { default as Icon, registerIcons, iconNames } from './components/Icon.svelte'
+export { default as Icon, registerIcons, iconNames, hasIcon } from './components/Icon.svelte'
 export { default as Empty, EmptyError } from './components/empty/index.js'
 export { default as Button } from './components/Button.svelte'
 export { default as ErrorMessage } from './components/ErrorMessage.svelte'

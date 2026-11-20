@@ -1,24 +1,31 @@
 <script>
   /**
-   * The kitchen sink's areas as a vertical menu, for a page's sidebar: the area in view is marked current (it follows
-   * the scroll), and choosing one jumps there and moves the focus to its heading.
+   * The kitchen sink's side menu, built on the design system's SideMenu: the areas as icon rows, each with a count of its
+   * demos; the area in view is marked current (it follows the scroll), and choosing one jumps there and moves the focus
+   * to its heading. The theme switch (system, light, dark) sits in the footer.
    *
-   *   <AppShell>
-   *     {#snippet sidebar()}<KitchenSinkNav />{/snippet}
-   *     <KitchenSink nav={false} />
-   *   </AppShell>
+   *   <KitchenSinkNav onpick={closeDrawer} />
    *
+   * onpick: after an area is chosen (to close a drawer it sits in).
    * Other attributes (class…) and attachments go to the <nav>.
    */
+  import Icon from '@xerios/design-system/components/Icon.svelte'
+  import ButtonGroup from '@xerios/design-system/components/inputs/ButtonGroup.svelte'
+  import SideMenu from '@xerios/design-system/components/side-menu/index.js'
   import { AREAS, jump } from './areas.js'
+  import { THEMES, setTheme, theme } from './theme.svelte.js'
 
-  /** @type {import('svelte/elements').HTMLAttributes<HTMLElement>} */
-  let { class: className, ...rest } = $props()
-  let current = $state(AREAS[0].id)
+  /** @type {{ onpick?: () => void } & import('svelte/elements').HTMLAttributes<HTMLElement>} */
+  let { onpick, ...rest } = $props()
 
-  /** Attachment: marks the area whose top has scrolled into the upper part of the window as current. */
+  let current = $state(AREAS[0]?.id ?? '')
+  /** @type {Record<string, number>} */
+  let counts = $state({})
+
+  /** Attachment: counts each area's demos, and marks the area whose top has scrolled into the upper part of the window as current. */
   function follow() {
     const sections = AREAS.map((area) => document.getElementById(area.id)).filter((el) => el !== null)
+    counts = Object.fromEntries(sections.map((section) => [section.id, section.querySelectorAll('figure.demo').length]))
     const observer = new IntersectionObserver(
       (entries) => {
         const seen = entries.filter((entry) => entry.isIntersecting).map((entry) => entry.target.id)
@@ -32,70 +39,43 @@
   }
 </script>
 
-<nav aria-label="Design system areas" class={['ks-nav', className]} {...rest} {@attach follow}>
-  <span class="title">Kitchen sink</span>
-  <ul>
+<SideMenu label="Design system areas" {...rest} {@attach follow}>
+  {#snippet header()}<span class="brand"><Icon name="swatches" size="lg" />Design system</span>{/snippet}
+
+  <SideMenu.Group>
     {#each AREAS as area (area.id)}
-      <li>
-        <a href="#{area.id}" aria-current={current === area.id ? 'location' : undefined} onclick={(e) => ((current = area.id), jump(e, area.id))}
-          >{area.label}</a
-        >
-      </li>
+      <SideMenu.Item
+        href="#{area.id}"
+        icon={area.icon}
+        label={area.label}
+        count={counts[area.id] || null}
+        current={current === area.id ? 'location' : false}
+        onclick={(/** @type {MouseEvent} */ e) => {
+          current = area.id
+          jump(e, area.id)
+          onpick?.()
+        }}
+      />
     {/each}
-  </ul>
-</nav>
+  </SideMenu.Group>
+
+  {#snippet footer()}
+    <ButtonGroup label="Theme" options={THEMES} value={theme.value} onchange={setTheme} />
+  {/snippet}
+</SideMenu>
 
 <style>
-  .ks-nav {
-    display: grid;
-    gap: var(--space-2);
-  }
-  .title {
-    padding: 0 var(--space-2);
-    font-size: 12px;
-    font-weight: var(--w-medium);
-    color: var(--muted);
-  }
-  ul {
-    display: grid;
-    gap: 2px;
-  }
-  a {
-    display: flex;
+  .brand {
+    display: inline-flex;
     align-items: center;
-    min-height: 28px;
-    padding: 0 var(--space-2);
-    border-radius: var(--r);
-    color: var(--fg-2);
-    font-size: 13px;
-    font-weight: var(--w-medium);
-    text-decoration: none;
-    transition:
-      background-color var(--dur) var(--ease-out),
-      color var(--dur) var(--ease-out);
-  }
-  a:hover {
-    background: var(--fill-2);
+    gap: var(--gap);
+    min-height: 32px;
+    padding-inline: var(--bleed);
+    margin-inline-start: calc(var(--bleed) * -1);
     color: var(--fg);
+    font: var(--w-semibold) 14px var(--font-display);
   }
-  a[aria-current='location'] {
-    background: var(--fill-3);
-    color: var(--fg);
-  }
-  /* A narrow window puts the menu in a row above the view. */
-  @media (max-width: 860px) {
-    .title {
-      display: none;
-    }
-    ul {
-      display: flex;
-      flex-wrap: wrap;
-    }
-  }
-  @media (forced-colors: active) {
-    a[aria-current='location'] {
-      outline: 1px solid Highlight;
-      outline-offset: -1px;
-    }
+  .brand > :global(.icon) {
+    color: var(--muted);
   }
 </style>

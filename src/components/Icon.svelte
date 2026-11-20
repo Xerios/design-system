@@ -8,10 +8,13 @@
   //   registerIcons({ briefcase });
   //
   // Then <Icon name="briefcase" /> works everywhere, including in options and menu items that take an icon name.
-  import BUILT_IN from './icons.js'
+  import BUILT_IN, { MISSING } from './icons.js'
 
   /** @type {Record<string, string>} */
   const ICONS = { ...BUILT_IN }
+
+  /** Names already reported, so a missing icon drawn in a list logs once, not once per row. */
+  const reported = new Set()
 
   /**
    * Adds icons (name → SVG markup using currentColor) to the registry, replacing any of the same name. Call before mounting.
@@ -22,6 +25,8 @@
   }
   /** Every registered name (for a gallery, or to check a name exists). */
   export const iconNames = () => Object.keys(ICONS)
+  /** @param {string} name */
+  export const hasIcon = (name) => Object.hasOwn(ICONS, name)
 </script>
 
 <script>
@@ -30,6 +35,7 @@
    * label: give one only when the icon carries meaning that no visible text repeats;
    * otherwise it is decorative and hidden from assistive tech.
    * Other attributes (class…) and attachments go to the wrapping <span>.
+   * A name nobody registered draws a question mark in the danger colour instead, and logs a console error once per name.
    *
    * @typedef {object} Props
    * @property {string} name
@@ -38,11 +44,25 @@
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLSpanElement>, keyof Props>} */
   let { name, size = 'md', label = null, class: className, ...rest } = $props()
+
+  const missing = $derived(!hasIcon(name))
+
+  $effect(() => {
+    if (!missing || reported.has(name)) return
+    reported.add(name)
+    // oxlint-disable-next-line no-console -- the point: a developer sees which name is missing
+    console.error(`Icon: no icon named "${name}". Register it with registerIcons({ ${name}: svgMarkup }) before mounting.`)
+  })
 </script>
 
 <!-- allow-html: ICONS holds SVG markup bundled at build time or passed to registerIcons by app code, never user input -->
-<span class={['icon', size, className]} role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'} {...rest}
-  >{@html ICONS[name]}</span
+<span
+  class={['icon', size, className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  data-missing={missing || undefined}
+  {...rest}>{@html missing ? MISSING : ICONS[name]}</span
 >
 
 <style>
@@ -53,6 +73,9 @@
     pointer-events: none;
     width: var(--icon-size);
     height: var(--icon-size);
+  }
+  .icon[data-missing] {
+    color: var(--danger);
   }
   .icon :global(svg) {
     width: 100%;

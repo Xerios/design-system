@@ -19,6 +19,7 @@
    *         <SideMenu.Item href="/p/mobile" icon="phone" label="Mobile app" />
    *       </SideMenu.Item>
    *     </SideMenu.Group>
+   *     {#snippet footer()}<ButtonGroup label="Theme" options={THEMES} value={theme} onchange={setTheme} />{/snippet}
    *   </SideMenu>
    *
    * label: the <nav>'s accessible name (default "Menu").
@@ -27,6 +28,7 @@
    * actions: buttons at the right of the top row. The last is the menu's main action (new, compose): it is drawn raised,
    * and centred on the trailing column, where the rows' counts sit.
    * children: SideMenu.Group parts. They scroll, with edge fades, under the header.
+   * footer: pinned under the rows at the content edge (a theme switch, an account or help button); the rows scroll above it.
    * Other attributes (class, id…) and attachments go to the <nav>. Fill the height it is given (it scrolls inside).
    *
    * Everything lines up on four columns, set here as properties and read by the parts: the content edge (--edge, where
@@ -42,10 +44,11 @@
    * @property {string} [label]
    * @property {import('svelte').Snippet} [header]
    * @property {import('svelte').Snippet} [actions]
+   * @property {import('svelte').Snippet} [footer]
    * @property {import('svelte').Snippet} children
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLElement>, keyof Props>} */
-  let { label = 'Menu', header, actions, class: className, children, ...rest } = $props()
+  let { label = 'Menu', header, actions, footer, class: className, children, ...rest } = $props()
 </script>
 
 <nav aria-label={label} class={['side-menu', className]} {...rest}>
@@ -56,6 +59,7 @@
     </div>
   {/if}
   <div class="scroll" {@attach scrollFade()}>{@render children()}</div>
+  {#if footer}<div class="footer">{@render footer()}</div>{/if}
 </nav>
 
 <style>
@@ -117,5 +121,12 @@
     overscroll-behavior: contain;
     /* Leaves room under the last row, where the bottom fade is. */
     padding-bottom: var(--space-8);
+  }
+  /* Under the scroll's bottom fade, which already parts it from the rows: no rule needed. */
+  .footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 32px;
   }
 </style>

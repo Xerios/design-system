@@ -59,12 +59,18 @@ const ICONS = {
   stopCircle: 'regular/stop-circle',
 }
 
-const lines = Object.entries(ICONS).map(([name, file]) => {
-  const svg = readFileSync(require.resolve(`@phosphor-icons/core/${file}.svg`), 'utf8').trim()
+/** Drawn, in the danger colour, for a name nobody registered. Not in the registry, so iconNames() leaves it out. */
+const MISSING = 'regular/question'
+
+/** @param {string} file */
+function svg(file) {
+  const markup = readFileSync(require.resolve(`@phosphor-icons/core/${file}.svg`), 'utf8').trim()
   // Single-quoted to match the code style; Phosphor's markup has no single quotes or backslashes.
-  if (/['\\\n]/.test(svg)) throw new Error(`Unexpected character in ${file}.svg`)
-  return `  ${name}: '${svg}',`
-})
+  if (/['\\\n]/.test(markup)) throw new Error(`Unexpected character in ${file}.svg`)
+  return `'${markup}'`
+}
+
+const lines = Object.entries(ICONS).map(([name, file]) => `  ${name}: ${svg(file)},`)
 
 const out = new URL('../src/components/icons.js', import.meta.url)
 writeFileSync(
@@ -76,6 +82,9 @@ writeFileSync(
 export default {
 ${lines.join('\n')}
 }
+
+/** Drawn in place of an unregistered name. */
+export const MISSING = ${svg(MISSING)}
 `,
 )
 console.log(`Wrote ${lines.length} icons to src/components/icons.js`)

@@ -4,5 +4,7 @@ import '@xerios/design-system/fonts.js'
 import '@xerios/design-system/css/index.css'
 import { mount } from 'svelte'
 import App from './App.svelte'
+import { registerAppIcons } from './icons.js'
 
+registerAppIcons()
 mount(App, { target: document.getElementById('app') })

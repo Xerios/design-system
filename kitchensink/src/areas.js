@@ -1,14 +1,14 @@
 // The kitchen sink's areas, in page order: what KitchenSink draws and KitchenSinkNav links to. Things you interact with
 // come first, then things that show content and state, then the atoms and foundations everything is built from.
 export const AREAS = [
-  { id: 'actions', label: 'Actions' },
-  { id: 'inputs', label: 'Inputs' },
-  { id: 'overlays', label: 'Overlays' },
-  { id: 'content', label: 'Content' },
-  { id: 'feedback', label: 'Feedback' },
-  { id: 'atoms', label: 'Atoms' },
-  { id: 'typography', label: 'Typography' },
-  { id: 'foundations', label: 'Foundations' },
+  { id: 'actions', label: 'Actions', icon: 'cursorClick' },
+  { id: 'inputs', label: 'Inputs', icon: 'textbox' },
+  { id: 'overlays', label: 'Overlays', icon: 'stack' },
+  { id: 'content', label: 'Content', icon: 'table' },
+  { id: 'feedback', label: 'Feedback', icon: 'bell' },
+  { id: 'atoms', label: 'Atoms', icon: 'atom' },
+  { id: 'typography', label: 'Typography', icon: 'textAa' },
+  { id: 'foundations', label: 'Foundations', icon: 'palette' },
 ]
 
 /**
