@@ -31,6 +31,7 @@
   import RangeShortcuts from './RangeShortcuts.svelte'
   import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js'
+  import { pop } from '../../lib/motion.js'
   import { compare, dateListShortcuts, dayOf, formatWhen, today } from '../../lib/dates.js'
 
   /**
@@ -214,6 +215,7 @@
       data-floating
       style:position-anchor={anchor}
       {@attach topLayer(button)}
+      transition:pop={{ from: button }}
       onkeydown={onPanelKey}
     >
       {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
@@ -330,7 +332,10 @@
     rotate: 180deg;
   }
   /* Anchored under the button, flipping above or to its other side when there's no room. */
+  /* A picker: its hint and dates are chrome, not text to copy (base.css). */
   .panel {
+    user-select: none;
+    -webkit-user-select: none;
     position: fixed;
     z-index: calc(var(--z-overlay) + 1);
     position-area: block-end span-inline-end;

@@ -21,6 +21,7 @@
   import { tooltip } from '../../lib/tooltip.js'
   import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
+  import { pop } from '../../lib/motion.js'
 
   /**
    * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string }} Option
@@ -225,6 +226,7 @@
         class="list"
         data-floating
         {@attach topLayer(button)}
+        transition:pop={{ from: button }}
         role="listbox"
         tabindex="-1"
         aria-labelledby="{id}-label"

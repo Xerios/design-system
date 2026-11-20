@@ -314,7 +314,10 @@
 </div>
 
 <style>
+  /* A picker: its headings and day names are chrome, not text to copy (base.css). */
   .calendar {
+    user-select: none;
+    -webkit-user-select: none;
     display: grid;
     gap: var(--space-2);
     width: max-content;

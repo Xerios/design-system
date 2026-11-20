@@ -4,16 +4,21 @@
    * x/y: preferred top-left corner. flipX: right edge to align to when there is no room on the right.
    * opener: the element it opens from. It is drawn in the top layer, inside that element's modal dialog if it has one, so
    * a menu opened from a drawer or dialog sits above it and can still be used.
+   * It grows out of the button or point it opened from and fades as it closes (global transitions: ContextMenu wraps it
+   * in a {#key}, so local ones would not run when the menu opens or closes).
    */
-  import { tick } from 'svelte'
+  import { tick, untrack } from 'svelte'
   // oxlint-disable-next-line import/no-self-import -- a recursive component: importing itself is how Svelte 5 renders its own submenu
   import MenuList from './MenuList.svelte'
   import Icon from '../Icon.svelte'
   import { topLayer } from '../../lib/dom.js'
+  import { pop } from '../../lib/motion.js'
 
   let { items, x, y, flipX = x, label, opener = null, level = 0, autofocus = true, onclose, onback = null } = $props()
 
   let sub = $state(null) // { index, x, y, flipX }
+  // What it grows out of: the button it opened from, else the point. Taken as it opens, since closing clears the menu state.
+  const origin = untrack(() => (level === 0 && opener ? opener : { x, y }))
   const buttons = []
   const usable = $derived(items.map((it, i) => (it.separator || it.disabled ? -1 : i)).filter((i) => i >= 0))
 
@@ -106,7 +111,17 @@
   }
 </script>
 
-<div class="ctx-menu" role="menu" aria-label={label} tabindex="-1" {@attach topLayer(opener)} {@attach place} {onkeydown} oncontextmenu={(e) => e.preventDefault()}>
+<div
+  class="ctx-menu"
+  role="menu"
+  aria-label={label}
+  tabindex="-1"
+  {@attach topLayer(opener)}
+  {@attach place}
+  transition:pop|global={{ from: origin, start: 0.96, distance: 0 }}
+  {onkeydown}
+  oncontextmenu={(e) => e.preventDefault()}
+>
   {#each items as item, i (i)}
     {#if item.separator}
       <div class="sep" role="separator"></div>
@@ -193,7 +208,6 @@
     padding: 4px;
     box-shadow: var(--shadow);
     font-size: 13px;
-    animation: pop var(--dur-fast) var(--ease-out);
   }
   .ctx-menu:focus {
     outline: none;
@@ -258,11 +272,5 @@
     height: 1px;
     background: var(--line);
     margin: 4px -4px;
-  }
-  @keyframes pop {
-    from {
-      opacity: 0;
-      scale: 0.96;
-    }
   }
 </style>

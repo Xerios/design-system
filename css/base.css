@@ -19,18 +19,29 @@ body {
 }
 
 /* Controls and chrome aren't text to copy: no accidental selection when clicking or dragging. Content stays selectable,
-   including what sits in a toggle or a pill but is data (a <summary> holding a log entry's call, a count). */
+   including what sits in a toggle or a pill but is data (a <summary> holding a log entry's call, a count), and so do
+   toasts, alerts and dialog text. Composite widgets (lists, menus, radio groups, toolbars) are chrome as a whole, their
+   headings and hints included. Where text can't be selected, lib/controls.js also cancels the browser's drag and
+   right-click menu, so this list decides all three; a component makes its own chrome with user-select: none. */
 button,
 [role='button'],
 [role='tab'],
+[role='tablist'],
 [role='radio'],
+[role='radiogroup'],
+[role='menu'],
+[role='menubar'],
 [role='menuitem'],
 [role='menuitemradio'],
+[role='menuitemcheckbox'],
+[role='listbox'],
 [role='option'],
+[role='toolbar'],
 [role='separator'],
 [role='switch'],
 [role='slider'],
 label,
+.field-label,
 kbd,
 select,
 .btn,
@@ -42,6 +53,8 @@ select,
 svg text {
   -webkit-user-select: none;
   user-select: none;
+  /* Chromium and WebKit: a link or image styled as a control isn't dragged out (lib/controls.js covers Firefox). */
+  -webkit-user-drag: none;
 }
 /* ...except text fields inside them. */
 input,

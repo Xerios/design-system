@@ -161,7 +161,9 @@
   cursor: default;
 }
 
-/* The tooltip drawn by the `tooltip` attachment (lib/tooltip.js): a popover in the top layer, placed from script. */
+/* The tooltip drawn by the `tooltip` attachment (lib/tooltip.js): a popover in the top layer, placed from script.
+   It fades in on the enter curve and out on the quicker exit one, as the modals do (css/effects.css); the attachment
+   removes it once the fade out has ended. Reduced motion drops the fade (css/base.css), so it simply appears and goes. */
 .tooltip {
   position: fixed;
   inset: auto;
@@ -182,6 +184,22 @@
   white-space: normal;
   text-align: left;
   overflow: visible;
+  transition:
+    opacity var(--dur-enter) var(--ease-enter),
+    overlay var(--dur-enter) allow-discrete,
+    display var(--dur-enter) allow-discrete;
+}
+/* Closed, it carries the exit timing (a transition takes the timing of the state it moves to). Only a browser that knows
+   :popover-open hides it here, so one that doesn't still shows the tip. */
+.tooltip:not(:popover-open) {
+  opacity: 0;
+  transition-duration: var(--dur-exit);
+  transition-timing-function: var(--ease-exit), linear, linear;
+}
+@starting-style {
+  .tooltip:popover-open {
+    opacity: 0;
+  }
 }
 
 /* Arrow on a tip, pointing at the element it belongs to: data-arrow="up" when the tip sits below it, "down" when above.

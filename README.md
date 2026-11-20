@@ -37,8 +37,8 @@ the fonts and CSS.
    import './app.css' // yours, after
    ```
 
-4. Mount the singletons at the root if you use them: `<ContextMenu />` (any `contextMenu` attachment or
-   `MenuButton`), `<Dialogs />` (`alertDialog`, `confirmDialog`, `promptDialog`) and `<Toast … />`.
+4. Mount the singletons at the root: `<ContextMenu />` (any `contextMenu` attachment or `MenuButton`; it also keeps
+   the browser's drag and right-click menu off controls, see `lib/controls.js`), and if you use them `<Dialogs />` (`alertDialog`, `confirmDialog`, `promptDialog`) and `<Toast … />`.
 5. Import components by path, `import Select from '$ds/components/inputs/Select.svelte'`, or by name from the
    barrel, `import { Select, Icon } from '$ds'`.
 
@@ -55,7 +55,7 @@ css/atoms.css        .btn, .icon-btn, .data-table, .count, tones, .label-chip, .
 components/          generic components (table below)
 components/inputs/   form controls
 components/menu/     the context menu layer
-lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, inline-md.js, spotlight.js
+lib/                 dom.js, dialogs.svelte.js, motion.js, scroll-fade.js, validity.js, tooltip.js, field-errors.svelte.js, menu.svelte.js, controls.js, inline-md.js, spotlight.js
 fonts.js             bundles the two typefaces
 index.js             named exports of everything
 ```
@@ -221,6 +221,11 @@ One family, regular weight. The `?raw` import is Vite's.
 </li>
 ```
 
+Where text can't be selected (base.css: buttons, lists, menus, pickers, labels), the mounted layer also cancels the
+browser's drag and right-click menu. Content, toasts, alerts, text fields and links keep theirs; Shift + right-click always
+gets the browser's menu. To make a component's own chrome behave this way, give it `user-select: none`; to keep a part
+selectable, `user-select: text`.
+
 Items: `{ label, icon?, action?, href?, hint?, checked?, disabled?, danger?, children? }` or `{ separator: true }`. `icon` sits in
 the column on the left (a checked item shows its check there instead).
 Right-click, Shift+F10 and the Menu key open it; text fields keep the browser's menu. Always pair a context
@@ -310,6 +315,7 @@ out and holds every timer.
 | `backdropClose(close)`                                         | Handlers to spread on a `<dialog>`: closes on a true backdrop click only                                                                                                                                                                                                                                                                                        |
 | `closeRequests(request)`                                       | Handlers to spread on a `<dialog>` that must ask before closing: Esc (however fast it is repeated) and other close requests call `request` instead of closing                                                                                                                                                                                                   |
 | `fade`, `fly`, `slide`, `scale`                                | Svelte's transitions on Material 3's motion rules: decelerate curve going in (250ms), accelerate going out (200ms), 0ms under reduced motion. Extra params `emphasized` (the emphasized set, for transitions that should draw the eye: 400ms in, 200ms out), `duration` (ms, both ways) and `curve: 'standard'` (one curve both ways, 300ms; `slide`'s default) |
+| `pop({ from?, start?, distance?, duration? })` | For a small floating layer (list, menu, tip, panel): fades while growing from 97% out of `from` (an element or `{ x, y }`) and moving 4px away from it, on whichever side it ended up; 150ms in, 100ms out, 0ms under reduced motion. `<ul transition:pop={{ from: button }}>` |
 | `flip`                                                         | `animate:flip` on the standard curve, 300ms by default                                                                                                                                                                                                                                                                                                          |
 | `tween(value, { emphasized?, duration? })`                     | A `Tween` from `svelte/motion` on the standard curve, for a value that changes in place                                                                                                                                                                                                                                                                         |
 | `durations`, `easings`, `defaults`                             | Material 3's duration tokens (`short1` 50 … `extraLong4` 1000), curves (`easings.standard.decelerate` and so on) and each curve's usual duration, for custom transitions                                                                                                                                                                                        |

@@ -23,6 +23,7 @@
   import ErrorMessage from '../ErrorMessage.svelte'
   import InfoTip from '../InfoTip.svelte'
   import { topLayer } from '../../lib/dom.js'
+  import { pop } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
 
   /**
@@ -164,6 +165,7 @@
       data-floating
       style:position-anchor={anchor}
       {@attach topLayer(button)}
+      transition:pop={{ from: box }}
       onkeydown={onPanelKey}
       {onfocusout}
     >

@@ -6,6 +6,7 @@
    * its own accessible name then). Other attributes (class…) and attachments go to the wrapping <span>.
    */
   import { topLayer } from '../lib/dom.js'
+  import { pop } from '../lib/motion.js'
 
   /**
    * @typedef {object} Props
@@ -56,6 +57,7 @@
     role="tooltip"
     data-arrow="up"
     {@attach topLayer(el)}
+    transition:pop={{ from: el, distance: 3 }}
     style:--arrow-x={pos.arrow}
     style:top="{pos.top}px"
     style:left={pos.left != null ? `${pos.left}px` : null}
@@ -91,12 +93,5 @@
     letter-spacing: normal;
     text-transform: none;
     cursor: default;
-    animation: tip-in var(--dur) var(--ease-out);
-  }
-  @keyframes tip-in {
-    from {
-      opacity: 0;
-      translate: 0 -3px;
-    }
   }
 </style>

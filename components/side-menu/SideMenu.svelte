@@ -59,7 +59,10 @@
 </nav>
 
 <style>
+  /* Navigation chrome: nothing in it is text to copy or drag out (base.css); its links keep their right-click menu. */
   .side-menu {
+    user-select: none;
+    -webkit-user-select: none;
     --edge: var(--space-3);
     --slot: var(--icon-lg);
     --gap: var(--space-2);

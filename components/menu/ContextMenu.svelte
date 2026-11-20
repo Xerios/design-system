@@ -1,7 +1,11 @@
 <script>
-  /** The app's single context menu layer. Open it with the contextMenu attachment from lib/menu.svelte.js. */
+  /**
+   * The app's single context menu layer. Open it with the contextMenu attachment from lib/menu.svelte.js. It also keeps
+   * the browser's drag and right-click menu off controls, app-wide (lib/controls.js).
+   */
   import MenuList from './MenuList.svelte'
   import { menu, closeMenu, anchorMoved } from '../../lib/menu.svelte.js'
+  import { noControlMenu, noControlDrag } from '../../lib/controls.js'
 
   // Close on anything that would leave the menu floating in the wrong place.
   const away = () => menu.open && closeMenu({ restoreFocus: false })
@@ -11,7 +15,7 @@
   const scrolled = (e) => menu.open && !e.target.closest?.('.ctx-menu') && anchorMoved() && away()
 </script>
 
-<svelte:document onpointerdowncapture={outside} onscrollcapture={scrolled} />
+<svelte:document onpointerdowncapture={outside} onscrollcapture={scrolled} oncontextmenu={noControlMenu} ondragstart={noControlDrag} />
 <svelte:window onresize={away} onblur={away} />
 
 {#if menu.open}

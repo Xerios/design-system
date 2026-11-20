@@ -26,7 +26,7 @@ Read it before building UI, and read a component's header comment before using i
   `src/lib/icons.js`), from Phosphor's regular weight.
 - Floating things are portalled (`portal`, `portalNear`) and marked `data-floating`. Anything that can open from
   inside a modal dialog (tips, lists, menus) uses `topLayer` instead, or the dialog draws over it. Svelte transitions
-  and animations come from `lib/motion.js` (`fade`, `fly`, `slide`, `scale`, `flip`, `tween`), which follow Material 3's
+  and animations come from `lib/motion.js` (`fade`, `fly`, `slide`, `scale`, `pop`, `flip`, `tween`), which follow Material 3's
   motion rules and honour reduced motion; a custom one uses its `durations`, `easings` and `motion(ms)`.
 - Every control has a label (visible, or `hideLabel` / `aria-label`), works from the keyboard, and has a
   pointer target of at least 24×24px. Anything on a context menu also has a visible `MenuButton`.

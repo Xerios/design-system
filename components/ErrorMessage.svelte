@@ -1,6 +1,7 @@
 <script>
   import Icon from './Icon.svelte'
   import { tooltip } from '../lib/tooltip.js'
+  import { fly, durations } from '../lib/motion.js'
   /**
    * One line of error text with a warning icon. Draws nothing while `message` is empty, so it can stay in the
    * markup. Inline, it is an alert (role="alert"): read out as it appears, for a failure no field owns. Floating, it is
@@ -13,6 +14,8 @@
    *
    * floating: a red bubble with an arrow, hanging under the nearest positioned ancestor (the field), over what follows, so nothing
    * shifts when it appears. Dismissing hides it until the message changes; the control keeps its invalid style.
+   * It drops in from its control and lifts away as it goes; the inline one fades in and goes at once, so the layout
+   * after it doesn't wait on a fade.
    * TextField, TextArea and Select draw a floating one themselves from their `error` prop.
    *
    * message: the text. id: so a control can point at it with aria-describedby. ondismiss: runs after the bubble
@@ -35,7 +38,16 @@
 </script>
 
 {#if shown}
-  <p {id} class={['error', className]} class:floating data-tone="danger" role={floating ? undefined : 'alert'} {...rest}>
+  <p
+    {id}
+    class={['error', className]}
+    class:floating
+    data-tone="danger"
+    role={floating ? undefined : 'alert'}
+    {...rest}
+    in:fly={{ y: floating ? -4 : 0, duration: durations.short3 }}
+    out:fly={{ y: floating ? -4 : 0, duration: floating ? durations.short2 : 0 }}
+  >
     <Icon name="warning" size="sm" />
     <span class="text">{message}</span>
     {#if floating}
