@@ -26,6 +26,7 @@ export { default as Modal } from './components/Modal.svelte'
 export { default as Drawer } from './components/Drawer.svelte'
 export { default as SideMenu, SideMenuGroup, SideMenuItem } from './components/side-menu/index.js'
 export { default as Tile, TileGroup } from './components/tiles/index.js'
+export { default as Metadata, MetadataRow } from './components/metadata/index.js'
 
 export { default as ButtonGroup } from './components/inputs/ButtonGroup.svelte'
 export { default as FileButton } from './components/inputs/FileButton.svelte'

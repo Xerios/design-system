@@ -31,22 +31,22 @@ export function byVersion(entries) {
     <div class="prose full specimen">
       <h1>Heading 1, 26px</h1>
       <h2>Heading 2, 20px</h2>
-      <h3>Heading 3, 16px</h3>
-      <h4>Heading 4, 14px</h4>
-      <h5>Heading 5, 13px</h5>
-      <h6>Heading 6, 13px and muted</h6>
+      <h3>Heading 3, 17px</h3>
+      <h4>Heading 4, 15px</h4>
+      <h5>Heading 5, 14px</h5>
+      <h6>Heading 6, 14px and muted</h6>
     </div>
   </Demo>
   <Demo label="Running text and inline elements">
     <div class="prose full">
       <p>
-        Body text is 14px, with room between the lines for reading. It holds <a href="#typography">links</a>,
+        Body text is 15px on a 24px line, with room between the lines for reading. It holds <a href="#typography">links</a>,
         <strong>strong</strong> and <em>emphasised</em> words, <code>inline code</code>, keys such as <kbd>⌘</kbd>
         <kbd>K</kbd>, <mark>highlighted text</mark>, an <abbr title="Application programming interface">API</abbr> with its expansion on hover,
         <small>small print</small>, <del>removed</del> and <ins>inserted</ins> words,
         <s>no longer true</s>, H<sub>2</sub>O and 2<sup>10</sup>.
       </p>
-      <p>A second paragraph starts 12px below the first. Lines never end in a lone word where the browser can avoid it.</p>
+      <p>A second paragraph starts 20px below the first. Lines never end in a lone word where the browser can avoid it.</p>
     </div>
   </Demo>
   <Demo label="Lists">

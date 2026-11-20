@@ -368,6 +368,38 @@ dialog[open] {
     scale: 1.16;
   }
 }
+/* Modal dialogs (.dialog: Modal and the confirm and prompt dialogs) bounce in instead: scaling up from 90% on a spring
+   (--ease-spring), past full size and back, while the fade finishes in the first 120ms. Closing, they drop 4px, then lift
+   12px above where they sat, shrinking back to 90% and fading out, over 240ms; the scrim fades with them. Scoped to the
+   class because Drawer slides by translate and takes the base dialog's timing, which a dip would make lurch. */
+.dialog {
+  translate: 0 -12px;
+  scale: 0.9;
+  transition:
+    opacity var(--dur-dip) var(--ease-exit),
+    translate var(--dur-dip) var(--ease-dip),
+    scale var(--dur-dip) var(--ease-exit),
+    overlay var(--dur-dip) allow-discrete,
+    display var(--dur-dip) allow-discrete;
+}
+.dialog[open] {
+  transition:
+    opacity var(--dur-enter) var(--ease-enter),
+    translate var(--dur-spring) var(--ease-spring),
+    scale var(--dur-spring) var(--ease-spring),
+    overlay var(--dur-spring) allow-discrete,
+    display var(--dur-spring) allow-discrete;
+}
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    translate: 0 0;
+    scale: 0.9;
+  }
+}
+.dialog::backdrop {
+  transition-duration: var(--dur-dip);
+}
 /* A modal holds the page still: scroll gestures inside it, or on the backdrop, don't chain to the page underneath, whether
    or not the dialog scrolls. The backdrop must be a scroll container (overflow: hidden, not clip) for overscroll-behavior
    to apply. Never overflow: hidden on <html> for this: it drops the scrollbar, shifts the layout and breaks sticky. */

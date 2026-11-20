@@ -1,12 +1,28 @@
 <script>
-  /** Kitchen sink: the global classes in css/atoms.css drawn on plain elements: chips, counts, keys, links, the plain table. */
+  /**
+   * Kitchen sink: the global classes in css/atoms.css drawn on plain elements: chips, counts, keys, links, the plain table;
+   * and the light and texture from css/effects.css and the tokens: shine, corner glow, grain.
+   */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Icon from '../components/Icon.svelte'
   import { tooltip } from '../lib/tooltip.js'
 </script>
 
 <Section id="atoms" title="Atoms" intro="Classes for plain elements, for the small things that don't need a component.">
+  <Demo label="Chip buttons">
+    <Case label="Borderless: hover for the fill">
+      <button type="button" class="chip-btn"><Icon name="circleDashed" />Planned</button>
+      <button type="button" class="chip-btn"><Icon name="monitor" />Web app</button>
+      <a class="chip-btn" href="#atoms"><Icon name="link" />A link</a>
+      <button type="button" class="chip-btn" disabled><Icon name="star" />Disabled</button>
+    </Case>
+    <Case label="Outlined, led by dots">
+      <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot="var(--info)"></span>Design</button>
+      <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot="var(--warning)"></span>Core experience</button>
+    </Case>
+  </Demo>
   <Demo label="Label chips and tones">
     {#each ['success', 'info', 'warning', 'neutral', 'danger'] as tone (tone)}
       <span class="label-chip" data-tone={tone}><span class="label-dot"></span>{tone}</span>
@@ -34,11 +50,52 @@
       </table>
     </div>
   </Demo>
+  <Demo label="Shine, corner glow, grain">
+    <Case label="Shine (.shine): a beam on the edge, placed with --shine-x and --shine-y">
+      <div class="specimen shine">Default</div>
+      <div class="specimen shine" style:--shine-x="100%" style:--shine-y="0">Top right</div>
+    </Case>
+    <Case label="Corner glow (.corner-glow): a soft light from the top-left corner">
+      <div class="specimen">Without</div>
+      <div class="specimen"><span class="corner-glow" aria-hidden="true"></span>With</div>
+    </Case>
+    <Case label="Grain (--grain): film grain over the scrim, as modal backdrops draw it">
+      <div class="specimen scrim">Scrim</div>
+      <div class="specimen scrim grain">Scrim with grain</div>
+    </Case>
+  </Demo>
 </Section>
 
 <style>
   .full {
     width: 100%;
     min-width: 0;
+  }
+  /* A card to light: its own stacking context, so the shine stays under the page's sticky parts and the glow behind
+     the label. */
+  .specimen {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    width: 160px;
+    min-height: 96px;
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    background: var(--view-bg);
+    font-size: 12px;
+    color: var(--fg-2);
+  }
+  .scrim {
+    background:
+      linear-gradient(var(--scrim), var(--scrim)),
+      var(--view-bg);
+  }
+  .scrim.grain {
+    background:
+      var(--grain) 0 0 / 256px 256px,
+      linear-gradient(var(--scrim), var(--scrim)),
+      var(--view-bg);
   }
 </style>

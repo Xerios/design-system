@@ -269,7 +269,7 @@
   padding-right: 16px;
 }
 
-.data-table :is(th, td)+ :is(th, td) {
+.data-table :is(th, td) + :is(th, td) {
   border-left: 1px solid var(--line);
 }
 
@@ -386,6 +386,50 @@
   flex: none;
 }
 
+/* Chip buttons (Linear's property pills): the interactive, borderless counterpart of .label-chip, for a value that opens
+   or changes something (a status, an owner, a link). Transparent until hovered; secondary text led by an icon at its
+   default 16px or a .label-dot. .outlined adds the hairline, for a row of labels. On a <button> or an <a>. */
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  max-width: 100%;
+  padding: 0 8px 0 6px;
+  flex: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: none;
+  font: var(--w-medium) 12px/14px var(--font-body);
+  color: var(--fg-2);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+
+.chip-btn.outlined {
+  border-color: var(--line-strong);
+}
+
+.chip-btn:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  background: var(--fill-3);
+  color: var(--fg);
+}
+
+.chip-btn:active:where(:not(:disabled, [aria-disabled='true'])),
+.chip-btn[aria-expanded='true'] {
+  background: var(--fill-4);
+  color: var(--fg);
+}
+
+.chip-btn:where(:disabled, [aria-disabled='true']) {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* Label above every form control (custom inputs share it). */
 /* The box a text field draws (TextField, TextArea, TagInput): sunken, the opposite of a raised button. A faint fill
    inside an inset hairline, pressed into the surface (--sunken-shadow, the raised controls' shadow inside out). Focus turns the hairline
@@ -439,7 +483,7 @@
   min-width: 0;
 }
 
-.field-head>.info {
+.field-head > .info {
   margin-block: -5px;
 }
 
@@ -532,20 +576,21 @@
 }
 /* ---------- prose ---------- */
 /* Long-form text (docs, release notes, rendered markdown): put .prose on the block and its plain elements are styled,
-   from headings and lists to quotes, code and tables. Its text is a step up from the app's: 14px body (13px for its
-   secondary text, code and tables), with headings stepping up from that. Space goes above each
-   block, never below, and the first child takes none, so it sits flush in whatever holds it. Selectors are :where()
-   after the class, so any one-class rule of the app's overrides them. */
+   from headings and lists to quotes, code and tables. Set like Linear's descriptions: a step up from the app's text,
+   15px on a 24px line, tracked in slightly (13px for its secondary text, code and tables), with headings stepping up
+   from that; 20px between blocks, list items 6px apart. Space goes above each block, never below, and the first child
+   takes none, so it sits flush in whatever holds it. Selectors are :where() after the class, so any one-class rule of the app's overrides them. */
 .prose {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
+  letter-spacing: -0.011em;
   color: var(--fg-2);
   overflow-wrap: break-word;
 }
 
 /* Only blocks take the space: an inline-block such as kbd would grow its line with it. */
 .prose :where(* + :is(p, ul, ol, dl, pre, blockquote, figure, table, details, img, video, div)) {
-  margin-top: var(--space-3);
+  margin-top: var(--space-5);
 }
 
 .prose :where(h1, h2, h3, h4, h5, h6) {
@@ -567,19 +612,19 @@
 }
 
 .prose :where(h3) {
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .prose :where(h4) {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .prose :where(h5) {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .prose :where(h6) {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: var(--w-medium);
   color: var(--muted);
 }
@@ -646,6 +691,7 @@
   color: var(--fg);
   font: 0.88em var(--font-data);
   font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
 }
 
 /* Code blocks scroll sideways rather than wrap, so the lines stay as written. */
@@ -658,6 +704,7 @@
   color: var(--fg);
   font: 13px/1.6 var(--font-data);
   font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
   tab-size: 2;
 }
 
@@ -683,11 +730,13 @@
   font-style: normal;
 }
 
+/* A bullet hangs in a 16px column, as in Linear's descriptions; numbers take a little more. */
 .prose :where(ul, ol) {
   padding-inline-start: var(--space-5);
 }
 
 .prose :where(ul) {
+  padding-inline-start: var(--space-4);
   list-style: disc;
 }
 
@@ -705,7 +754,7 @@
 
 /* List items sit closer than paragraphs, and so does a list nested in one. */
 .prose :where(li + li, li > :is(ul, ol)) {
-  margin-top: var(--space-1);
+  margin-top: calc(var(--space-1) * 1.5);
 }
 
 .prose :where(li)::marker {

@@ -10,6 +10,8 @@
   import SideMenu from '../components/side-menu/index.js'
   import Button from '../components/Button.svelte'
   import Table from '../components/Table.svelte'
+  import Metadata from '../components/metadata/index.js'
+  import Case from './Case.svelte'
   import { scrollFade } from '../lib/scroll-fade.js'
 
   const PEOPLE = [
@@ -36,6 +38,11 @@
   let open = $state(true)
   let width = $state(260)
   let picked = $state('starred')
+  let done = $state(false)
+  let labels = $state([
+    { name: 'Design', tone: 'info' },
+    { name: 'Core experience', tone: 'warning' },
+  ])
   let displaysOpen = $state(false)
   const LINES = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: scroll to see the edges fade while there is more.`)
 </script>
@@ -114,6 +121,54 @@
       <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
   </Demo>
+  <Demo label="Metadata" wide>
+    <Case label="Chip buttons as values, a label that adds one (Labels), a description under it">
+      <div class="full">
+        <Metadata>
+          <Metadata.Row label="Properties">
+            <button type="button" class="chip-btn" onclick={() => (done = !done)}>
+              <Icon name={done ? 'checkCircle' : 'circleDashed'} />{done ? 'Done' : 'Planned'}
+            </button>
+            <button type="button" class="chip-btn"><Icon name="caretUp" />High</button>
+            <button type="button" class="chip-btn"><Icon name="monitor" />Web app</button>
+          </Metadata.Row>
+          <Metadata.Row
+            label="Labels"
+            labelTip="Add a label"
+            onlabelclick={() => labels.push({ name: `Label ${labels.length + 1}`, tone: 'success' })}
+          >
+            {#each labels as l (l.name)}
+              <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot={`var(--${l.tone})`}></span>{l.name}</button>
+            {/each}
+          </Metadata.Row>
+          <Metadata.Row label="Resources">
+            <a class="chip-btn" href="#content"><Icon name="link" />Design explorations</a>
+            <a class="chip-btn" href="#content"><Icon name="external" />Friction log</a>
+          </Metadata.Row>
+        </Metadata>
+        <div class="prose described">
+          <p>Refreshes the busiest views so they load faster and read more clearly, in line with the current design system.</p>
+          <ul>
+            <li>Lay out the home screen for a faster first load</li>
+            <li>Fewer status states, with a clearer order</li>
+          </ul>
+        </div>
+      </div>
+    </Case>
+    <Case label="Narrow: values wrap beside their label">
+      <div class="narrow">
+        <Metadata>
+          <Metadata.Row label="Properties">
+            <span class="label-chip"><Icon name="circleDashed" size="sm" />Planned</span>
+            <span class="label-chip"><Icon name="caretUp" size="sm" />High</span>
+            <span class="label-chip"><Icon name="monitor" size="sm" />Web app</span>
+            <span class="label-chip"><Icon name="calendar" size="sm" />Next cycle</span>
+          </Metadata.Row>
+          <Metadata.Row label="Owner"><span class="label-chip">Platform team</span></Metadata.Row>
+        </Metadata>
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Inline markdown, no {'{@html}'}">
     <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
   </Demo>
@@ -150,6 +205,13 @@
   .full {
     width: 100%;
     min-width: 0;
+  }
+  .described {
+    margin-top: var(--space-8);
+  }
+  .narrow {
+    width: 100%;
+    max-width: 280px;
   }
   .stack {
     display: grid;
