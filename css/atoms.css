@@ -189,6 +189,19 @@
     overlay var(--dur-enter) allow-discrete,
     display var(--dur-enter) allow-discrete;
 }
+/* A tip with a detail line (tooltip(text, { detail })): the text in bold over the detail, which breaks anywhere so a long
+   name without spaces still wraps inside the tip. */
+.tooltip-lines {
+  display: grid;
+  min-width: 0;
+}
+.tooltip-lines > strong {
+  color: var(--fg);
+  font-weight: var(--w-semibold);
+}
+.tooltip-lines > span {
+  overflow-wrap: anywhere;
+}
 /* Closed, it carries the exit timing (a transition takes the timing of the state it moves to). Only a browser that knows
    :popover-open hides it here, so one that doesn't still shows the tip. */
 .tooltip:not(:popover-open) {

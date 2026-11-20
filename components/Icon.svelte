@@ -19,6 +19,9 @@
   import starFill from '@phosphor-icons/core/fill/star-fill.svg?raw'
   import more from '@phosphor-icons/core/regular/dots-three.svg?raw'
   import upload from '@phosphor-icons/core/regular/upload-simple.svg?raw'
+  import fileBlank from '@phosphor-icons/core/regular/file.svg?raw'
+  import folderSimple from '@phosphor-icons/core/regular/folder.svg?raw'
+  import image from '@phosphor-icons/core/regular/image.svg?raw'
   import arrowLeft from '@phosphor-icons/core/regular/arrow-left.svg?raw'
   import arrowRight from '@phosphor-icons/core/regular/arrow-right.svg?raw'
   import arrowDown from '@phosphor-icons/core/regular/arrow-down.svg?raw'
@@ -69,6 +72,9 @@
     starFill,
     more,
     upload,
+    fileBlank,
+    folderSimple,
+    image,
     arrowLeft,
     arrowRight,
     arrowDown,

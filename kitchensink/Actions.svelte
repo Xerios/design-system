@@ -1,10 +1,9 @@
 <script>
-  /** Kitchen sink: Button in all its states, the file button, the context menu with its visible ⋯ twin, and tiles. */
+  /** Kitchen sink: Button in all its states, the context menu with its visible ⋯ twin, and tiles. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
   import Button from '../components/Button.svelte'
-  import FileButton from '../components/inputs/FileButton.svelte'
   import MenuButton from '../components/menu/MenuButton.svelte'
   import Tile from '../components/tiles/Tile.svelte'
   import { contextMenu } from '../lib/menu.svelte.js'
@@ -16,7 +15,6 @@
       throw new Error('The server refused it. Try again in a minute.')
     })
 
-  let files = $state('')
   let picked = $state('nothing yet')
   let pending = $state(false)
   let pressed = $state('nothing yet')
@@ -75,9 +73,6 @@
     <Case label="As a link">
       <Button href="#actions">A link drawn as a button</Button>
     </Case>
-  </Demo>
-  <Demo label="File button">
-    <FileButton label="Choose files" multiple chosen={files} onfiles={(list) => (files = list.map((f) => f.name).join(', '))} onclear={() => (files = '')} />
   </Demo>
   <Demo label="Context menu and its ⋯ twin">
     <button type="button" class="target" {@attach contextMenu(menuItems, 'Demo item')}>Right-click, Shift+F10 or the Menu key</button>

@@ -20,6 +20,7 @@
   import DateRangeSelect from '../components/inputs/DateRangeSelect.svelte'
   import Tile from '../components/tiles/Tile.svelte'
   import TileGroup from '../components/tiles/TileGroup.svelte'
+  import Upload from '../components/upload/index.js'
   import { fieldErrors } from '../lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '../lib/invalid.js'
   import { addDays, today } from '../lib/dates.js'
@@ -43,6 +44,13 @@
   let topics = $state(['deploys', 'mentions'])
   let backups = $state(true)
   let keep = $state('30')
+  let upFile = $state(/** @type {File | null} */ (null))
+  let upFiles = $state(/** @type {File[]} */ ([]))
+  let upFolder = $state(/** @type {{ name: string, files: { path: string, file: File }[] } | null} */ (null))
+  let upImage = $state(/** @type {File | null} */ (null))
+  let upImages = $state(/** @type {File[]} */ ([]))
+  let zoneImages = $state(/** @type {File[]} */ ([]))
+  let zoneFile = $state(/** @type {File | null} */ (null))
   const KEEP = [
     { value: '7', label: '7 days' },
     { value: '30', label: '30 days' },
@@ -183,6 +191,52 @@
   <Demo label="Range from a list of dates">
     <DateRangeSelect bind:value={runs} dates={RUNS} id="ks-runs" label="Runs" />
   </Demo>
+  <Demo label="Upload" span={2}>
+    <Case label="File: pick or drop, and the button becomes the file">
+      <Upload.File bind:file={upFile} />
+      <span class="small muted">file: <span class="data">{upFile?.name ?? 'null'}</span></span>
+    </Case>
+    <Case label="Files: a list, added to">
+      <Upload.Files bind:files={upFiles} />
+      <span class="small muted">files: <span class="data">{upFiles.length}</span></span>
+    </Case>
+    <Case label="Folder: every file in it, with its path">
+      <Upload.Folder bind:folder={upFolder} />
+      <span class="small muted">first path: <span class="data">{upFolder?.files[0]?.path ?? 'null'}</span></span>
+    </Case>
+    <Case label="Image: a thumbnail">
+      <Upload.Image bind:file={upImage} />
+    </Case>
+    <Case label="Images: a grid, added to">
+      <Upload.Images bind:files={upImages} />
+    </Case>
+    <Case label="Image: at most 100 KB (the default is 10 MB)">
+      <div class="bubble-room">
+        <Upload.Image label="Choose icon" maxSize={100 * 1024} />
+      </div>
+    </Case>
+    <Case label="Zone: drop anywhere on it">
+      <Upload.Zone class="full">
+        <Upload.Images bind:files={zoneImages} />
+      </Upload.Zone>
+    </Case>
+    <Case label="Zone, bare: any area, marked only while files are over it">
+      <div class="drop-panel">
+        <Upload.Zone bare>
+          <div class="drop-panel-body">
+            <p class="small muted">A panel with content of its own. Files dropped anywhere on it go to the picker below.</p>
+            <Upload.File bind:file={zoneFile} />
+          </div>
+        </Upload.Zone>
+      </div>
+    </Case>
+    <Case label="With an error, or disabled">
+      <div class="bubble-room">
+        <Upload.File label="Attach the contract" accept=".pdf" error="Attach the signed contract." />
+        <Upload.File label="Choose file" disabled />
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Tile group" span={2}>
     <Case label="One choice: arrows move and choose">
       <div class="full">
@@ -275,6 +329,20 @@
   .full {
     width: 100%;
     min-width: 0;
+  }
+  .drop-panel {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .drop-panel-body {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+  .drop-panel-body p {
+    margin: 0;
   }
   .one-tile {
     width: 100%;
