@@ -33,6 +33,8 @@
   import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
+  import { reveal } from '../../lib/reveal.js'
+  import DashOutline from '../DashOutline.svelte'
   import { compare, dateListShortcuts, dayOf, formatWhen, monthRuns, today } from '../../lib/dates.js'
 
   /**
@@ -142,11 +144,28 @@
     choose(/** @type {[string, string]} */ ([first, day].toSorted(compare)))
   }
 
+  /**
+   * Attachment on the span's band: lays it behind the rows from the span's later end (on top, newest first) to its
+   * earlier one, measured, since a month's heading can sit between them. Runs again whenever the span changes.
+   * @param {[string, string] | null} _span @param {string | null} _first
+   */
+  const band = (_span, _first) => (/** @type {HTMLElement} */ node) => {
+    // After the rows have taken their new classes (they come after the band, so they update after it).
+    tick().then(() => {
+      const top = /** @type {HTMLElement | null} */ (list?.querySelector('.span-top'))
+      const bottom = /** @type {HTMLElement | null} */ (list?.querySelector('.span-bottom'))
+      node.hidden = !top || !bottom
+      if (!top || !bottom) return
+      node.style.top = `${top.offsetTop}px`
+      node.style.height = `${bottom.offsetTop + bottom.offsetHeight - top.offsetTop}px`
+    })
+  }
+
   /** @param {number} i */
   function moveTo(i) {
     active = Math.min(Math.max(i, 0), newest.length - 1)
     if (first) pointed = newest[active]
-    list?.querySelector(`[data-i="${active}"]`)?.scrollIntoView({ block: 'nearest' })
+    reveal(list, list?.querySelector(`[data-i="${active}"]`))
   }
 
   /** @param {KeyboardEvent} e */
@@ -187,7 +206,8 @@
 
 {#snippet option(/** @type {string} */ day, /** @type {number} */ i)}
   {@const inSpan = !!span && day >= span[0] && day <= span[1]}
-  {@const edge = !!span && (day === span[0] || day === span[1])}
+  <!-- While the second press is pending only the first date is solid; the other end is where the pointer is. -->
+  {@const edge = !!span && (first ? day === first : day === span[0] || day === span[1])}
   <!-- Keyboard is handled on the listbox (aria-activedescendant pattern); options only take pointer input. -->
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <li
@@ -198,6 +218,8 @@
     class:active={i === active}
     class:edge
     class:between={inSpan && !edge}
+    class:span-top={!!span && day === span[1]}
+    class:span-bottom={!!span && day === span[0]}
     onpointerenter={() => ((active = i), first && (pointed = day))}
     onclick={() => pick(day)}
   >
@@ -238,12 +260,13 @@
       transition:pop={{ from: button }}
       onkeydown={onPanelKey}
     >
-      <p class="hint small muted" id="{id}-hint" aria-live="polite">{first ? `From ${formatWhen(first)}: pick the last date` : 'Pick the first date'}</p>
-      {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
+      <div class="top">
+        <p class="hint small muted" id="{id}-hint" aria-live="polite">{first ? `From ${formatWhen(first)}: pick the last date` : 'Pick the first date'}</p>
+        {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
+      </div>
       <ul
         bind:this={list}
         class="list"
-        class:grouped={months.length > 1}
         role="listbox"
         tabindex="0"
         aria-multiselectable="true"
@@ -252,10 +275,12 @@
         aria-activedescendant="{id}-opt-{active}"
         onkeydown={onListKey}
       >
+        <!-- The span's band, behind its rows from end to end (see .band). -->
+        <li class="band" class:pending={!!first} class:down={!!first && !!span && first === span[1]} role="none" {@attach band(span, first)}>{#if first}<DashOutline />{/if}</li>
         {#if months.length > 1}
           {#each months as month (month.key)}
             <li class="group" role="group" aria-labelledby="{id}-month-{month.key}">
-              <div class="group-head" id="{id}-month-{month.key}">{month.label}</div>
+              <div class="group-head" id="{id}-month-{month.key}" data-sticky-head>{month.label}</div>
               <ul role="none">
                 {#each month.items as { item: day, index } (day)}{@render option(day, index)}{/each}
               </ul>
@@ -292,7 +317,7 @@
     border-radius: var(--r);
     background: var(--control-2);
     color: var(--fg-2);
-    font: 400 13px var(--font-data);
+    font: var(--w-medium) 13px var(--font-data);
     font-variant-numeric: tabular-nums;
     text-align: left;
     cursor: pointer;
@@ -318,13 +343,17 @@
     border-color: var(--line);
     cursor: default;
   }
+  /* Focused, it sits flat inside the ring, as Select's does. */
   .trigger:focus-visible {
     border-color: var(--accent-line);
-    box-shadow: var(--raise), var(--ring);
+    box-shadow: var(--ring);
     outline: none;
   }
   .trigger:global([aria-invalid='true']) {
     border-color: var(--danger);
+  }
+  .trigger:global([aria-invalid='true']):focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
   }
   .value {
     min-width: 0;
@@ -358,31 +387,45 @@
       flip-inline,
       flip-block flip-inline;
     position-visibility: anchors-visible;
-    display: grid;
-    gap: var(--space-2);
+    /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
+       end at the field's right edge: a flip swaps the inline margins too). */
+    margin-inline-start: calc(var(--space-1) * -1);
+    display: flex;
+    flex-direction: column;
     width: max-content;
     min-width: max(anchor-size(width), 224px);
     max-width: calc(100dvw - 32px);
     margin-block: 4px;
-    padding: var(--space-2);
-    border: 1px solid var(--line-float);
+    overflow: hidden;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--elevated), var(--elevated)) padding-box,
+      var(--edge-grad-float);
     border-radius: var(--r-lg);
-    background: var(--elevated);
     box-shadow: var(--shadow);
     color: var(--fg);
   }
+  /* The hint and the shortcuts above the list, with a hairline under them from edge to edge (as Select's search). */
+  .top {
+    flex: none;
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-2) 4px;
+    border-bottom: 1px solid var(--line);
+  }
   .hint {
     margin: 0;
-    padding-inline: var(--space-2);
+    padding: 2px var(--space-2) 0;
   }
   .list {
-    max-height: min(264px, calc(100dvh - 160px));
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: min(280px, calc(100dvh - 160px));
     margin: 0;
-    padding: 0;
+    padding: 4px;
     overflow-y: auto;
     overscroll-behavior: contain;
     list-style: none;
-    border-radius: var(--r);
     /* Positioned: the options' offsetTop (opening on the value) counts from the list. */
     position: relative;
     --head: 26px;
@@ -392,11 +435,8 @@
     padding: 0;
     list-style: none;
   }
-  /* Keyboard scrolling (scrollIntoView) stops short of the sticky heading, so it never covers the active date. */
-  .list.grouped {
-    scroll-padding-top: var(--head);
-  }
-  /* A month's heading, kept at the top while its dates scroll under it. */
+  /* A month's heading, kept at the top while its dates scroll under it, across the list's whole width (as Select's
+     group headings). It sticks at the list's content edge, 4px below its top: that strip is filled too. */
   .group-head {
     position: sticky;
     top: 0;
@@ -404,45 +444,91 @@
     display: flex;
     align-items: center;
     min-height: var(--head);
-    padding: 0 var(--space-2);
+    margin-inline: -4px;
+    padding: 0 10px 0 12px;
     background: var(--elevated);
+    box-shadow: 0 -4px 0 var(--elevated);
     color: var(--muted);
     font: var(--w-medium) 12px var(--font-body);
   }
+  /* A hairline between months, edge to edge. */
   .group + .group {
     margin-top: 4px;
+    margin-inline: -4px;
+    padding: 4px 4px 0;
+    border-top: 1px solid var(--line);
   }
   .list:focus {
     outline: none;
   }
+  /* Rows as Select's: 32px, the pointer's or keyboard's row filled (.active, which the pointer moves too). */
   [role='option'] {
     display: flex;
     align-items: center;
-    min-height: 30px;
-    padding: 0 var(--space-2);
-    border-radius: var(--r);
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: var(--r-sm);
     color: var(--fg-2);
-    font: var(--w-medium) 12px var(--font-data);
+    font: 13px var(--font-data);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     cursor: pointer;
   }
-  [role='option']:hover:not(.edge) {
+  .active {
     background: var(--control-3);
     color: var(--fg);
   }
+  /* Rows paint above the span's band (which is positioned). */
+  [role='option'] {
+    position: relative;
+  }
+  /* The span, one rounded block (Linear's timeline bars): its ends solid, and between them a band of the brand colour
+     that blends out of each end, strongest beside it and easing off in the middle. The rows between stay clear, so the
+     row under the pointer lights up on top of it. */
+  .band {
+    position: absolute;
+    inset-inline: 4px;
+    border-radius: var(--r-sm);
+    background: linear-gradient(
+      color-mix(in srgb, var(--brand) 24%, transparent),
+      color-mix(in srgb, var(--brand) 8%, transparent) 50%,
+      color-mix(in srgb, var(--brand) 24%, transparent)
+    );
+    pointer-events: none;
+  }
+  /* While the second press is pending, the span is only proposed: the band is Linear's tail, a dashed outline (what a
+     suggestion looks like here; DashOutline's spaced dashes) and a tint that fades in from the first date towards the
+     pointer. */
+  .band.pending {
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--brand) 0%, transparent),
+      color-mix(in srgb, var(--brand) 20%, transparent)
+    );
+  }
+  .band.pending.down {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--brand) 0%, transparent),
+      color-mix(in srgb, var(--brand) 20%, transparent)
+    );
+  }
   .between {
-    border-radius: 0;
-    background: var(--accent-soft);
     color: var(--fg);
   }
   .edge {
     background: var(--brand);
     color: var(--accent-ink);
   }
-  .list:focus-visible .active {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
+  /* The span reads as one block: newest first, its later end rounds off only on top and its earlier end only at the
+     bottom, joining the square rows between (one date alone stays round all over). */
+  .span-top:not(.span-bottom) {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .span-bottom:not(.span-top) {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
   }
   @media (pointer: coarse) {
     [role='option'] {

@@ -6,7 +6,11 @@
    *   <Calendar bind:month bind:focus selected={[value]} onpick={(day) => (value = day)} label="Start date" />
    *
    * month (bindable): any day in the month shown. focus (bindable): the day that holds the keyboard focus.
-   * selected: the chosen days. range: [from, to] to tint the days between (a range picker), or null.
+   * selected: the chosen days. range: [from, to] to tint the days between (a range picker), or null. The range is
+   * drawn as one bar per week (Linear's timeline bars): its ends solid, the days between tinted with the brand colour
+   * blending out of each end, strongest beside it. pending: the range is still being chosen, its second end following
+   * the pointer: only its selected end is solid, and the rest is a proposal, a dashed outline and a tint fading in from
+   * that end towards the other (Linear's bar tails).
    * min, max: the first and last day that can be picked; others show but can't be picked.
    * allowed: the only days that can be picked (within min and max), or null for every day.
    * onpick(day). onpoint(day): the day under the pointer or focus, for a range picker's preview.
@@ -20,6 +24,7 @@
    */
   import { tick } from 'svelte'
   import Button from '../Button.svelte'
+  import DashOutline from '../DashOutline.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { addDays, addMonths, monthGrid, monthOf, formatMonth, parse, speakDay, weekdayNames, within, today, compare } from '../../lib/dates.js'
 
@@ -29,6 +34,7 @@
    * @property {string} focus bindable
    * @property {string[]} [selected]
    * @property {[string, string] | null} [range]
+   * @property {boolean} [pending]
    * @property {string | null} [min]
    * @property {string | null} [max]
    * @property {string[] | null} [allowed]
@@ -43,6 +49,7 @@
     focus = $bindable(),
     selected = [],
     range = null,
+    pending = false,
     min = null,
     max = null,
     allowed = null,
@@ -57,6 +64,45 @@
   const weeks = $derived(monthGrid(month))
   const names = $derived(weekdayNames(weeks[0]))
   const span = $derived(range ? range.toSorted(compare) : null)
+  /** Days since the epoch, for counting the days in a range. @param {string} day */
+  const dayNumber = (day) => Date.parse(day) / 864e5
+  /** While pending: whether the solid (selected) end is the range's first day, so the tail runs forward. */
+  const fromStart = $derived(!!span && selected.includes(span[0]))
+  /** A range's end shown solid: both ends, or while pending only the selected one. @param {string} day */
+  const isEnd = (day) => !!span && (pending ? selected.includes(day) && (day === span[0] || day === span[1]) : day === span[0] || day === span[1])
+  /**
+   * How strong the brand tint is at a point t of the range (0 its first day, 1 its last), in percent: strongest beside
+   * the solid ends and easing off in the middle; while pending, fading in from the solid end towards the pointer.
+   * @param {number} t
+   */
+  const strength = (t) => (pending ? 20 * (fromStart ? t : 1 - t) : 24 - 32 * Math.min(t, 1 - t))
+  /** @param {number} p */
+  const mix = (p) => `color-mix(in srgb, var(--brand) ${Math.round(p * 10) / 10}%, transparent)`
+  /**
+   * A day's piece of the tint: a gradient from where the day before left off to where the day after picks up, so the
+   * pieces read as one blend along the range, week after week.
+   * @param {string} day
+   */
+  /**
+   * Where a pending day's slice of the dashed outline falls: the outline is the whole of this week's bar (from the
+   * range's start or the week's first day to its end or the week's last), and the day shows its own part of it, so the
+   * dashes run on unbroken from day to day.
+   * @param {string} day @param {number} col @param {number} days in the week
+   */
+  function slice(day, col, days) {
+    if (!span) return ''
+    const before = Math.min(col, dayNumber(day) - dayNumber(span[0]))
+    const after = Math.min(days - 1 - col, dayNumber(span[1]) - dayNumber(day))
+    return `--dash-x: calc(var(--day) * ${-before}); --dash-width: calc(var(--day) * ${before + after + 1}); --dash-radius: var(--r)`
+  }
+
+  function tint(day) {
+    if (!span) return undefined
+    const length = Math.max(1, dayNumber(span[1]) - dayNumber(span[0]))
+    const at = dayNumber(day) - dayNumber(span[0])
+    const clamp = (/** @type {number} */ t) => Math.min(1, Math.max(0, t))
+    return `linear-gradient(to right, ${mix(strength(clamp((at - 0.5) / length)))}, ${mix(strength(clamp((at + 0.5) / length)))})`
+  }
   /** The allowed days within min and max, or null when every day in them is. */
   const open = $derived(allowed ? allowed.filter((day) => within(day, min, max)) : null)
   const openSet = $derived(open ? new Set(open) : null)
@@ -283,12 +329,13 @@
     <tbody>
       {#each weeks as week (week[0])}
         <tr>
-          {#each week as day (day)}
+          {#each week as day, col (day)}
             {@const inMonth = monthOf(day) === monthOf(month)}
             {@const chosen = selected.includes(day)}
-            {@const between = span ? day > span[0] && day < span[1] : false}
-            {@const edge = span ? day === span[0] || day === span[1] : false}
-            <td role="gridcell" aria-selected={chosen || between || edge}>
+            {@const inRange = !!span && day >= span[0] && day <= span[1]}
+            {@const edge = isEnd(day)}
+            {@const between = inRange && !edge}
+            <td role="gridcell" aria-selected={chosen || inRange}>
               <button
                 type="button"
                 data-day={day}
@@ -296,13 +343,17 @@
                 class:outside={!inMonth}
                 class:chosen={chosen || edge}
                 class:between
+                class:bar-start={inRange && (day === span?.[0] || col === 0)}
+                class:bar-end={inRange && (day === span?.[1] || col === week.length - 1)}
+                style:--tint={between ? tint(day) : undefined}
                 tabindex={day === focus ? 0 : -1}
                 aria-label={speakDay(day)}
                 aria-current={day === now ? 'date' : undefined}
                 aria-disabled={can(day) ? undefined : 'true'}
                 onclick={() => pick(day)}
                 onpointerenter={() => onpoint?.(day)}
-                onfocus={() => onpoint?.(day)}>{Number(day.slice(8))}</button
+                onfocus={() => onpoint?.(day)}
+                >{Number(day.slice(8))}{#if pending && between}<DashOutline style={slice(day, col, week.length)} />{/if}</button
               >
             </td>
           {/each}
@@ -318,6 +369,8 @@
   .calendar {
     user-select: none;
     -webkit-user-select: none;
+    /* A day's width: the cells sit edge to edge, so a range's outline slices (slice()) line up by it. */
+    --day: 32px;
     display: grid;
     gap: var(--space-2);
     width: max-content;
@@ -403,7 +456,7 @@
   .day {
     display: grid;
     place-items: center;
-    width: 32px;
+    width: var(--day);
     height: 30px;
     padding: 0;
     border: 0;
@@ -424,10 +477,38 @@
   [aria-current='date'] {
     box-shadow: inset 0 0 0 1px var(--accent-line);
   }
+  /* A range: one bar per week, rounded only where it starts or ends (the range's ends, the week's ends). Between its
+     ends, each day's piece of the blended tint (--tint, from tint()); the day under the pointer lights up on top. */
+  .day {
+    position: relative;
+  }
   .between {
     border-radius: 0;
-    background: var(--accent-soft);
+    background: var(--tint);
     color: var(--fg);
+  }
+  .between:hover:not([aria-disabled='true']) {
+    background:
+      linear-gradient(var(--control-3), var(--control-3)),
+      var(--tint);
+  }
+  .bar-start {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .bar-end {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .between.bar-start,
+  .chosen.bar-start {
+    border-start-start-radius: var(--r);
+    border-end-start-radius: var(--r);
+  }
+  .between.bar-end,
+  .chosen.bar-end {
+    border-start-end-radius: var(--r);
+    border-end-end-radius: var(--r);
   }
   .chosen,
   .chosen:hover:not([aria-disabled='true']) {

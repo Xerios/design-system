@@ -114,6 +114,36 @@ export function dateListShortcuts() {
   ]
 }
 
+/**
+ * A day relative to today, from an id such as '-3d' (3 days ago), '-2w' (2 weeks ago), '-1m' (a month ago) or '+1d'
+ * (tomorrow); an ISO day is returned as it is; null for anything else. What a date filter stores when it means "3 days
+ * ago" rather than a fixed day, so the filter stays true to its label as the days pass.
+ * @param {string} id
+ * @returns {string | null}
+ */
+export function relativeDay(id) {
+  if (parse(id)) return id
+  const m = /^([+-]\d+)([dwm])$/.exec(id ?? '')
+  if (!m) return null
+  const n = Number(m[1])
+  return m[2] === 'm' ? addMonths(today(), n) : addDays(today(), m[2] === 'w' ? n * 7 : n)
+}
+
+/**
+ * Ready-made relative days for a date filter (FilterBar): [{ value, label }], value an id for relativeDay.
+ * @returns {{ value: string, label: string }[]}
+ */
+export function datePresets() {
+  return [
+    { value: '-1d', label: '1 day ago' },
+    { value: '-3d', label: '3 days ago' },
+    { value: '-1w', label: '1 week ago' },
+    { value: '-2w', label: '2 weeks ago' },
+    { value: '-1m', label: '1 month ago' },
+    { value: '-3m', label: '3 months ago' },
+  ]
+}
+
 const utc = { timeZone: 'UTC' }
 /** '18 Nov 2026' in the user's language. @param {string} day */
 export const formatDay = (day) => new Intl.DateTimeFormat(undefined, { ...utc, dateStyle: 'medium' }).format(parse(day) ?? undefined)

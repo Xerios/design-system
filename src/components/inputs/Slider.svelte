@@ -5,6 +5,8 @@
    *   <Slider bind:value={opacity} min={0} max={1} step={0.05} id="opacity" label="Opacity" format={(v) => `${Math.round(v * 100)}%`} />
    *
    * format: how the value reads, beside the track (on the right) and to screen readers.
+   * ticks: a mark under the track at each stop. 'auto' (default): when there are 3 to 11 stops (1–5, 0–10, 0–100 in
+   * tens), so a few values to aim for show where they are; true, always; false, never (lib/ticks.js).
    * note, info, hideLabel: as on the other fields (see FieldLabel). Other attributes (class…) and attachments go to the
    * slider itself (role="slider").
    *
@@ -19,8 +21,10 @@
    * @property {string} [note]
    * @property {string} [info]
    * @property {boolean} [hideLabel]
+   * @property {'auto' | boolean} [ticks]
    */
   import FieldLabel from './FieldLabel.svelte'
+  import SliderTicks from './SliderTicks.svelte'
 
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
   let {
@@ -34,6 +38,7 @@
     note = '',
     info = '',
     hideLabel = false,
+    ticks = 'auto',
     class: className,
     ...rest
   } = $props()
@@ -95,6 +100,7 @@
       {onkeydown}
     >
       <div class="track" bind:this={track}><div class="fill"></div></div>
+      <SliderTicks {min} {max} {step} {ticks} on={(v) => v <= value} />
       <div class="thumb"></div>
     </div>
     <output for={id}>{format(value)}</output>

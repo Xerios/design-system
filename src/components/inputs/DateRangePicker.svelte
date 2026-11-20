@@ -164,6 +164,7 @@
           {label}
           selected={first ? [first] : value.filter(Boolean)}
           range={tint}
+          pending={!!first}
           onpoint={(day) => first && (pointed = day)}
           onpick={(day) => pick(day, close)}
         />

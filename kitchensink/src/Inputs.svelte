@@ -22,6 +22,10 @@
   import TileGroup from '@xerios/design-system/components/tiles/TileGroup.svelte'
   import FieldLabel from '@xerios/design-system/components/inputs/FieldLabel.svelte'
   import Upload from '@xerios/design-system/components/upload/index.js'
+  import FilterBar from '@xerios/design-system/components/filters/FilterBar.svelte'
+  import FilterChip from '@xerios/design-system/components/filters/FilterChip.svelte'
+  import OptionList from '@xerios/design-system/components/filters/OptionList.svelte'
+  import Icon from '@xerios/design-system/components/Icon.svelte'
   import { fieldErrors } from '@xerios/design-system/lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '@xerios/design-system/lib/invalid.js'
   import { addDays, today } from '@xerios/design-system/lib/dates.js'
@@ -36,6 +40,8 @@
   let filter = $state('all')
   let density = $state('comfortable')
   let opacity = $state(60)
+  let years = $state(3)
+  let band = $state(/** @type {[number, number]} */ ([2, 4]))
   let price = $state(/** @type {[number, number]} */ ([20, 80]))
   let due = $state('')
   let stay = $state(/** @type {[string, string]} */ (['', '']))
@@ -63,6 +69,61 @@
     (n, i) => `${addDays(today(), -n)}T${String(6 + ((i * 5) % 14)).padStart(2, '0')}:${i % 2 ? '30' : '05'}:00Z`,
   )
 
+  // Filters, on a job board: where a job is in your applications, how it's worked, the company, when it was posted,
+  // words in the listing and a salary floor (a custom field with its own editor).
+  const STAGES = [
+    { value: 'new', label: 'Not applied', icon: 'circleDashed', hint: '48 jobs' },
+    { value: 'applied', label: 'Applied', icon: 'paperPlane', tone: 'info', hint: '9 jobs' },
+    { value: 'interview', label: 'Interviewing', icon: 'chatsCircle', tone: 'warning', hint: '3 jobs' },
+    { value: 'offer', label: 'Offer', icon: 'checkCircle', tone: 'success', hint: '1 job' },
+    { value: 'rejected', label: 'Rejected', icon: 'xCircle', tone: 'danger', hint: '6 jobs' },
+  ]
+  const MODES = [
+    { value: 'remote', label: 'Remote', icon: 'globe', hint: '31 jobs' },
+    { value: 'hybrid', label: 'Hybrid', icon: 'house', hint: '22 jobs' },
+    { value: 'onsite', label: 'On-site', icon: 'buildings', hint: '14 jobs' },
+  ]
+  const LEVELS = ['Junior', 'Mid-level', 'Senior', 'Staff', 'Principal'].map((label) => ({ value: label.toLowerCase(), label }))
+  const COMPANIES = [
+    'Acme Robotics', 'Brightwave', 'Cobalt Labs', 'Driftwood Studio', 'Evergreen Health', 'Foxglove', 'Granite Bank',
+    'Halcyon Travel', 'Ironbark Energy', 'Juniper Games', 'Kestrel Logistics', 'Lumen Data',
+  ].map((label, i) => ({ value: label.toLowerCase().replace(/\s+/g, '-'), label, icon: 'buildings', hint: `${1 + ((i * 5) % 9)} jobs` }))
+  /** @type {import('svelte').ComponentProps<typeof FilterBar>['fields']} */
+  const FIELDS = [
+    { key: 'stage', label: 'Application', icon: 'paperPlane', options: STAGES, plural: 'stages' },
+    { key: 'mode', label: 'Work mode', icon: 'globe', options: MODES, plural: 'modes', operators: ['is any of', 'is not'] },
+    { key: 'level', label: 'Seniority', icon: 'steps', options: LEVELS, plural: 'levels' },
+    { key: 'company', label: 'Company', icon: 'buildings', options: COMPANIES, plural: 'companies' },
+    { key: 'posted', label: 'Posted', icon: 'clock', kind: 'date' },
+    { key: 'words', label: 'Keywords', icon: 'search', kind: 'text', operators: ['contain', "don't contain"] },
+    { key: 'salary', label: 'Salary', icon: 'currencyEur', kind: 'custom', operators: ['at least', 'at most'] },
+  ]
+  let filters = $state([
+    { field: 'posted', op: 'after', value: '-3d' },
+    { field: 'mode', op: 'is any of', value: ['remote'] },
+  ])
+  let manyFilters = $state([
+    { field: 'stage', op: 'is not', value: ['applied', 'interview', 'rejected'] },
+    { field: 'words', op: 'contain', value: ['svelte', 'typescript'] },
+    { field: 'salary', op: 'at least', value: 70 },
+  ])
+  let noFilters = $state([])
+  let chipOp = $state('is')
+  let chipStages = $state(['applied'])
+  let chipGone = $state(false)
+  let picked = $state(['applied', 'interview'])
+  let pickedCompanies = $state(['foxglove'])
+  let pickedLevel = $state('senior')
+  /** @param {number} k */
+  const euros = (k) => `€${k}k`
+
+  // Many options: past 8 the list gets a search field (accents don't matter: "zurich" finds Zürich).
+  const CITIES = ['Amsterdam', 'Barcelona', 'Berlin', 'Copenhagen', 'Dublin', 'Helsinki', 'Kraków', 'Lisbon', 'London', 'Madrid', 'Milan', 'Munich', 'Paris', 'Prague', 'Stockholm', 'Vienna', 'Warsaw', 'Zürich']
+  const LOCATIONS = [
+    { value: 'anywhere', label: 'Anywhere (remote)', group: 'Remote' },
+    ...CITIES.map((city) => ({ value: city, label: city, group: 'Offices' })),
+  ]
+  let location = $state('anywhere')
   const REGIONS = [
     { value: 'eu', label: 'Europe', hint: 'Frankfurt', group: 'Close by' },
     { value: 'uk', label: 'United Kingdom', hint: 'London', group: 'Close by' },
@@ -95,6 +156,13 @@
   }
 </script>
 
+{#snippet salaryPanel(/** @type {{ filter: { value: any }, set: (value: any) => void }} */ { filter, set })}
+  <div class="filter-salary">
+    <Slider bind:value={() => filter.value ?? 50, (k) => set(k)} min={20} max={200} step={5} id="ks-filter-salary" label="Yearly salary" format={euros} />
+  </div>
+{/snippet}
+{#snippet salarySummary(/** @type {{ filter: { value: any } }} */ { filter })}<span class="num">{euros(filter.value)}</span>{/snippet}
+
 <Section
   id="inputs"
   title="Inputs"
@@ -120,12 +188,60 @@
     <Case label="Grouped">
       <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
     </Case>
+    <Case label="Many options: a search field narrows the list">
+      <Select bind:value={location} options={LOCATIONS} id="ks-location" label="Location" />
+    </Case>
     <Case label="Loading, ghost, error">
       <div class="bubble-room">
         <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
         <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
         <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
       </div>
+    </Case>
+  </Demo>
+  <Demo label="Filter bar" wide>
+    <Case label="Applied filters: a relative date and a list of values">
+      <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
+    </Case>
+    <Case label="Several values, typed keywords and a custom field (salary, with a slider)">
+      <FilterBar bind:filters={manyFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
+    </Case>
+    <Case label="Nothing filtered yet (the custom field is left out without a panel snippet)">
+      <FilterBar bind:filters={noFilters} fields={FIELDS} label="Job filters" />
+    </Case>
+  </Demo>
+  <Demo label="Filter chip">
+    <Case label="A condition menu and a list of values">
+      {#if chipGone}
+        <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>
+      {:else}
+        <FilterChip
+          field={{ label: 'Application', icon: 'paperPlane' }}
+          operator={chipOp}
+          operators={['is', 'is not']}
+          onoperator={(op) => (chipOp = op)}
+          onremove={() => (chipGone = true)}
+        >
+          {#snippet value()}<span class="num">{chipStages.length}</span> {chipStages.length === 1 ? 'stage' : 'stages'}{/snippet}
+          {#snippet panel()}<OptionList bind:value={chipStages} options={STAGES} label="Application" />{/snippet}
+        </FilterChip>
+      {/if}
+    </Case>
+    <Case label="One condition, a value with no editor">
+      <FilterChip field={{ label: 'Role', icon: 'briefcase' }} operator="is" onremove={() => {}}>
+        {#snippet value()}Frontend engineer{/snippet}
+      </FilterChip>
+    </Case>
+  </Demo>
+  <Demo label="Option list (inside a panel)">
+    <Case label="Several, with icons, tones and counts">
+      <div class="panel-like"><OptionList bind:value={picked} options={STAGES} label="Application" autofocus={false} /></div>
+    </Case>
+    <Case label="More than 8: a search field narrows it">
+      <div class="panel-like"><OptionList bind:value={pickedCompanies} options={COMPANIES} label="Company" autofocus={false} /></div>
+    </Case>
+    <Case label="One, no icons">
+      <div class="panel-like"><OptionList bind:value={pickedLevel} options={LEVELS} multiple={false} label="Seniority" autofocus={false} /></div>
     </Case>
   </Demo>
   <Demo label="Tags (Enter or comma adds)">
@@ -173,10 +289,18 @@
     </div>
   </Demo>
   <Demo label="Slider and range slider">
-    <div class="stack">
-      <Slider bind:value={opacity} id="ks-opacity" label="Opacity" format={(v) => `${v}%`} />
-      <RangeSlider bind:value={price} min={0} max={200} step={5} gap={10} id="ks-price" label="Price" format={(v) => `€${v}`} />
-    </div>
+    <Case label="Fine steps: no ticks">
+      <div class="stack">
+        <Slider bind:value={opacity} id="ks-opacity" label="Opacity" format={(v) => `${v}%`} />
+        <RangeSlider bind:value={price} min={0} max={200} step={5} gap={10} id="ks-price" label="Price" format={(v) => `€${v}`} />
+      </div>
+    </Case>
+    <Case label="A few stops: a tick at each">
+      <div class="stack">
+        <Slider bind:value={years} min={0} max={10} id="ks-years" label="Years of experience" format={(v) => (v === 10 ? '10+' : String(v))} />
+        <RangeSlider bind:value={band} min={1} max={5} id="ks-band" label="Seniority" format={(v) => LEVELS[v - 1].label} />
+      </div>
+    </Case>
   </Demo>
   <Demo label="Date picker">
     <Case label="Within the next 90 days">
@@ -312,6 +436,21 @@
 <style>
   /* Room under a field showing its error for the bubble hanging below it (its offset and one line), so the bubble stays
      inside its Demo instead of covering the one tucked under it. Lays its fields out as a Case does. */
+  .panel-like {
+    width: 280px;
+    max-width: 100%;
+    border: 1px solid var(--line-float);
+    border-radius: var(--r-lg);
+    background: var(--elevated);
+  }
+  .num {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+  }
+  .filter-salary {
+    padding: var(--space-3);
+    width: 280px;
+  }
   .bubble-room {
     display: flex;
     flex-wrap: wrap;

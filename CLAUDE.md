@@ -36,6 +36,14 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   `.label-chip`, `.chip-btn` or `.btn` (`<Button class="suggested">`) with `.suggested`: a dashed outline in its resting
   state, turning solid as a button is hovered or pressed. Keep dashed outlines for this: no other control is dashed at
   rest (drop zones, which say where files go, aside).
+- A chosen span is one block (Linear's timeline bars). A range picked out of a list or grid (days, rows, steps) reads
+  as one rounded shape: its two ends solid `--brand`, rounded only on their outer side; the items between square, under
+  a brand tint that blends out of each end (strongest beside it, easing off in the middle) as one continuous gradient,
+  never a flat fill per item. Where it wraps (a calendar's weeks) it is one bar per line, rounded only where each bar
+  starts and ends. While its second end is still being chosen it is a proposal: only the fixed end is solid, and the rest
+  is a tint fading in from it towards the pointer inside a `DashOutline` (Linear's spaced dashes, open on the solid
+  side). The row under the pointer still lights up on top of the tint. `Calendar` (one bar per week) and
+  `DateRangeSelect` (one band behind its rows) draw it; follow them for a new one.
 - Text is 13px (12px for secondary and labels, 11px for counts), in px, as are the breakpoints. A box holding text gets
   `min-height`, not `height`. Weights `--w-medium` and `--w-semibold`.
   Numbers, counts, dates and code use `--font-data` with `font-variant-numeric: tabular-nums`. Sentence
@@ -80,6 +88,12 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   handlers, so a consumer's class adds to it and their attachments arrive. Snippets for the parts a consumer fills in.
 - Svelte 5 practice: `$derived` (writable when a value resets) over `$effect` that sets state; DOM work in
   `{@attach}`; page-wide listeners in `<svelte:document>` / `<svelte:window>`; ids from `$props.id()`.
+- Chrome can't be selected: a component's own chrome (anything you press, drag or read as a label: buttons, chips,
+  pills, segments, list rows, headings of lists, menus, toolbars, calendars) takes `user-select: none`. `base.css`
+  covers the common roles and atoms; a component built from plain `<span>`s and `<div>`s sets it in its own styles,
+  on its root. Content stays selectable (values worth copying, messages, prose; `user-select: text` on such a part
+  inside chrome). Never set it on an ancestor of a text field: Safari then won't let you type in it, so put it on the
+  field's siblings instead.
 - New tokens go in `css/tokens.css` with a comment, in the `:root` block as `light-dark(light, dark)` when they
   differ by theme (shadows: one `light-dark()` per layer colour, `transparent` for a layer one theme lacks), and
   in the README's token table. A non-colour value that differs needs its dark value twice below the

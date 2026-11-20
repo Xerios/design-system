@@ -217,6 +217,9 @@
       flip-inline,
       flip-block flip-inline;
     position-visibility: anchors-visible;
+    /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
+       end at the field's right edge: a flip swaps the inline margins too). */
+    margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
     padding: var(--space-3);
     border: 1px solid var(--line-float);

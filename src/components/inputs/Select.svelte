@@ -1,7 +1,8 @@
 <script>
   import Icon from '../Icon.svelte'
   /**
-   * Single-choice dropdown with a listbox popover. Keyboard: arrows, Home/End, type-ahead, Enter, Escape.
+   * Single-choice dropdown with a listbox popover. Keyboard: arrows, Home/End, type-ahead, Enter, Escape; with a search
+   * field the focus stays in it, arrows and Enter work the list, and Home/End, Space and letters are the field's.
    * Options: { value, label, text?, hint?, group? }. `label` shows on the button, `text` (if set) in the list.
    * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
@@ -11,6 +12,9 @@
    * error: a message from the app; the button turns red (aria-invalid, set by lib/invalid.js) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
+   * search: 'auto' (default: a ListSearch field at the top of the list when there are more than 8 options), true or
+   * false. Typing narrows the list (anywhere in an option's text, ignoring case and accents; lib/list-search.js) and
+   * puts the keyboard on the first match; Esc clears the text, then closes. searchPlaceholder: its text ("Filter…").
    * Other attributes (class…) and attachments go to the button.
    *
    *   <Select bind:value={region} options={REGIONS} id="region" label="Region" info="Where the files are served from." />
@@ -24,6 +28,9 @@
   import { observeSize } from '../../lib/observe.js'
   import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
   import { pop } from '../../lib/motion.js'
+  import ListSearch from './ListSearch.svelte'
+  import { matches, wantsSearch } from '../../lib/list-search.js'
+  import { reveal } from '../../lib/reveal.js'
 
   /**
    * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string }} Option
@@ -40,6 +47,8 @@
    * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [ghost]
    * @property {boolean} [disabled]
+   * @property {'auto' | boolean} [search]
+   * @property {string} [searchPlaceholder]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
@@ -55,18 +64,27 @@
     note = '',
     ghost = false,
     disabled = false,
+    search = 'auto',
+    searchPlaceholder = 'Filter…',
     class: className,
     ...rest
   } = $props()
   let open = $state(false)
   let active = $state(0)
   let button = $state(),
-    list = $state()
+    list = $state(),
+    listbox = $state(),
+    searchField = $state()
+  let query = $state('')
   const current = $derived(options.find((o) => o.value === value) ?? options[0])
   const text = (o) => o.text ?? o.label
-  // Runs of options with the same group, each keeping its index into `options` (what keyboard and ids use).
+  const searchable = $derived(wantsSearch(search, options.length))
+  // The options the search leaves, each with its index into `options` (what keyboard and ids use).
+  const shown = $derived(options.map((o, i) => ({ o, i })).filter(({ o }) => matches(text(o), query)))
+  const visible = $derived(shown.map(({ i }) => i))
+  // Runs of shown options with the same group.
   const sections = $derived(
-    options.reduce((acc, o, i) => {
+    shown.reduce((acc, { o, i }) => {
       const last = acc.at(-1)
       if (last && last.group === (o.group ?? null)) last.items.push({ o, i })
       else acc.push({ group: o.group ?? null, items: [{ o, i }] })
@@ -91,13 +109,22 @@
 
   async function show() {
     if (disabled || loading || !options.length) return
+    query = ''
     active = Math.max(0, options.indexOf(current))
     open = true
     await tick()
     // Open on the current option: centred in the list when the list scrolls.
-    const el = list.querySelector(`[data-i="${active}"]`)
-    if (el) list.scrollTop = el.offsetTop - (list.clientHeight - el.offsetHeight) / 2
-    list.focus()
+    const el = listbox?.querySelector(`[data-i="${active}"]`)
+    if (el) listbox.scrollTop = el.offsetTop - (listbox.clientHeight - el.offsetHeight) / 2
+    if (searchField) searchField.focus()
+    else listbox?.focus()
+  }
+  /** @param {string} q */
+  function narrow(q) {
+    query = q
+    // The keyboard goes to the first match (back on the current option when the text is cleared).
+    active = q ? (visible[0] ?? -1) : Math.max(0, options.indexOf(current))
+    tick().then(() => reveal(listbox, listbox?.querySelector(`[data-i="${active}"]`)))
   }
   async function runGroupAction(action) {
     action.run()
@@ -120,23 +147,27 @@
     }
   }
   function onListKey(e) {
-    const n = options.length
+    // Steps go through the options the search leaves.
+    const n = visible.length
+    const at = visible.indexOf(active)
     switch (e.key) {
       case 'ArrowDown':
-        active = (active + 1) % n
+        if (n) active = visible[(at + 1) % n]
         break
       case 'ArrowUp':
-        active = (active - 1 + n) % n
+        if (n) active = visible[at <= 0 ? n - 1 : at - 1]
         break
       case 'Home':
-        active = 0
-        break
       case 'End':
-        active = n - 1
+        if (searchable) return // the caret's
+        if (n) active = e.key === 'Home' ? visible[0] : visible[n - 1]
+        break
+      case ' ':
+        if (searchable) return // a space in the search
+        if (at >= 0) choose(active)
         break
       case 'Enter':
-      case ' ':
-        choose(active)
+        if (at >= 0) choose(active)
         break
       case 'Escape':
         hide()
@@ -145,7 +176,7 @@
         hide()
         return // back on the button first, so Tab moves on from there (the list sits at the end of <body>)
       default: {
-        if (e.key.length !== 1) return
+        if (searchable || e.key.length !== 1) return
         const k = e.key.toLowerCase()
         const order = [...options.keys()].slice(active + 1).concat([...options.keys()].slice(0, active + 1))
         const hit = order.find((i) => text(options[i]).toLowerCase().startsWith(k))
@@ -155,7 +186,7 @@
     }
     e.preventDefault()
     e.stopPropagation()
-    list.querySelector(`[data-i="${active}"]`)?.scrollIntoView({ block: 'nearest' })
+    reveal(listbox, listbox?.querySelector(`[data-i="${active}"]`))
   }
 
   // While open, a press outside closes the list. The label counts as the button (its click toggles the list), so pressing
@@ -218,24 +249,38 @@
       {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
     </button>
     {#if open}
-      <ul
-        bind:this={list}
-        style:position-anchor={anchor}
-        class="list"
-        data-floating
-        {@attach topLayer(button)}
-        transition:pop={{ from: button }}
-        role="listbox"
-        tabindex="-1"
-        aria-labelledby="{id}-label"
-        aria-activedescendant="{id}-opt-{active}"
-        onkeydown={onListKey}
-      >
+      {@const activeId = visible.includes(active) ? `${id}-opt-${active}` : undefined}
+      <div bind:this={list} style:position-anchor={anchor} class="list" data-floating {@attach topLayer(button)} transition:pop={{ from: button }}>
+        {#if searchable}
+          <ListSearch
+            bind:this={searchField}
+            value={query}
+            oninput={narrow}
+            {label}
+            controls="{id}-listbox"
+            active={activeId}
+            placeholder={searchPlaceholder}
+            onkeydown={onListKey}
+          />
+        {/if}
+        <!-- With a search field the focus stays in it: a press on the list mustn't take it (mousedown is what moves it). -->
+        <ul
+          bind:this={listbox}
+          id="{id}-listbox"
+          class="options"
+          role="listbox"
+          tabindex="-1"
+          aria-labelledby="{id}-label"
+          aria-activedescendant={searchable ? undefined : activeId}
+          onkeydown={searchable ? undefined : onListKey}
+          onmousedown={searchable ? (e) => e.preventDefault() : undefined}
+        >
         {#each sections as sec, si (si)}
           {#if sec.group}
             {@const action = groupActions[sec.group]}
             <li class="group" role="group" aria-labelledby="{id}-group-{si}">
-              <div class="group-head">
+              <!-- Sticky: lib/reveal.js keeps the keyboard's option clear of it. -->
+              <div class="group-head" data-sticky-head>
                 <span id="{id}-group-{si}">{sec.group}</span>
                 {#if action}
                   <!-- Pointer only (keeps focus on the listbox, which owns the keyboard). -->
@@ -258,7 +303,9 @@
             {#each sec.items as { o, i } (i)}{@render option(o, i)}{/each}
           {/if}
         {/each}
-      </ul>
+        {#if !shown.length}<li class="empty" role="none">No matches</li>{/if}
+        </ul>
+      </div>
     {/if}
   </div>
   <ErrorMessage floating id="{id}-error" message={error} ondismiss={() => button?.focus()} />
@@ -380,24 +427,52 @@
       flip-inline,
       flip-block flip-inline;
     position-visibility: anchors-visible;
+    /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
+       end at the field's right edge: a flip swaps the inline margins too). */
+    margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
+    display: flex;
+    flex-direction: column;
     width: max-content;
     min-width: anchor-size(width);
     max-width: min(max(anchor-size(width), 440px), calc(100dvw - 32px));
-    max-height: min(280px, calc(100dvh - 16px));
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
+    max-height: min(320px, calc(100dvh - 16px));
+    overflow: hidden;
     border: 1px solid transparent;
     background:
       linear-gradient(var(--elevated), var(--elevated)) padding-box,
       var(--edge-grad-float);
     border-radius: var(--r-lg);
-    padding: 4px;
     box-shadow: var(--shadow);
   }
-  .list:focus {
+  /* The options scroll under the search field, which stays put. */
+  .options {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 280px;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    /* Positioned: the options' offsetTop (opening on the value) counts from the list. */
+    position: relative;
+    --head: 26px;
+  }
+  .options:focus {
     outline: none;
+  }
+  .empty {
+    display: block;
+    color: var(--muted);
+    cursor: default;
+  }
+  /* The box's edge is a gradient under a transparent border (base.css outlines listboxes; this one wraps the listbox). */
+  @media (forced-colors: active) {
+    .list {
+      border-color: CanvasText;
+    }
   }
   li {
     display: grid;
@@ -436,14 +511,23 @@
     padding-top: 4px;
     border-top: 1px solid var(--line);
   }
+  /* A group's heading stays at the top of the list while its options scroll under it (as DateRangeSelect's months do):
+     on the list's own surface, across its whole width. */
   .group-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    min-height: 26px;
-    padding: 0 6px 0 8px;
-    font: var(--w-medium) 11.5px var(--font-body);
+    min-height: var(--head);
+    margin-inline: -4px;
+    padding: 0 10px 0 12px;
+    background: var(--elevated);
+    /* It sticks at the list's content edge, 4px below its top: fill that strip too, so rows don't show through it. */
+    box-shadow: 0 -4px 0 var(--elevated);
+    font: var(--w-medium) 12px var(--font-body);
     color: var(--muted);
   }
   .group-action {

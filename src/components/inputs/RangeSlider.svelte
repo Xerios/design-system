@@ -6,6 +6,7 @@
    *
    * value (bindable): [from, to]. gap: the least distance kept between them (default 0, they may meet).
    * format: how a value reads, beside the track (on the right, "from – to") and to screen readers.
+   * ticks: a mark under the track at each stop, as Slider's ('auto' by default: when there are 3 to 11 stops).
    * note, info, hideLabel: as on the other fields (see FieldLabel).
    * Keyboard, on each thumb (each is its own slider, as the ARIA pattern has it): arrows step, PageUp / PageDown take a
    * tenth of the range, Home / End go as far as the other thumb allows. Pointer: drag a thumb, or press the track to
@@ -24,8 +25,10 @@
    * @property {string} [note]
    * @property {string} [info]
    * @property {boolean} [hideLabel]
+   * @property {'auto' | boolean} [ticks]
    */
   import FieldLabel from './FieldLabel.svelte'
+  import SliderTicks from './SliderTicks.svelte'
 
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
   let {
@@ -40,6 +43,7 @@
     note = '',
     info = '',
     hideLabel = false,
+    ticks = 'auto',
     class: className,
     ...rest
   } = $props()
@@ -127,6 +131,7 @@
       onpointercancel={up}
     >
       <div class="track" bind:this={track}><div class="fill"></div></div>
+      <SliderTicks {min} {max} {step} {ticks} on={(v) => v >= value[0] && v <= value[1]} />
       {#each [0, 1] as i (i)}
         <div
           bind:this={thumbs[i]}
