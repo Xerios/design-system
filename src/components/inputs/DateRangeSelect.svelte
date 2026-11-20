@@ -316,7 +316,7 @@
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
     background: var(--control-2);
-    color: var(--fg-2);
+    color: var(--fg);
     font: var(--w-medium) 13px var(--font-data);
     font-variant-numeric: tabular-nums;
     text-align: left;
@@ -330,11 +330,9 @@
   }
   .trigger:hover:not(:disabled) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .trigger[aria-expanded='true'] {
     background: var(--control-4);
-    color: var(--fg);
     box-shadow: none;
   }
   .trigger:disabled {
@@ -468,7 +466,7 @@
     min-height: 32px;
     padding: 0 10px;
     border-radius: var(--r-sm);
-    color: var(--fg-2);
+    color: var(--fg);
     font: 13px var(--font-data);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -476,7 +474,6 @@
   }
   .active {
     background: var(--control-3);
-    color: var(--fg);
   }
   /* Rows paint above the span's band (which is positioned). */
   [role='option'] {

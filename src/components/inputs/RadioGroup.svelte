@@ -108,7 +108,7 @@
     border: 0;
     border-radius: calc(var(--r) - 2px);
     background: none;
-    color: var(--muted);
+    color: var(--fg);
     font-size: 12px;
     line-height: 14px;
     font-weight: var(--w-medium);
@@ -120,7 +120,6 @@
       box-shadow var(--dur) var(--ease-out);
   }
   button:not([aria-checked='true']):hover {
-    color: var(--fg-2);
     background: var(--control-3);
   }
   [aria-checked='true'] {
@@ -144,9 +143,6 @@
   }
   .info {
     display: inline-flex;
-    color: var(--faint);
-  }
-  button:hover .info {
     color: var(--muted);
   }
   .text {

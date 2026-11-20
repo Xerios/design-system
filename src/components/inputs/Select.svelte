@@ -337,7 +337,7 @@
     padding: 0 8px 0 10px;
     font-size: 13px;
     font-weight: var(--w-medium);
-    color: var(--fg-2);
+    color: var(--fg);
     background: var(--control-2);
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
@@ -353,7 +353,6 @@
   }
   .trigger:hover:not([aria-busy], :disabled) {
     background: var(--control-3);
-    color: var(--fg);
   }
   /* Loading: the working shimmer runs along the hairline and through the label (global .shimmer / .shimmer-text), on an
      outlined box: no fill and no raised edge to drown it out, as a busy Button. */
@@ -367,7 +366,6 @@
   }
   .trigger[aria-expanded='true'] {
     background: var(--control-4);
-    color: var(--fg);
     box-shadow: none;
   }
   /* Ghost: no relief, open or closed (the focus ring still shows). */
@@ -483,13 +481,12 @@
     padding: 0 10px 0 8px;
     border-radius: var(--r-sm);
     font-size: 13px;
-    color: var(--fg-2);
+    color: var(--fg);
     cursor: pointer;
     white-space: nowrap;
   }
   li.active {
     background: var(--control-3);
-    color: var(--fg);
   }
   .tick {
     display: inline-flex;

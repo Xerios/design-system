@@ -126,7 +126,7 @@
     min-width: 0;
     border: 1px solid var(--line-strong);
     background: var(--control-1);
-    color: var(--fg-2);
+    color: var(--fg);
     transition:
       border-radius var(--dur) var(--ease-out),
       border-color var(--dur) var(--ease-out),
@@ -192,7 +192,6 @@
   }
   .empty:has(> button.main:hover:not(:disabled)) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .empty:has(> button.main:hover:not(:disabled)) .main > :global(.icon) {
     color: inherit;

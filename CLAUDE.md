@@ -32,9 +32,16 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
 - Controls (anything you press, type into or drag) take the tinted control fills (`--control-1` … `--control-4`) at
   rest and for hover, pressed and active; non-interactive things use the neutral `--fill-*`. Both are translucent, never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
+- Interactive text is clear at rest and keeps its colour. A button's, row's, option's or tab's text is `--fg` (`--fg-2`
+  only where something brighter beside it must stand out, such as the current page after breadcrumb links), and hover,
+  pressed, open, chosen and keyboard-highlighted states change the fill, border or raise, never the text colour: a
+  brightness step on text the fill already marks is barely seen, but it redraws the glyphs, which reads as a shift.
+  Icons may brighten (no text to redraw). A colour change is the indicator only where nothing else changes (a link, a
+  sort header). Muted text is for things you don't press.
 - Suggestions are dashed. Anything proposed but not applied yet (a suggested label, assignee, reply or next step) is a
-  `.label-chip`, `.chip-btn` or `.btn` (`<Button class="suggested">`) with `.suggested`: a dashed outline in its resting
-  state, turning solid as a button is hovered or pressed. Keep dashed outlines for this: no other control is dashed at
+  `.label-chip`, `.chip-btn` or `.btn` (`<Button class="suggested">`) with `.suggested`: a dashed outline and no fill in
+  its resting state, turning solid as a button is hovered or pressed (a suggested button's text is as clear as any
+  button's; only a suggested label's is muted). Keep dashed outlines for this: no other control is dashed at
   rest (drop zones, which say where files go, aside).
 - A chosen span is one block (Linear's timeline bars). A range picked out of a list or grid (days, rows, steps) reads
   as one rounded shape: its two ends solid `--brand`, rounded only on their outer side; the items between square, under

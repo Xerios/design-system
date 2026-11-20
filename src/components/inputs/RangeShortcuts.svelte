@@ -50,7 +50,7 @@
     border: 0;
     border-radius: var(--r);
     background: none;
-    color: var(--fg-2);
+    color: var(--fg);
     font: var(--w-medium) 12px var(--font-body);
     text-align: start;
     white-space: nowrap;
@@ -58,11 +58,9 @@
   }
   .shortcut:hover:not(:disabled) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .shortcut[aria-current='true'] {
     background: var(--accent-soft);
-    color: var(--fg);
   }
   .shortcut:disabled {
     color: var(--faint);

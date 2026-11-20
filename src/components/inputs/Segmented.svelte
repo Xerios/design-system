@@ -58,18 +58,16 @@
     line-height: 14px;
     font-weight: var(--w-medium);
     cursor: pointer;
-    color: var(--muted);
+    color: var(--fg);
     transition:
       color var(--dur) var(--ease-out),
       background-color var(--dur) var(--ease-out);
   }
   button:not([aria-checked='true']):hover {
-    color: var(--fg-2);
     background: var(--control-3);
   }
   [aria-checked='true'] {
     background: var(--control-4);
-    color: var(--fg);
   }
   /* Something finished behind this option (e.g. research done): its icon turns green. */
   [data-done] :global(.icon) {

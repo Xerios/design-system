@@ -184,12 +184,18 @@
   .field :global(.icon) {
     color: var(--muted);
   }
+  /* As readable as the field name beside it (it is a button too); hovering changes only the fill. */
   .op {
-    color: var(--muted);
+    color: var(--fg-2);
   }
   .value {
     max-width: 280px;
     overflow: hidden;
+    color: var(--fg);
+  }
+  /* An icon may brighten as it is hovered (no text to shift). */
+  .remove:hover,
+  .remove:active {
     color: var(--fg);
   }
   .remove {
@@ -203,12 +209,10 @@
   }
   button.seg:hover:not(:disabled) {
     background: var(--control-3);
-    color: var(--fg);
   }
   button.seg:active:not(:disabled),
   button.seg[aria-expanded='true'] {
     background: var(--control-4);
-    color: var(--fg);
   }
   .value:disabled {
     cursor: default;

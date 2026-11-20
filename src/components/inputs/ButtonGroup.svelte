@@ -64,7 +64,7 @@
     border: 0;
     border-radius: 0;
     background: none;
-    color: var(--muted);
+    color: var(--fg);
     font-size: 12px;
     line-height: 14px;
     font-weight: var(--w-medium);
@@ -88,12 +88,10 @@
     padding-inline-end: 14px;
   }
   button:not([aria-checked='true']):hover {
-    color: var(--fg-2);
     background: var(--control-2);
   }
   [aria-checked='true'] {
     background: var(--control-4);
-    color: var(--fg);
   }
   button :global(.icon) {
     flex: none;

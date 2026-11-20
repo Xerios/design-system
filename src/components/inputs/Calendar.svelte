@@ -423,7 +423,7 @@
     border: 0;
     border-radius: var(--r);
     background: none;
-    color: var(--fg-2);
+    color: var(--fg);
     font: var(--w-medium) 12px var(--font-body);
     transition: background-color var(--dur-fast) var(--ease-out);
   }
@@ -433,7 +433,6 @@
   }
   .cell:hover:not([aria-disabled='true']) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .cell[aria-disabled='true'] {
     color: var(--faint);
@@ -462,14 +461,13 @@
     border: 0;
     border-radius: var(--r);
     background: none;
-    color: var(--fg-2);
+    color: var(--fg);
     font: var(--w-medium) 12px var(--font-data);
     font-variant-numeric: tabular-nums;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
   .day:hover:not([aria-disabled='true']) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .outside {
     color: var(--faint);

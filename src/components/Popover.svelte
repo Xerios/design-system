@@ -150,7 +150,6 @@
   }
   .trigger[aria-expanded='true'] {
     background: var(--control-4);
-    color: var(--fg);
   }
   .badge {
     font: var(--w-medium) 11px/1 var(--font-data);

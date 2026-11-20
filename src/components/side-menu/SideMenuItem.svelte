@@ -125,7 +125,7 @@
     margin-inline: calc(var(--bleed) * -1);
     padding-inline: calc(var(--bleed) + var(--depth) * (var(--slot) + var(--gap))) var(--bleed);
     border-radius: var(--r);
-    color: var(--fg-2);
+    color: var(--fg);
     font-size: 13px;
     font-weight: var(--w-medium);
     text-decoration: none;
@@ -145,14 +145,12 @@
   }
   .row:hover {
     background: var(--control-2);
-    color: var(--fg);
   }
   .row:hover > :global(.icon) {
     color: var(--fg-2);
   }
   .row[aria-current] {
     background: var(--control-3);
-    color: var(--fg);
   }
   .row[aria-current] > :global(.icon) {
     color: var(--fg);

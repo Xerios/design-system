@@ -213,7 +213,7 @@
     background:
       linear-gradient(var(--elevated), var(--elevated)) padding-box,
       var(--edge-grad-float);
-    color: var(--fg-2);
+    color: var(--fg);
     border-radius: var(--r-lg);
     padding: 4px;
     box-shadow: var(--shadow);
@@ -234,14 +234,13 @@
     padding: 0 var(--space-3) 0 var(--space-2);
     border-radius: var(--r-sm);
     cursor: pointer;
-    color: var(--fg-2);
+    color: var(--fg);
     font-weight: var(--w-medium);
     text-decoration: none;
   }
   .item:focus,
   .item.open {
     background: var(--control-3);
-    color: var(--fg);
     outline: none;
   }
   .item :global(.icon) {

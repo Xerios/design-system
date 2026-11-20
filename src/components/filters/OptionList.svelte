@@ -253,13 +253,12 @@
     border-radius: var(--r-sm);
     font-size: 13px;
     font-weight: var(--w-medium);
-    color: var(--fg-2);
+    color: var(--fg);
     white-space: nowrap;
   }
   /* The keyboard's row shows only while the list is in use (focused or under the pointer), not in a list at rest. */
   .option-list:is(:focus-within, :hover) .option.active {
     background: var(--control-3);
-    color: var(--fg);
   }
   .list:focus-visible .option.active {
     box-shadow: inset 0 0 0 2px var(--accent);

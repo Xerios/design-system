@@ -67,13 +67,12 @@
     padding: 0 var(--space-3);
     border-radius: var(--r-pill);
     background: var(--fill-2);
-    color: var(--fg-2);
+    color: var(--fg);
     font-size: 12px;
     font-weight: var(--w-medium);
     text-decoration: none;
   }
   .jump a:hover {
     background: var(--fill-3);
-    color: var(--fg);
   }
 </style>

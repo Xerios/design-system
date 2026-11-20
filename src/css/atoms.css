@@ -13,7 +13,7 @@
   border: 1px solid var(--line-strong);
   background: var(--control-2);
   box-shadow: var(--shadow-btn);
-  color: var(--fg-2);
+  color: var(--fg);
   font-weight: var(--w-medium);
   font-size: 12px;
   line-height: 14px;
@@ -40,7 +40,6 @@
 /* Hover and pressed feedback only on buttons that can act; :where keeps the plain .btn:hover / .btn:active specificity. */
 .btn:hover:where(:not(:disabled, [aria-disabled='true'])) {
   background: var(--control-3);
-  color: var(--fg);
 }
 
 .btn:hover:where(:not(:disabled, [aria-disabled='true'])) :where(.icon) {
@@ -414,7 +413,7 @@
   border-radius: var(--r-pill);
   background: none;
   font: var(--w-medium) 12px/14px var(--font-body);
-  color: var(--fg-2);
+  color: var(--fg);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -429,13 +428,11 @@
 
 .chip-btn:hover:where(:not(:disabled, [aria-disabled='true'])) {
   background: var(--control-3);
-  color: var(--fg);
 }
 
 .chip-btn:active:where(:not(:disabled, [aria-disabled='true'])),
 .chip-btn[aria-expanded='true'] {
   background: var(--control-4);
-  color: var(--fg);
 }
 
 .chip-btn:where(:disabled, [aria-disabled='true']) {
@@ -457,11 +454,17 @@
   color: var(--muted);
 }
 
+/* A suggested button reads as clearly as any button (you can press it); only a suggested label, which you can't, is
+   muted. */
+.chip-btn.suggested,
+.btn.suggested {
+  color: var(--fg);
+}
+
 .chip-btn.suggested:hover:where(:not(:disabled, [aria-disabled='true'])),
 .btn.suggested:hover:where(:not(:disabled, [aria-disabled='true'])) {
   border-style: solid;
   background: var(--control-3);
-  color: var(--fg);
 }
 
 .chip-btn.suggested:active:where(:not(:disabled, [aria-disabled='true'])),
@@ -469,7 +472,6 @@
 .btn.suggested:active:where(:not(:disabled, [aria-disabled='true'])) {
   border-style: solid;
   background: var(--control-4);
-  color: var(--fg);
 }
 
 /* Label above every form control (custom inputs share it). */

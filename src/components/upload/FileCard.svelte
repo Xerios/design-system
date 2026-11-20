@@ -132,7 +132,7 @@
     max-width: 100%;
     border: 1px solid var(--line-strong);
     background: var(--control-1);
-    color: var(--fg-2);
+    color: var(--fg);
     transition:
       border-radius var(--dur) var(--ease-out),
       border-color var(--dur) var(--ease-out),
@@ -184,7 +184,6 @@
   }
   .card:has(> button.main:hover:not(:disabled, [aria-disabled='true'])) {
     background: var(--control-3);
-    color: var(--fg);
   }
   .card:has(> button.main:hover:not(:disabled, [aria-disabled='true'])) .main > :global(.icon) {
     color: inherit;

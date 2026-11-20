@@ -82,14 +82,13 @@
     min-height: 32px;
     margin: 0;
     padding: 0 var(--pad);
-    color: var(--muted);
+    color: var(--fg-2);
     font: var(--w-medium) 12px var(--font-body);
     transition:
       color var(--dur-fast) var(--ease-out),
       background-color var(--dur-fast) var(--ease-out);
   }
   h3:has(> .hit:hover) {
-    color: var(--fg-2);
     background: var(--control-2);
   }
   .hit {

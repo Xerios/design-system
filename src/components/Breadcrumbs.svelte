@@ -177,7 +177,9 @@
     max-inline-size: none;
   }
 
+  /* A link is readable at rest, as hovering changes only its fill; the page you are on stays the brightest. */
   .link {
+    color: var(--fg-2);
     cursor: pointer;
     transition:
       background-color var(--dur) var(--ease-out),
@@ -185,7 +187,6 @@
   }
   .link:hover {
     background: var(--control-2);
-    color: var(--fg);
   }
   .link:active {
     background: var(--control-3);
