@@ -95,10 +95,11 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   handlers, so a consumer's class adds to it and their attachments arrive. Snippets for the parts a consumer fills in.
 - Svelte 5 practice: `$derived` (writable when a value resets) over `$effect` that sets state; DOM work in
   `{@attach}`; page-wide listeners in `<svelte:document>` / `<svelte:window>`; ids from `$props.id()`.
-- Cut text off with `overflow: clip` (with `text-overflow: ellipsis` and `white-space: nowrap`), never `overflow: hidden`:
-  hidden makes the element a scroll container, which Chrome may move to a layer of its own while the pointer is over it,
-  redrawing its text with other smoothing, so the text seems to shift as it is hovered. Keep `hidden`/`auto` for boxes
-  that really scroll.
+- Cut text off with `overflow: clip` (with `text-overflow: ellipsis` and `white-space: nowrap`), not `overflow: hidden`,
+  which also makes the element a scroll container (scrollable from script). Keep `hidden`/`auto` for boxes that really
+  scroll.
+- Hover rules restyle only what the hover is about. No global `*:hover` / `:hover` on broad selectors: every element
+  the pointer passes over then restyles and repaints, and its text can redraw a pixel off, as if it jumped.
 - Chrome can't be selected: a component's own chrome (anything you press, drag or read as a label: buttons, chips,
   pills, segments, list rows, headings of lists, menus, toolbars, calendars) takes `user-select: none`. `base.css`
   covers the common roles and atoms; a component built from plain `<span>`s and `<div>`s sets it in its own styles,
