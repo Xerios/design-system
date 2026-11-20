@@ -81,7 +81,7 @@
     <MenuButton items={menuItems} label="Demo item" />
     <span class="small muted">Picked: {picked}</span>
   </Demo>
-  <Demo label="Tile" wide>
+  <Demo label="Tile" span={2}>
     <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
       <div class="tiles">
         <Tile title="Typography" icon="document" href="#typography" cta="See the styles">Headings, lists, quotes and code for long-form text.</Tile>

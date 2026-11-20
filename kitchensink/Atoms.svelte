@@ -50,19 +50,17 @@
       </table>
     </div>
   </Demo>
-  <Demo label="Shine, corner glow, grain">
-    <Case label="Shine (.shine): a beam on the edge, placed with --shine-x and --shine-y">
-      <div class="specimen shine">Default</div>
-      <div class="specimen shine" style:--shine-x="100%" style:--shine-y="0">Top right</div>
-    </Case>
-    <Case label="Corner glow (.corner-glow): a soft light from the top-left corner">
-      <div class="specimen">Without</div>
-      <div class="specimen"><span class="corner-glow" aria-hidden="true"></span>With</div>
-    </Case>
-    <Case label="Grain (--grain): film grain over the scrim, as modal backdrops draw it">
-      <div class="specimen scrim">Scrim</div>
-      <div class="specimen scrim grain">Scrim with grain</div>
-    </Case>
+  <Demo label="Shine (.shine): a beam on the edge, placed with --shine-x and --shine-y">
+    <div class="specimen shine">Default</div>
+    <div class="specimen shine" style:--shine-x="100%" style:--shine-y="0">Top right</div>
+  </Demo>
+  <Demo label="Corner glow (.corner-glow): a soft light from the top-left corner">
+    <div class="specimen">Without</div>
+    <div class="specimen"><span class="corner-glow" aria-hidden="true"></span>With</div>
+  </Demo>
+  <Demo label="Grain (--grain): film grain over the scrim, as modal backdrops draw it">
+    <div class="specimen scrim">Scrim</div>
+    <div class="specimen scrim grain">Scrim with grain</div>
   </Demo>
 </Section>
 
@@ -72,13 +70,14 @@
     min-width: 0;
   }
   /* A card to light: its own stacking context, so the shine stays under the page's sticky parts and the glow behind
-     the label. */
+     the label. It shrinks to 120px so a pair fits side by side in one column of the Section. */
   .specimen {
     position: relative;
     isolation: isolate;
     display: flex;
     align-items: flex-end;
-    width: 160px;
+    flex: 1 1 120px;
+    max-width: 160px;
     min-height: 96px;
     padding: var(--space-3);
     border: 1px solid var(--line);

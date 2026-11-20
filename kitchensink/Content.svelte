@@ -121,7 +121,7 @@
       <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
   </Demo>
-  <Demo label="Metadata" wide>
+  <Demo label="Metadata" span={2}>
     <Case label="Chip buttons as values, a label that adds one (Labels), a description under it">
       <div class="full">
         <Metadata>

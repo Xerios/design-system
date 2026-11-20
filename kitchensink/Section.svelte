@@ -10,6 +10,8 @@
    * @property {string} [intro]
    * @property {import('svelte').Snippet} children
    */
+  import { masonry } from './masonry.js'
+
   /** @type {Props} */
   let { id, title, intro = '', children } = $props()
 </script>
@@ -17,7 +19,7 @@
 <section {id} aria-labelledby="{id}-title" class="section">
   <h2 id="{id}-title" tabindex="-1">{title}</h2>
   {#if intro}<p class="intro">{intro}</p>{/if}
-  <div class="demos">{@render children()}</div>
+  <div class="demos" {@attach masonry}>{@render children()}</div>
 </section>
 
 <style>
@@ -49,7 +51,10 @@
     max-width: 75ch;
     color: var(--muted);
   }
+  /* Columns at least 300px wide, laid out as masonry (see masonry.js; it needs align-items: start). A container, so a
+     Demo can tell how many columns there are room for. */
   .demos {
+    container: demos / inline-size;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: var(--space-4);

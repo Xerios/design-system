@@ -96,7 +96,9 @@
       <TextField bind:value={name} id="ks-name" label="Name" type="text" placeholder="Ada Lovelace" info="What people call you. Shown on your profile." />
     </Case>
     <Case label="With an error">
-      <TextField value="ada@" id="ks-email" label="Email" type="text" error="Enter a whole email address." />
+      <div class="bubble-room">
+        <TextField value="ada@" id="ks-email" label="Email" type="text" error="Enter a whole email address." />
+      </div>
     </Case>
   </Demo>
   <Demo label="Search (Esc clears, / focuses)">
@@ -110,9 +112,11 @@
       <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
     </Case>
     <Case label="Loading, ghost, error">
-      <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
-      <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
-      <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
+      <div class="bubble-room">
+        <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
+        <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
+        <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
+      </div>
     </Case>
   </Demo>
   <Demo label="Tags (Enter or comma adds)">
@@ -179,7 +183,7 @@
   <Demo label="Range from a list of dates">
     <DateRangeSelect bind:value={runs} dates={RUNS} id="ks-runs" label="Runs" />
   </Demo>
-  <Demo label="Tile group" wide>
+  <Demo label="Tile group" span={2}>
     <Case label="One choice: arrows move and choose">
       <div class="full">
         <TileGroup label="Plan" bind:value={plan} columns={3} info="Change it any time. The new price starts on the day it changes.">
@@ -240,6 +244,15 @@
 </Section>
 
 <style>
+  /* Room under a field showing its error for the bubble hanging below it (its offset and one line), so the bubble stays
+     inside its Demo instead of covering the one tucked under it. Lays its fields out as a Case does. */
+  .bubble-room {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: calc(var(--space-2) + var(--space-8));
+  }
   .stack {
     display: grid;
     gap: var(--space-3);

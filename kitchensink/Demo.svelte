@@ -1,19 +1,21 @@
 <script>
   /**
-   * Kitchen sink: one specimen, captioned with what it shows. `wide` spans the whole row.
+   * Kitchen sink: one specimen, captioned with what it shows. It takes one column of its Section; `span={2}` takes two
+   * once the Section has room for two, and `wide` takes the whole row.
    *
    *   <Demo label="Async button: fails">…</Demo>
    *
    * @typedef {object} Props
    * @property {string} label
+   * @property {1 | 2} [span]
    * @property {boolean} [wide]
    * @property {import('svelte').Snippet} children
    */
   /** @type {Props} */
-  let { label, wide = false, children } = $props()
+  let { label, span = 1, wide = false, children } = $props()
 </script>
 
-<figure class="demo" class:wide>
+<figure class="demo" class:span-2={span === 2} class:wide>
   <figcaption>{label}</figcaption>
   <div class="stage">{@render children()}</div>
 </figure>
@@ -30,6 +32,13 @@
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: var(--surface);
+  }
+  /* Two columns fit once the Section's grid is two 300px columns and their gap (--space-4) wide. With one, a span of two
+     would add a column that sticks out of it. */
+  @container demos (min-width: 616px) {
+    .span-2 {
+      grid-column: span 2;
+    }
   }
   .wide {
     grid-column: 1 / -1;
