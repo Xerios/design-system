@@ -93,14 +93,11 @@
     align-items: center;
     gap: var(--space-1);
   }
-  /* The main action: raised, square-cornered like the rows, and exactly the trailing column's width. */
+  /* The main action: ghost (a fill on hover only), square-cornered like the rows, and exactly the trailing column's width. */
   .actions > :global(.icon-btn:last-child) {
     width: var(--trail);
     height: var(--trail);
-    border: 1px solid var(--line-strong);
     border-radius: var(--r);
-    background: var(--control-1);
-    box-shadow: var(--shadow-btn);
     color: var(--fg-2);
   }
   .actions > :global(.icon-btn:last-child:hover) {

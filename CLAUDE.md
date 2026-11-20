@@ -26,6 +26,10 @@ Read it before building UI, and read a component's header comment before using i
 - Controls (anything you press, type into or drag) take the tinted control fills (`--control-1` … `--control-4`) at
   rest and for hover, pressed and active; non-interactive things use the neutral `--fill-*`. Both are translucent, never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
+- Suggestions are dashed. Anything proposed but not applied yet (a suggested label, assignee, reply or next step) is a
+  `.label-chip`, `.chip-btn` or `.btn` (`<Button class="suggested">`) with `.suggested`: a dashed outline in its resting
+  state, turning solid as a button is hovered or pressed. Keep dashed outlines for this: no other control is dashed at
+  rest (drop zones, which say where files go, aside).
 - Text is 13px (12px for secondary and labels, 11px for counts), in px, as are the breakpoints. A box holding text gets
   `min-height`, not `height`. Weights `--w-medium` and `--w-semibold`.
   Numbers, counts, dates and code use `--font-data` with `font-variant-numeric: tabular-nums`. Sentence

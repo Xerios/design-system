@@ -84,7 +84,7 @@
     gap: var(--space-3);
     min-height: 140px;
     padding: var(--space-4);
-    border: 1px dashed var(--line-strong);
+    border: 2px dashed var(--line-strong);
     border-radius: var(--r-lg);
     background: var(--control-1);
     transition:
@@ -120,7 +120,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    border: 1px dashed var(--accent);
+    border: 2px dashed var(--accent);
     border-radius: inherit;
     background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
     color: var(--fg);

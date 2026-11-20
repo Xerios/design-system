@@ -146,7 +146,7 @@
     border-radius: var(--r);
   }
   .square {
-    border-style: dashed;
+    border: 2px dashed var(--line-strong);
   }
   .filled {
     background: var(--control-3);

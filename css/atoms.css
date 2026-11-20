@@ -443,6 +443,35 @@
   cursor: default;
 }
 
+/* Suggestions: .suggested on a .label-chip, .chip-btn or .btn marks something proposed but not applied yet (a label the
+   app suggests, a likely assignee, a next step). A dashed outline, no fill or shadow and muted text at rest; a button
+   turns solid as it is hovered or pressed, as the thing would once taken. A dashed outline on a control means this
+   and nothing else (drop zones aside). */
+.label-chip.suggested,
+.chip-btn.suggested,
+.btn.suggested {
+  border-style: dashed;
+  border-color: var(--faint);
+  background: none;
+  box-shadow: none;
+  color: var(--muted);
+}
+
+.chip-btn.suggested:hover:where(:not(:disabled, [aria-disabled='true'])),
+.btn.suggested:hover:where(:not(:disabled, [aria-disabled='true'])) {
+  border-style: solid;
+  background: var(--control-3);
+  color: var(--fg);
+}
+
+.chip-btn.suggested:active:where(:not(:disabled, [aria-disabled='true'])),
+.chip-btn.suggested[aria-expanded='true'],
+.btn.suggested:active:where(:not(:disabled, [aria-disabled='true'])) {
+  border-style: solid;
+  background: var(--control-4);
+  color: var(--fg);
+}
+
 /* Label above every form control (custom inputs share it). */
 /* The box a text field draws (TextField, TextArea, TagInput): sunken, the opposite of a raised button. A faint fill
    inside an inset hairline, pressed into the surface (--sunken-shadow, the raised controls' shadow inside out). Focus turns the hairline

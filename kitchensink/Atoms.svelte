@@ -18,6 +18,11 @@
       <a class="chip-btn" href="#atoms"><Icon name="link" />A link</a>
       <button type="button" class="chip-btn" disabled><Icon name="star" />Disabled</button>
     </Case>
+    <Case label="Suggested: dashed until taken, solid on hover">
+      <button type="button" class="chip-btn suggested"><Icon name="plus" />Frontend</button>
+      <button type="button" class="chip-btn suggested"><span class="label-dot" style:--dot="var(--success)"></span>Ready to ship</button>
+      <button type="button" class="btn btn-small suggested"><Icon name="plus" size="sm" />Assign to me</button>
+    </Case>
     <Case label="Outlined, led by dots">
       <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot="var(--info)"></span>Design</button>
       <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot="var(--warning)"></span>Core experience</button>
@@ -28,6 +33,7 @@
       <span class="label-chip" data-tone={tone}><span class="label-dot"></span>{tone}</span>
     {/each}
     <span class="label-chip"><Icon name="lock" size="sm" />With an icon</span>
+    <span class="label-chip suggested"><span class="label-dot" style:--dot="var(--info)"></span>Suggested</span>
     <span class="label-chip icon-only" {@attach tooltip('Starred')} aria-label="Starred" role="img"><Icon name="star" size="sm" /></span>
   </Demo>
   <Demo label="Counts, keys, dots">
@@ -87,9 +93,7 @@
     color: var(--fg-2);
   }
   .scrim {
-    background:
-      linear-gradient(var(--scrim), var(--scrim)),
-      var(--view-bg);
+    background: linear-gradient(var(--scrim), var(--scrim)), var(--view-bg);
   }
   .scrim.grain {
     background:
