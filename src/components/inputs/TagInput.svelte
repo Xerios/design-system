@@ -7,7 +7,7 @@
    *
    * Props:
    *   value (bindable): the tags, an array of strings. Changes only by whole tags, so it can be saved on every change.
-   *   id, label, hideLabel, placeholder, info (an ⓘ next to the label, see InfoTip), error (a message from the app).
+   *   id, label, hideLabel, placeholder, info (an ⓘ next to the label, see InfoTip), note (dimmed text after the label, such as '(optional)'), error (a message from the app).
    *   separator: a RegExp for what splits typed text into tags (default commas and line breaks).
    *   normalize(text): turns typed text into a tag (default: trimmed). Return '' to drop it.
    *   validate(tag): a message when the tag isn't allowed, else ''. A rejected tag stays in the input, with the
@@ -20,7 +20,7 @@
   import { tick } from 'svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
   import Icon from '../Icon.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import { flip, scale, durations } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
   import { composing } from '../../lib/dom.js'
@@ -35,6 +35,7 @@
    * @property {boolean} [hideLabel]
    * @property {string} [placeholder]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {string} [error]
    * @property {RegExp} [separator]
    * @property {(text: string) => string} [normalize]
@@ -48,6 +49,7 @@
     hideLabel = false,
     placeholder = '',
     info = '',
+    note = '',
     error = '',
     separator = /[,\n]+/,
     normalize = (text) => text.trim(),
@@ -165,13 +167,8 @@
   }
 </script>
 
-{#snippet fieldLabel()}<label for={id} id="{id}-label" class:sr-only={hideLabel} class="field-label">{label}</label>{/snippet}
 <div class="field">
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} id="{id}-label" {label} {note} {info} {hideLabel} />
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
   <div bind:this={box} class="box field-box" {onfocusout} onkeydown={onTagKeydown} onclick={(e) => e.target === e.currentTarget && input.focus()}>
     <ul aria-labelledby="{id}-label">

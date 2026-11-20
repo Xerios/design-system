@@ -20,6 +20,7 @@
   import DateRangeSelect from '@xerios/design-system/components/inputs/DateRangeSelect.svelte'
   import Tile from '@xerios/design-system/components/tiles/Tile.svelte'
   import TileGroup from '@xerios/design-system/components/tiles/TileGroup.svelte'
+  import FieldLabel from '@xerios/design-system/components/inputs/FieldLabel.svelte'
   import Upload from '@xerios/design-system/components/upload/index.js'
   import { fieldErrors } from '@xerios/design-system/lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '@xerios/design-system/lib/invalid.js'
@@ -281,6 +282,17 @@
           </div>
         </Tile>
       </div>
+    </Case>
+  </Demo>
+  <Demo label="Field label (for a custom control)">
+    <Case label="Plain">
+      <FieldLabel for="ks-fl-plain" label="Project" />
+    </Case>
+    <Case label="With a note">
+      <FieldLabel for="ks-fl-note" label="Description" note="(optional)" />
+    </Case>
+    <Case label="With a note and an ⓘ">
+      <FieldLabel for="ks-fl-info" label="Budget" note="(per month)" info="Spending stops once it is reached." />
     </Case>
   </Demo>
   <Demo label="A form: errors only after Submit" wide>

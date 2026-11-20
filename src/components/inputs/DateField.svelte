@@ -13,7 +13,7 @@
    * value). show(focus = true): opens it and, with focus, moves the focus onto the calendar (an input's ArrowDown);
    * a click in an input opens it without, so typing carries on. hasValue + onclear: the clear button. panel(close): the panel's
    * content; close() shuts it and puts the focus back on the calendar button. calendarLabel: that button's name
-   * ("Choose a date"). error, info, hideLabel, disabled: as on the other fields. Other attributes and attachments go to
+   * ("Choose a date"). error, info, note, hideLabel, disabled: as on the other fields. Other attributes and attachments go to
    * the field's wrapper.
    * Keyboard: the calendar button or ArrowDown in an input opens the panel with the focus in it; a click in an input opens
    * it too, leaving the focus there; Esc closes it; tabbing out of the field (or the panel) closes it.
@@ -21,7 +21,7 @@
   import { tick } from 'svelte'
   import Icon from '../Icon.svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import { topLayer } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
@@ -38,6 +38,7 @@
    * @property {boolean} [hideLabel]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [disabled]
    * @property {import('svelte').Snippet} inputs
    * @property {import('svelte').Snippet<[() => void]>} panel
@@ -54,6 +55,7 @@
     hideLabel = false,
     error = '',
     info = '',
+    note = '',
     disabled = false,
     class: className,
     inputs,
@@ -128,12 +130,7 @@
 <svelte:document onpointerdowncapture={outside} />
 
 <div class={['field', className]} {...rest}>
-  {#snippet fieldLabel()}<label for={id} class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</label>{/snippet}
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} id="{id}-label" {label} {note} {info} {hideLabel} />
   <!-- The keys and focus are its inputs'; the box only listens for Esc and for the focus leaving. -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div bind:this={box} class="box field-box" class:disabled style:anchor-name={anchor} onfocusout={onBoxFocusOut} onkeydown={onBoxKey}>

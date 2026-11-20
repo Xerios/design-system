@@ -34,7 +34,8 @@
    * Everything lines up on four columns, set here as properties and read by the parts: the content edge (--edge, where
    * group headings start), the icon column (--slot wide, icons centred in it), the label column after it (--gap on),
    * and the trailing column at the right (--trail wide, counts and buttons centred in it). A row's fill reaches --bleed
-   * past the content edge on both sides. Override them on the element to retune the menu.
+   * past the content edge on both sides, so an icon and a count sit the same distance in from its ends; the main action
+   * (--action square) is centred on the trailing column. Override them on the element to retune the menu.
    * Keyboard: Tab moves through the header's controls, then the rows in order; Enter follows a link or folds a group.
    */
   import { scrollFade } from '../../lib/scroll-fade.js'
@@ -67,11 +68,14 @@
   .side-menu {
     user-select: none;
     -webkit-user-select: none;
-    --edge: var(--space-3);
+    --edge: var(--space-4);
     --slot: var(--icon-lg);
     --gap: var(--space-2);
-    --trail: 28px;
-    --bleed: var(--space-1);
+    /* As wide as a count, and --bleed as wide as the gap between the icon column and the fill's edge, so an icon and a
+       count sit the same distance in from either end of a row's fill. */
+    --trail: 20px;
+    --bleed: var(--space-2);
+    --action: 28px;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -97,10 +101,12 @@
     align-items: center;
     gap: var(--space-1);
   }
-  /* The main action: ghost (a fill on hover only), square-cornered like the rows, and exactly the trailing column's width. */
+  /* The main action: ghost (a fill on hover only), square-cornered like the rows, and centred on the trailing column (it
+     is wider, so it reaches past the column's end by half the difference). */
   .actions > :global(.icon-btn:last-child) {
-    width: var(--trail);
-    height: var(--trail);
+    width: var(--action);
+    height: var(--action);
+    margin-inline-end: calc((var(--trail) - var(--action)) / 2);
     border-radius: var(--r);
     color: var(--fg-2);
   }

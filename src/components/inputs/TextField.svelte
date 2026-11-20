@@ -1,7 +1,7 @@
 <script>
   import ErrorMessage from '../ErrorMessage.svelte'
   import Icon from '../Icon.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { validity } from '../../lib/validity.js'
   import { composing } from '../../lib/dom.js'
@@ -13,6 +13,7 @@
    * shows there once its form is validated (never just for leaving the field). See lib/validity.js, and lib/field-errors.svelte.js
    * for a form's worth of them.
    * info: what the field is for or how to fill it, behind an ⓘ next to the label (see InfoTip).
+   * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
    */
   /**
    * @typedef {object} Props
@@ -28,6 +29,7 @@
    * @property {((value: string) => void) | null} [onenter]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLInputAttributes, keyof Props>} */
   let {
@@ -43,6 +45,7 @@
     onenter = null,
     error = '',
     info = '',
+    note = '',
     ...rest
   } = $props()
   let input = $state()
@@ -65,12 +68,7 @@
 </script>
 
 <div class="field">
-  {#snippet fieldLabel()}<label for={id} class:sr-only={hideLabel} class="field-label">{label}</label>{/snippet}
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} {label} {note} {info} {hideLabel} />
   <div class="box field-box" class:compact>
     {#if icon}
       <span class="lead"><Icon name="search" /></span>

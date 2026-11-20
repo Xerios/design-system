@@ -10,13 +10,14 @@
    * disabled: shows the value but doesn't open, flat with no fill or caret (e.g. when there is only one choice).
    * error: a message from the app; the button turns red (aria-invalid, set by lib/invalid.js) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
+   * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
    * Other attributes (class…) and attachments go to the button.
    *
    *   <Select bind:value={region} options={REGIONS} id="region" label="Region" info="Where the files are served from." />
    */
   import { tick } from 'svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import Shimmer from '../Shimmer.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { invalid } from '../../lib/invalid.js'
@@ -35,6 +36,7 @@
    * @property {boolean | string} [loading]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [ghost]
    * @property {boolean} [disabled]
    */
@@ -49,6 +51,7 @@
     loading = false,
     error = '',
     info = '',
+    note = '',
     ghost = false,
     disabled = false,
     class: className,
@@ -185,12 +188,7 @@
 <div class="field">
   <!-- A real label for the trigger button: clicking it activates the button, so it opens the list, as clicking a text
        field's label puts you in the field. -->
-  {#snippet fieldLabel()}<label for={id} class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</label>{/snippet}
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} id="{id}-label" {label} {note} {info} {hideLabel} />
   <div class="wrap">
     <button
       {id}

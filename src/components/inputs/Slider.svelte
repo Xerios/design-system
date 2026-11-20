@@ -4,8 +4,9 @@
    *
    *   <Slider bind:value={opacity} min={0} max={1} step={0.05} id="opacity" label="Opacity" format={(v) => `${Math.round(v * 100)}%`} />
    *
-   * format: how the value reads, next to the label and to screen readers. Other attributes (class…) and attachments go
-   * to the slider itself (role="slider").
+   * format: how the value reads, beside the track (on the right) and to screen readers.
+   * note, info, hideLabel: as on the other fields (see FieldLabel). Other attributes (class…) and attachments go to the
+   * slider itself (role="slider").
    *
    * @typedef {object} Props
    * @property {number} [value] bindable
@@ -15,9 +16,27 @@
    * @property {string} id
    * @property {string} label
    * @property {(value: number) => string} [format]
+   * @property {string} [note]
+   * @property {string} [info]
+   * @property {boolean} [hideLabel]
    */
+  import FieldLabel from './FieldLabel.svelte'
+
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
-  let { value = $bindable(0), min = 0, max = 100, step = 1, id, label, format = (v) => String(v), class: className, ...rest } = $props()
+  let {
+    value = $bindable(0),
+    min = 0,
+    max = 100,
+    step = 1,
+    id,
+    label,
+    format = (v) => String(v),
+    note = '',
+    info = '',
+    hideLabel = false,
+    class: className,
+    ...rest
+  } = $props()
   let track = $state()
   let dragging = $state(false)
   const pct = $derived(((value - min) / (max - min)) * 100)
@@ -54,28 +73,31 @@
 </script>
 
 <div class="field">
-  <span class="field-label" id="{id}-label">{label} <output for={id}>{format(value)}</output></span>
-  <div
-    {id}
-    class={['slider', className]}
-    {...rest}
-    class:dragging
-    role="slider"
-    tabindex="0"
-    aria-labelledby="{id}-label"
-    aria-valuemin={min}
-    aria-valuemax={max}
-    aria-valuenow={value}
-    aria-valuetext={format(value)}
-    style:--pct="{pct}%"
-    onpointerdown={down}
-    onpointermove={(e) => dragging && fromPointer(e)}
-    onpointerup={() => (dragging = false)}
-    onpointercancel={() => (dragging = false)}
-    {onkeydown}
-  >
-    <div class="track" bind:this={track}><div class="fill"></div></div>
-    <div class="thumb"></div>
+  <FieldLabel id="{id}-label" {label} {note} {info} {hideLabel} />
+  <div class="row">
+    <div
+      {id}
+      class={['slider', className]}
+      {...rest}
+      class:dragging
+      role="slider"
+      tabindex="0"
+      aria-labelledby="{id}-label"
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value}
+      aria-valuetext={format(value)}
+      style:--pct="{pct}%"
+      onpointerdown={down}
+      onpointermove={(e) => dragging && fromPointer(e)}
+      onpointerup={() => (dragging = false)}
+      onpointercancel={() => (dragging = false)}
+      {onkeydown}
+    >
+      <div class="track" bind:this={track}><div class="fill"></div></div>
+      <div class="thumb"></div>
+    </div>
+    <output for={id}>{format(value)}</output>
   </div>
 </div>
 
@@ -85,15 +107,21 @@
     flex-direction: column;
     gap: 3px;
   }
+  /* The track, then the value on its right. The gap clears the thumb, which overhangs the track's end by half its width. */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
   output {
     font: var(--w-medium) 12px var(--font-data);
     font-variant-numeric: tabular-nums;
     color: var(--fg-2);
-    margin-left: 4px;
+    white-space: nowrap;
   }
   .slider {
     position: relative;
-    width: 150px;
+    width: 180px;
     height: 32px;
     display: flex;
     align-items: center;

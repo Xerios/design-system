@@ -6,7 +6,7 @@
    *
    * value (bindable): [from, to] as ISO days, from ≤ to; ['', ''] for none (either end may be empty while typing).
    * min, max: the first and last day allowed. Typing works as DatePicker's, in each end; ends typed the wrong way round
-   * swap. placeholder, clearable, error, info, hideLabel, disabled: as DatePicker's.
+   * swap. placeholder, clearable, error, info, note, hideLabel, disabled: as DatePicker's.
    * On the calendar the first press starts a new range; while choosing the second, the days up to the pointer (or the
    * keyboard focus) are tinted, and a second press before the first swaps them. Closing before the second press keeps
    * the old range. A hint in the panel says which press is next, read out as it changes. Keyboard: as DatePicker's.
@@ -34,6 +34,7 @@
    * @property {boolean} [hideLabel]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */

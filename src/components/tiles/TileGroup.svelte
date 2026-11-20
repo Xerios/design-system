@@ -13,6 +13,7 @@
    * value: bindable. The chosen tile's value ('' for none yet), or with `multiple` the array of chosen values.
    * label: the group's name, shown above it; `hideLabel` keeps it for screen readers only.
    * info: help text behind an ⓘ next to the label.
+   * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
    * multiple: any number may be chosen (checkboxes) rather than one (radios).
    * columns: at most this many tiles to a row (default: as many as fit). Each is at least --tile-min wide (220px), so a
    * narrow container gets fewer, down to one.
@@ -27,6 +28,7 @@
    * @property {string} label
    * @property {boolean} [hideLabel]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [multiple]
    * @property {number} [columns]
    * @property {boolean} [disabled]
@@ -34,7 +36,7 @@
    * @property {import('svelte').Snippet} children
    */
   import { setContext, untrack } from 'svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from '../inputs/FieldLabel.svelte'
   import { radioKeys } from '../../lib/roving.js'
   import { TILE_GROUP } from './context.js'
 
@@ -44,6 +46,7 @@
     label,
     hideLabel = false,
     info,
+    note = '',
     multiple = false,
     columns,
     disabled = false,
@@ -94,13 +97,7 @@
 </script>
 
 <div class={['tile-group', className]} {...rest}>
-  {#if info}
-    <div class="field-head" class:sr-only={hideLabel}>
-      <span id="{uid}-label" class="field-label">{label}</span><InfoTip lines={[{ text: info }]} label="About {label}" />
-    </div>
-  {:else}
-    <span id="{uid}-label" class="field-label" class:sr-only={hideLabel}>{label}</span>
-  {/if}
+  <FieldLabel id="{uid}-label" {label} {note} {info} {hideLabel} />
   <div
     class="tiles"
     class:capped={!!columns}

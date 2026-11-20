@@ -10,7 +10,7 @@
    * Typing: DD/MM/YYYY ('18/11/2026'; the placeholder shows it), with any separators, two-digit years or
    * ISO; read when the field is left or Enter is pressed. Something that doesn't read, or falls outside min / max, is
    * the field's error until fixed (Esc puts the value back). placeholder: in place of the format.
-   * clearable (default true): a ✕ to empty it. error, info, hideLabel, disabled: as on the other fields.
+   * clearable (default true): a ✕ to empty it. error, info, note, hideLabel, disabled: as on the other fields.
    * A click in the field opens the calendar under it (the focus stays, so typing carries on). Keyboard: ArrowDown in the
    * field, or the calendar button, opens it with the focus on the value (or today); arrows move
    * by day and week, PageUp / PageDown by month (Shift: year), Enter picks and closes, Esc closes.
@@ -34,6 +34,7 @@
    * @property {boolean} [hideLabel]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */

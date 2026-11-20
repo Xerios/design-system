@@ -6,9 +6,10 @@
    * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints (`required`,
    * `minlength`…) report the browser's own message the same way. See lib/validity.js.
    * info: what the field is for or how to fill it, behind an ⓘ next to the label (see InfoTip).
+   * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
    */
   import ErrorMessage from '../ErrorMessage.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import { validity } from '../../lib/validity.js'
   import { invalid } from '../../lib/invalid.js'
   /**
@@ -20,9 +21,10 @@
    * @property {number} [rows]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLTextareaAttributes, keyof Props>} */
-  let { value = $bindable(''), id, label, hideLabel = false, rows = 3, error = '', info = '', ...rest } = $props()
+  let { value = $bindable(''), id, label, hideLabel = false, rows = 3, error = '', info = '', note = '', ...rest } = $props()
   let area = $state()
   let native = $state('') // the browser's message for a failed native constraint
   const problem = $derived(error || native)
@@ -30,12 +32,7 @@
 </script>
 
 <div class="field">
-  {#snippet fieldLabel()}<label for={id} class:sr-only={hideLabel} class="field-label">{label}</label>{/snippet}
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} {label} {note} {info} {hideLabel} />
   <!-- The box draws the field; the textarea inside is bare. -->
   <div class="box field-box">
     <!-- svelte-ignore a11y_autofocus -->

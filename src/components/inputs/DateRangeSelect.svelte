@@ -15,7 +15,7 @@
    * shortcuts: ready-made spans above the list, [{ label, range(dates) }], range given the dates oldest first and
    * returning [from, to], or null to show it disabled. Default: Most recent, Last 3, This month (dateListShortcuts in
    * lib/dates.js); [] for none. One press sets it and closes.
-   * placeholder: the button's text with no value. error, info, hideLabel, disabled: as Select's.
+   * placeholder: the button's text with no value. error, info, note, hideLabel, disabled: as Select's.
    * The button opens a panel with the shortcuts and the list. The first press in the list starts a new span, the second
    * ends it (either way round; the same date again picks it alone) and closes; the dates between are tinted as the
    * pointer or the keyboard moves. Closing before the second press keeps the old span. A hint at the top of the panel says which
@@ -28,7 +28,7 @@
   import { tick } from 'svelte'
   import Icon from '../Icon.svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
-  import InfoTip from '../InfoTip.svelte'
+  import FieldLabel from './FieldLabel.svelte'
   import RangeShortcuts from './RangeShortcuts.svelte'
   import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js'
@@ -46,6 +46,7 @@
    * @property {boolean} [hideLabel]
    * @property {string} [error]
    * @property {string} [info]
+   * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
@@ -59,6 +60,7 @@
     hideLabel = false,
     error = '',
     info = '',
+    note = '',
     disabled = false,
     class: className,
     ...rest
@@ -204,12 +206,7 @@
 {/snippet}
 
 <div class="field">
-  {#snippet fieldLabel()}<label for={id} class="field-label" class:sr-only={hideLabel} id="{id}-label">{label}</label>{/snippet}
-  {#if info}
-    <div class="field-head">{@render fieldLabel()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
-  {:else}
-    {@render fieldLabel()}
-  {/if}
+  <FieldLabel for={id} id="{id}-label" {label} {note} {info} {hideLabel} />
   <button
     {id}
     bind:this={button}

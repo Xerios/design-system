@@ -5,7 +5,8 @@
    *   <RangeSlider bind:value={price} min={0} max={500} step={10} id="price" label="Price" format={(v) => `€${v}`} />
    *
    * value (bindable): [from, to]. gap: the least distance kept between them (default 0, they may meet).
-   * format: how a value reads, next to the label and to screen readers.
+   * format: how a value reads, beside the track (on the right, "from – to") and to screen readers.
+   * note, info, hideLabel: as on the other fields (see FieldLabel).
    * Keyboard, on each thumb (each is its own slider, as the ARIA pattern has it): arrows step, PageUp / PageDown take a
    * tenth of the range, Home / End go as far as the other thumb allows. Pointer: drag a thumb, or press the track to
    * move the nearer thumb there.
@@ -20,9 +21,28 @@
    * @property {string} id
    * @property {string} label
    * @property {(value: number) => string} [format]
+   * @property {string} [note]
+   * @property {string} [info]
+   * @property {boolean} [hideLabel]
    */
+  import FieldLabel from './FieldLabel.svelte'
+
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
-  let { value = $bindable([0, 100]), min = 0, max = 100, step = 1, gap = 0, id, label, format = (v) => String(v), class: className, ...rest } = $props()
+  let {
+    value = $bindable([0, 100]),
+    min = 0,
+    max = 100,
+    step = 1,
+    gap = 0,
+    id,
+    label,
+    format = (v) => String(v),
+    note = '',
+    info = '',
+    hideLabel = false,
+    class: className,
+    ...rest
+  } = $props()
 
   /** @type {HTMLDivElement | undefined} */
   let track = $state()
@@ -87,42 +107,45 @@
 </script>
 
 <div class="field">
-  <span class="field-label" id="{id}-label">{label} <output for="{id}-from {id}-to">{format(value[0])} – {format(value[1])}</output></span>
+  <FieldLabel id="{id}-label" {label} {note} {info} {hideLabel} />
   <span id="{id}-from-name" class="sr-only">from</span>
   <span id="{id}-to-name" class="sr-only">to</span>
-  <!-- Pointer only: the thumbs inside are the keyboard's way in. -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class={['range', className]}
-    {...rest}
-    role="group"
-    aria-labelledby="{id}-label"
-    class:dragging={dragging !== null}
-    style:--from="{pct(value[0])}%"
-    style:--to="{pct(value[1])}%"
-    onpointerdown={down}
-    onpointermove={move}
-    onpointerup={up}
-    onpointercancel={up}
-  >
-    <div class="track" bind:this={track}><div class="fill"></div></div>
-    {#each [0, 1] as i (i)}
-      <div
-        bind:this={thumbs[i]}
-        id="{id}-{i === 0 ? 'from' : 'to'}"
-        class="thumb"
-        class:active={dragging === i}
-        style:left="var(--{i === 0 ? 'from' : 'to'})"
-        role="slider"
-        tabindex="0"
-        aria-labelledby="{id}-label {id}-{i === 0 ? 'from' : 'to'}-name"
-        aria-valuemin={lowest(i)}
-        aria-valuemax={highest(i)}
-        aria-valuenow={value[i]}
-        aria-valuetext={format(value[i])}
-        onkeydown={(e) => onkeydown(e, /** @type {0 | 1} */ (i))}
-      ></div>
-    {/each}
+  <div class="row">
+    <!-- Pointer only: the thumbs inside are the keyboard's way in. -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class={['range', className]}
+      {...rest}
+      role="group"
+      aria-labelledby="{id}-label"
+      class:dragging={dragging !== null}
+      style:--from="{pct(value[0])}%"
+      style:--to="{pct(value[1])}%"
+      onpointerdown={down}
+      onpointermove={move}
+      onpointerup={up}
+      onpointercancel={up}
+    >
+      <div class="track" bind:this={track}><div class="fill"></div></div>
+      {#each [0, 1] as i (i)}
+        <div
+          bind:this={thumbs[i]}
+          id="{id}-{i === 0 ? 'from' : 'to'}"
+          class="thumb"
+          class:active={dragging === i}
+          style:left="var(--{i === 0 ? 'from' : 'to'})"
+          role="slider"
+          tabindex="0"
+          aria-labelledby="{id}-label {id}-{i === 0 ? 'from' : 'to'}-name"
+          aria-valuemin={lowest(i)}
+          aria-valuemax={highest(i)}
+          aria-valuenow={value[i]}
+          aria-valuetext={format(value[i])}
+          onkeydown={(e) => onkeydown(e, /** @type {0 | 1} */ (i))}
+        ></div>
+      {/each}
+    </div>
+    <output for="{id}-from {id}-to">{format(value[0])} – {format(value[1])}</output>
   </div>
 </div>
 
@@ -132,11 +155,17 @@
     flex-direction: column;
     gap: 3px;
   }
+  /* The track, then the value on its right. The gap clears the thumb, which overhangs the track's end by half its width. */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
   output {
     font: var(--w-medium) 12px var(--font-data);
     font-variant-numeric: tabular-nums;
     color: var(--fg-2);
-    margin-left: 4px;
+    white-space: nowrap;
   }
   .range {
     position: relative;
