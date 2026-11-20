@@ -147,7 +147,7 @@
   }
   .text {
     min-width: 0;
-    overflow: hidden;
+    overflow: clip;
     text-overflow: ellipsis;
   }
 </style>

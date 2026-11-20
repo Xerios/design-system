@@ -266,7 +266,7 @@
     color: var(--accent);
   }
   .label {
-    overflow: hidden;
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

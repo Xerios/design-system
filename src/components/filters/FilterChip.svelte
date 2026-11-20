@@ -188,9 +188,11 @@
   .op {
     color: var(--fg-2);
   }
+  /* clip, not hidden: an element with overflow: hidden is a scroll container, which Chrome may put on a layer of its own
+     while the pointer is over it, redrawing its text with other smoothing (the text seems to shift as it is hovered). */
   .value {
     max-width: 280px;
-    overflow: hidden;
+    overflow: clip;
     color: var(--fg);
   }
   /* An icon may brighten as it is hovered (no text to shift). */

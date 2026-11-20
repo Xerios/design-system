@@ -238,14 +238,14 @@
     min-width: 0;
   }
   .name {
-    overflow: hidden;
+    overflow: clip;
     color: var(--fg);
     font-size: 13px;
     line-height: 18px;
     text-overflow: ellipsis;
   }
   .detail {
-    overflow: hidden;
+    overflow: clip;
     color: var(--muted);
     font-family: var(--font-data);
     font-size: 11px;

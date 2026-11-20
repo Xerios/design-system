@@ -400,7 +400,7 @@
   .trigger :global(.value),
   .label {
     min-width: 0;
-    overflow: hidden;
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

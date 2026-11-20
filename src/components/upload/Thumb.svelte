@@ -241,7 +241,7 @@
     width: 96px;
   }
   .caption > span {
-    overflow: hidden;
+    overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
