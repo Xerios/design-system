@@ -1,11 +1,13 @@
 <script>
-  /** Kitchen sink: Button in all its states, the context menu with its visible ⋯ twin, and tiles. */
+  /** Kitchen sink: Button in all its states, the context menu with its visible ⋯ twin, the scroll buttons, and tiles. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
   import Button from '@xerios/design-system/components/Button.svelte'
   import MenuButton from '@xerios/design-system/components/menu/MenuButton.svelte'
   import Tile from '@xerios/design-system/components/tiles/Tile.svelte'
+  import ScrollToTop from '@xerios/design-system/components/scroll/ScrollToTop.svelte'
+  import ScrollMore from '@xerios/design-system/components/scroll/ScrollMore.svelte'
   import { contextMenu } from '@xerios/design-system/lib/menu.svelte.js'
 
   /** @param {number} ms */
@@ -19,6 +21,9 @@
   let pending = $state(false)
   let pressed = $state('nothing yet')
   let compact = $state(false)
+
+  // Filler for the scroll areas: enough lines to run a few screenfuls.
+  const lines = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: a row of content to scroll through.`)
 
   const menuItems = () => [
     { label: 'Open', icon: 'eye', action: () => (picked = 'Open') },
@@ -79,6 +84,28 @@
     <MenuButton items={menuItems} label="Demo item" />
     <span class="small muted">Picked: {picked}, compact rows {compact ? 'on' : 'off'}</span>
   </Demo>
+  <Demo label="ScrollToTop">
+    <Case label="Appears a screenful down">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollToTop />
+      </div>
+    </Case>
+  </Demo>
+  <Demo label="ScrollMore">
+    <Case label="Minimal: until you scroll">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollMore />
+      </div>
+    </Case>
+    <Case label="With text, whenever more is below; goes to the end">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollMore showLabel label="Jump to latest" until="end" toEnd />
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Tile" span={2}>
     <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
       <div class="tiles">
@@ -135,6 +162,17 @@
   .data {
     font-family: var(--font-data);
     font-variant-numeric: tabular-nums;
+  }
+  .scroller {
+    width: 100%;
+    height: 180px;
+    overflow: auto;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .scroller p {
+    margin: 0 0 var(--space-2);
   }
   .target {
     padding: var(--space-2) var(--space-3);

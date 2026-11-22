@@ -9,6 +9,12 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Added
 
+- `ScrollToTop`: a floating "back to top" pill (an up arrow and its label) that rises in at the bottom corner of the
+  window or a scroll area once you are a screenful down.
+- `ScrollMore`: a floating cue that there is more below, a gently bobbing down arrow (or a pill with its label) that
+  scrolls on by a screenful, or to the end (`toEnd`); shown until the area is scrolled, or whenever more is below
+  (`until="end"`).
+- `Icon`: the built-in `arrowUp`, `arrowUpBold` and `arrowDownBold` glyphs.
 - `lib/dates.js`: `formatShort` ('18 Nov', '18 Nov 2025 15:30') and `formatSpan` ('3–18 Nov', '28 Oct – 3 Nov',
   '14:30–16:00 18 Nov') write a day or a span for reading, with the month's short name and what both ends share once;
   `year: true` shows the year even when it is this one.
