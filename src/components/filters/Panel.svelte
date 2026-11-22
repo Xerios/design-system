@@ -41,7 +41,7 @@
   /** @param {PointerEvent} e */
   function outside(e) {
     const target = /** @type {Element} */ (e.target)
-    if (panel?.contains(target) || anchor?.contains(target) || target.closest?.('.ctx-menu, .tooltip')) return
+    if (panel?.contains(target) || anchor?.contains(target) || target.closest?.('.ctx-menu, .tooltip, [data-floating]')) return
     onclose(false)
   }
 

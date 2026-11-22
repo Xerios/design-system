@@ -1,8 +1,9 @@
 <script>
   /**
    * A typed day, the text part of DatePicker and DateRangePicker, in their panels (use those). It shows the value as DD/MM/YYYY
-   * ('18/11/2026') and reads what is typed when the field is left or Enter is pressed: that form with any
-   * separators, two-digit years, or ISO ('2026-11-18'). See lib/dates.js.
+   * ('18/11/2026') and reads what is typed when the field is left or Enter is pressed, with any-date-parser: numbers day
+   * first with any separators ('18.11.26', '18/11' for this year), ISO, month names ('18 Nov') or words ('tomorrow',
+   * '3 days ago'). See parseInput in lib/dates.js.
    *
    *   <DateInput bind:value {id} {min} {max} errorId={problem && `${id}-error`} onopen={openCalendar} onproblem={(m) => (problem = m)} />
    *

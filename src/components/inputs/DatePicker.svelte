@@ -8,10 +8,12 @@
    * value (bindable): an ISO day ('2026-11-18'), or '' for none. min, max: the first and last day allowed.
    * allowed: the only days that can be chosen (ISO days), or null for any; the calendar strikes out the rest and opens
    * on the nearest one, and typing another is an error under the input.
-   * Typing, in the input at the top of the panel: DD/MM/YYYY ('18/11/2026'; its placeholder shows it), with any
-   * separators, two-digit years or ISO; read when the input is left (the calendar moves to the day) or Enter is pressed
+   * Typing, in the input at the top of the panel: DD/MM/YYYY ('18/11/2026'; its placeholder shows it) with any
+   * separators or a two-digit year, '18/11' for this year, ISO, month names ('18 Nov') or words ('tomorrow', '3 days
+   * ago'; parseInput in lib/dates.js); read when the input is left (the calendar moves to the day) or Enter is pressed
    * (which also closes). Something that doesn't read, or falls outside min / max, is shown under the input until fixed
    * (Esc puts the value back). placeholder: the button's text with no value ("Choose a date").
+   * weekStart: the day the calendar's weeks start on, 1 Monday (the default) … 7 Sunday, or 'locale' for the user's.
    * clearable (default true): a ✕ to empty it. error, info, note, hideLabel, disabled: as on the other fields.
    * Keyboard: Enter, Space or ArrowDown on the button opens the panel with the focus in the input, its text selected
    * (typing replaces it); ArrowDown or Tab moves on to the calendar, where arrows move by day and week, PageUp / PageDown
@@ -33,6 +35,7 @@
    * @property {string | null} [max]
    * @property {string[] | null} [allowed]
    * @property {string} [placeholder]
+   * @property {number | 'locale'} [weekStart]
    * @property {boolean} [clearable]
    * @property {boolean} [hideLabel]
    * @property {string} [error]
@@ -41,7 +44,7 @@
    * @property {boolean} [disabled]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
-  let { value = $bindable(''), id, label, min = null, max = null, allowed = null, placeholder, clearable = true, error = '', disabled = false, ...field } = $props()
+  let { value = $bindable(''), id, label, min = null, max = null, allowed = null, placeholder, weekStart = 1, clearable = true, error = '', disabled = false, ...field } = $props()
 
   /** @type {HTMLDivElement | undefined} */
   let calendar = $state()
@@ -100,6 +103,7 @@
           bind:focus
           {min}
           {max}
+          {weekStart}
           {allowed}
           {label}
           selected={value ? [value] : []}

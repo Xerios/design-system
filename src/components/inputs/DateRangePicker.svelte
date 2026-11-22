@@ -8,11 +8,11 @@
    * value (bindable): [from, to] as ISO days, from ≤ to; ['', ''] for none (either end may be empty while typing).
    * min, max: the first and last day allowed. Typing works as DatePicker's, in the panel's two inputs; ends typed the
    * wrong way round swap. Enter in the first moves on to the second; Enter in the second closes once both are set.
-   * placeholder ("Choose dates"), clearable, error, info, note, hideLabel, disabled: as DatePicker's.
+   * placeholder ("Choose dates"), weekStart, clearable, error, info, note, hideLabel, disabled: as DatePicker's.
    * On the calendar the first press starts a new range; while choosing the second, the days up to the pointer (or the
    * keyboard focus) are tinted, and a second press before the first swaps them. Until the second press the inputs show
    * the first day in "from" and nothing in "to" (typing there finishes the range). Closing before the second press keeps
-   * the old range. A hint in the panel says which press is next, read out as it changes. Keyboard: as DatePicker's.
+   * the old range. After the first press, screen readers are told to pick the last day. Keyboard: as DatePicker's.
    * shortcuts: ready-made spans beside the calendar, [{ label, range() }] with range() giving [from, to]; one press sets
    * it and closes. Default: Last 7, 30, 60 and 90 days, This year (rangeShortcuts in lib/dates.js); [] for
    * none. A span reaching past min or max is cut to them, and one wholly outside is disabled.
@@ -34,6 +34,7 @@
    * @property {string | null} [max]
    * @property {{ label: string, range: () => [string, string] }[]} [shortcuts]
    * @property {string} [placeholder]
+   * @property {number | 'locale'} [weekStart]
    * @property {boolean} [clearable]
    * @property {boolean} [hideLabel]
    * @property {string} [error]
@@ -50,6 +51,7 @@
     max = null,
     shortcuts = rangeShortcuts(),
     placeholder = 'Choose dates',
+    weekStart = 1,
     clearable = true,
     error = '',
     disabled = false,
@@ -179,12 +181,13 @@
       {/if}
       <div class="days" bind:this={days}>
         <ErrorMessage id="{id}-typed-error" message={typed[0] || typed[1]} />
-        <p class="hint small muted" aria-live="polite">{first ? `From ${formatShort(first)}: pick the last day` : 'Pick the first day, or type the dates'}</p>
+        <p class="sr-only" aria-live="polite">{first ? `From ${formatShort(first)}: pick the last day` : ''}</p>
         <Calendar
           bind:month
           bind:focus
           {min}
           {max}
+          {weekStart}
           {label}
           selected={first ? [first] : value.filter(Boolean)}
           range={tint}
@@ -201,10 +204,6 @@
   .to {
     flex: none;
     color: var(--muted);
-    user-select: none;
-  }
-  .hint {
-    margin: 0;
     user-select: none;
   }
   .range,

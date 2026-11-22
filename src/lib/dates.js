@@ -1,6 +1,7 @@
 // Calendar dates for the pickers, as ISO strings ('2026-11-18'): a day, not an instant, so no time zone can move it.
 // All arithmetic runs in UTC; nothing here reads the local clock except today().
 
+import { attempt } from 'any-date-parser'
 import { runs } from './runs.js'
 
 /** @param {string | null | undefined} iso @returns {Date | null} */
@@ -54,11 +55,23 @@ export function firstDayOfWeek() {
   }
 }
 
-/** The weeks to draw for a month: 6 rows of 7 ISO days, starting on the locale's first day of the week.
- *  @param {string} month any day in it */
-export function monthGrid(month) {
+/** The days of the weekend where the user is, 1 Monday … 7 Sunday, as Intl reports it (default Saturday and Sunday). */
+export function weekendDays() {
+  try {
+    const locale = /** @type {any} */ (new Intl.Locale(navigator.language))
+    const info = locale.getWeekInfo?.() ?? locale.weekInfo
+    return /** @type {number[]} */ (info?.weekend ?? [6, 7])
+  } catch {
+    return [6, 7]
+  }
+}
+
+/** The weeks to draw for a month: 6 rows of 7 ISO days, starting on weekStart (1 Monday … 7 Sunday; by default the
+ *  locale's first day of the week).
+ *  @param {string} month any day in it @param {number} [weekStart] */
+export function monthGrid(month, weekStart = firstDayOfWeek()) {
   const first = monthOf(month)
-  const start = ((firstDayOfWeek() % 7) + 7) % 7 // Intl's 7 (Sunday) is getUTCDay's 0
+  const start = ((weekStart % 7) + 7) % 7 // Intl's 7 (Sunday) is getUTCDay's 0
   const lead = (weekday(first) - start + 7) % 7
   const from = addDays(first, -lead)
   return Array.from({ length: 6 }, (_week, w) => Array.from({ length: 7 }, (_day, d) => addDays(from, w * 7 + d)))
@@ -268,25 +281,24 @@ export function formatInput(day) {
 }
 
 /**
- * Reads a typed date: ISO ('2026-11-18'), or three numbers as day, month, year with any separators ('18/11/2026',
- * '18.11.26', '18 11 2026'). A two-digit year is this century. Returns the ISO day, or null if it isn't a real date.
+ * Reads a typed date with any-date-parser: numbers day first, whatever the locale ('18/11/2026', '18.11.26',
+ * '18 11 2026', '18/11' for this year), ISO ('2026-11-18'), month names ('18 Nov 2026', 'November 18', in English or
+ * the user's language) and words ('today', 'tomorrow', '3 days ago'). A missing year is this year. Returns the ISO
+ * day, or null if it isn't a real date.
  * @param {string} text
  */
 export function parseInput(text) {
   const typed = text.trim()
   if (!typed) return null
-  if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(typed)) {
-    const [y, m, d] = typed.split('-')
-    return parse(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`) ? `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}` : null
+  // en-GB reads numbers day first, as the placeholder asks; the user's own locale then catches month names in their
+  // language.
+  const locales = new Set(['en-GB', ...(typeof navigator === 'undefined' ? [] : [navigator.language])])
+  for (const locale of locales) {
+    const got = attempt(typed, locale)
+    if (got.invalid || !got.day || !got.month) continue
+    const year = got.year ?? Number(today().slice(0, 4))
+    const day = `${String(year).padStart(4, '0')}-${pad(got.month)}-${pad(got.day)}`
+    return parse(day) ? day : null
   }
-  const numbers = typed.split(/\D+/).filter(Boolean)
-  if (numbers.length !== 3) return null
-  const { order } = inputFormat()
-  /** @type {Record<string, string>} */
-  const got = Object.fromEntries(order.map((part, i) => [part, numbers[i]]))
-  let year = got.year
-  if (year.length <= 2) year = String(2000 + Number(year))
-  if (year.length !== 4) return null
-  const day = `${year}-${got.month.padStart(2, '0')}-${got.day.padStart(2, '0')}`
-  return parse(day) ? day : null
+  return null
 }

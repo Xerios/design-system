@@ -1,7 +1,7 @@
 <script>
   /**
    * One month of days to pick from: the grid inside DatePicker and DateRangePicker (use those; this is their part).
-   * Days are ISO strings ('2026-11-18'), see lib/dates.js. Weeks start on the user's locale's first day.
+   * Days are ISO strings ('2026-11-18'), see lib/dates.js.
    *
    *   <Calendar bind:month bind:focus selected={[value]} onpick={(day) => (value = day)} label="Start date" />
    *
@@ -14,19 +14,25 @@
    * min, max: the first and last day that can be picked; others show but can't be picked.
    * allowed: the only days that can be picked (within min and max), or null for every day.
    * onpick(day). onpoint(day): the day under the pointer or focus, for a range picker's preview.
+   * A hairline runs down the grid where the workdays meet the weekend (the user's locale's, Saturday and Sunday by
+   * default).
+   * weekStart: the day weeks start on, 1 Monday (the default) … 7 Sunday, or 'locale' for the user's locale's first day.
    * autofocus: take the focus (on `focus`) when it appears. label: names the grid with the month.
-   * The previous / next arrows stop at the first and last page holding a day that can be picked.
+   * The previous / next arrows stop at the first and last page holding a day that can be picked. The mouse wheel or a
+   * trackpad turns the pages too (down: next, up: previous), with the same stops.
    * Keyboard, as the ARIA date picker grid: arrows move a day or a week, Home / End to the week's ends, PageUp /
    * PageDown a month (with Shift a year), Enter or Space picks. Moving past the month turns the page.
-   * The month and the year in the head are buttons: they swap the grid for the twelve months, or a page of twelve
-   * years (picking a year then shows its months, picking a month its days). There, arrows move a cell or a row,
-   * PageUp / PageDown a year (or a page of years), Enter or Space picks, Esc goes back to the days.
+   * The month and the year in the head are dropdowns (Select, ghost): the months that hold a day that can be picked,
+   * and the years from min to max (without them, 3 years back to 1 ahead, and the year shown when it is further), with
+   * a search field when there are more than 8. Picking a year whose
+   * month has nothing to pick moves to its nearest month that does. Keyboard in them: as Select's.
    */
-  import { tick } from 'svelte'
+  import { tick, untrack } from 'svelte'
   import Button from '../Button.svelte'
   import DashOutline from '../DashOutline.svelte'
-  import { tooltip } from '../../lib/tooltip.js'
-  import { addDays, addMonths, monthGrid, monthOf, formatMonth, parse, speakDay, weekdayNames, within, today, compare } from '../../lib/dates.js'
+  import Select from './Select.svelte'
+  import { durations, motion } from '../../lib/motion.js'
+  import { addDays, addMonths, firstDayOfWeek, weekday, weekendDays, monthGrid, monthOf, formatMonth, parse, speakDay, weekdayNames, within, today, compare } from '../../lib/dates.js'
 
   /**
    * @typedef {object} Props
@@ -40,6 +46,7 @@
    * @property {string[] | null} [allowed]
    * @property {(day: string) => void} onpick
    * @property {(day: string) => void} [onpoint]
+   * @property {number | 'locale'} [weekStart]
    * @property {boolean} [autofocus]
    * @property {string} [label]
    */
@@ -55,14 +62,20 @@
     allowed = null,
     onpick,
     onpoint,
+    weekStart = 1,
     autofocus = false,
     label = '',
   } = $props()
 
   const uid = $props.id()
   const now = today()
-  const weeks = $derived(monthGrid(month))
+  const weeks = $derived(monthGrid(month, weekStart === 'locale' ? firstDayOfWeek() : weekStart))
   const names = $derived(weekdayNames(weeks[0]))
+  const weekend = new Set(weekendDays())
+  /** Per column: whether it is a weekend day (as Intl numbers them, Sunday 7). */
+  const weekendCols = $derived(weeks[0].map((day) => weekend.has(weekday(day) || 7)))
+  /** Whether a hairline runs down a column's start: where the workdays and the weekend meet. @param {number} col */
+  const split = (col) => col > 0 && weekendCols[col] !== weekendCols[col - 1]
   const span = $derived(range ? range.toSorted(compare) : null)
   /** Days since the epoch, for counting the days in a range. @param {string} day */
   const dayNumber = (day) => Date.parse(day) / 864e5
@@ -113,11 +126,120 @@
   /** @type {HTMLDivElement | undefined} */
   let root = $state()
 
-  /** What the grid shows: the month's days, the year's months, or a page of twelve years. */
-  /** @type {'days' | 'months' | 'years'} */
-  let view = $state('days')
-  /** The first year on the years page. */
-  let yearsFrom = $state(0)
+  /*
+   * Turning the page scrolls the grid, as one strip of weeks. Two months next to each other share a week or two: those
+   * glide from where they were to where they are now, the weeks leaving fade out under the day names and the new ones
+   * slide in. A jump with no week in common (another month or year picked) slides by the whole grid, the way the months
+   * run: a later month comes up from below, an earlier one down from above.
+   * The strip is two copies of the grid (the old one, copied before the update, and the new one) in a clipped layer
+   * over the real grid, which stays in place, unseen (opacity, so its focus stays), for keys and the pointer. Another
+   * turn mid-way cuts it short and starts again from the real grid. Nothing under reduced motion.
+   */
+  /** The page shown ('2026-11-01'). */
+  const pageKey = () => monthOf(month)
+  /** The grid the page is drawn in (the days' tbody). */
+  const grid = () => /** @type {HTMLElement | null | undefined} */ (root?.querySelector('[data-page]'))
+  /** Where each cell of a grid sits, by its data-key. @param {HTMLElement} page */
+  const cellTops = (page) => new Map([...page.querySelectorAll('[data-key]')].map((cell) => [cell.getAttribute('data-key'), cell.getBoundingClientRect().top]))
+  /** A copy of a grid to lay in the layer: a tbody inside a copy of its table (no rows), anything else on its own.
+   *  @param {HTMLElement} page */
+  function copyOf(page) {
+    const copy = /** @type {HTMLElement} */ (page.cloneNode(true))
+    copy.style.opacity = ''
+    if (page.tagName !== 'TBODY') return copy
+    const shell = /** @type {HTMLElement} */ (/** @type {HTMLElement} */ (page.parentElement).cloneNode(false))
+    shell.append(copy)
+    return shell
+  }
+
+  /** The page before it turned: its key, a copy of its grid, and where its cells sat. */
+  /** @type {{ key: string, copy: HTMLElement, tops: Map<string | null, number> } | null} */
+  let before = null
+  /** The turn playing now, to cut short. @type {{ layer: HTMLElement, page: HTMLElement } | null} */
+  let turning = null
+  /** The page the grid shows, as of the last update (by the time the pre-effect runs, the state is already the next). */
+  /** @type {string | null} */
+  let shown = null
+
+  function settle() {
+    if (!turning) return
+    turning.layer.remove()
+    turning.page.style.opacity = ''
+    turning = null
+  }
+
+  // Before the DOM updates for a new page: copy the grid as it still is.
+  $effect.pre(() => {
+    pageKey()
+    untrack(() => {
+      settle()
+      const page = grid()
+      before = shown && page ? { key: shown, copy: copyOf(page), tops: cellTops(page) } : null
+    })
+  })
+  $effect(() => {
+    const key = pageKey()
+    untrack(() => {
+      scrollPage(key)
+      shown = key
+    })
+  })
+
+  /** @param {string} key the page now shown */
+  function scrollPage(key) {
+    const from = before
+    before = null
+    const page = grid()
+    const duration = motion(durations.medium1)
+    if (!from || from.key === key || !page || !root || !duration) return
+    // How far the strip moved: by a cell both pages show (the new page's first, or the old page's first), else by the
+    // whole grid and the gap between its rows, in the direction the pages run.
+    const tops = cellTops(page)
+    const [first] = tops.keys()
+    const [oldFirst] = from.tops.keys()
+    const gap = parseFloat(getComputedStyle(page).rowGap) || 0
+    const forward = from.key < key
+    const shift = from.tops.has(first)
+      ? /** @type {number} */ (from.tops.get(first)) - /** @type {number} */ (tops.get(first))
+      : tops.has(oldFirst)
+        ? /** @type {number} */ (from.tops.get(oldFirst)) - /** @type {number} */ (tops.get(oldFirst))
+        : (forward ? 1 : -1) * (page.offsetHeight + gap)
+    if (!shift) return
+
+    const box = root.getBoundingClientRect()
+    const area = page.getBoundingClientRect()
+    const layer = document.createElement('div')
+    layer.setAttribute('aria-hidden', 'true')
+    layer.inert = true
+    Object.assign(layer.style, {
+      position: 'absolute',
+      left: `${area.left - box.left}px`,
+      top: `${area.top - box.top}px`,
+      width: `${area.width}px`,
+      height: `${area.height}px`,
+      overflow: 'clip',
+      pointerEvents: 'none',
+    })
+    /** Lays a copy at the top of the layer. @param {HTMLElement} copy */
+    const strip = (copy) => {
+      Object.assign(copy.style, { position: 'absolute', top: '0', left: '0', width: '100%', margin: '0' })
+      layer.append(copy)
+      return copy
+    }
+    const old = strip(from.copy)
+    const now = strip(copyOf(page))
+    root.append(layer)
+    page.style.opacity = '0'
+    const run = { layer, page }
+    turning = run
+    // M3's standard curve (easings.standard.standard): the pages begin and end on screen.
+    const timing = { duration, easing: 'cubic-bezier(0.2, 0, 0, 1)' }
+    old.animate([{ translate: '0 0', opacity: 1 }, { translate: `0 ${-shift}px`, opacity: 0 }], timing)
+    now.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], timing).finished.then(
+      () => turning === run && settle(),
+      () => {},
+    )
+  }
 
   /** @param {string} day */
   const yearOf = (day) => Number(day.slice(0, 4))
@@ -134,8 +256,6 @@
       .formatToParts(parse(month) ?? undefined)
       .filter((part) => part.type === 'month' || part.type === 'year'),
   )
-  const years = $derived(Array.from({ length: 12 }, (_y, i) => yearsFrom + i))
-
   /** The focus day moved into month m (0–11) of year y, keeping its day where that month has it. @param {number} y @param {number} m */
   const dayIn = (y, m) => addMonths(focus, (y - yearOf(focus)) * 12 + m - monthIndex(focus))
   /** Whether any day of month m (0–11) of year y can be picked. @param {number} y @param {number} m */
@@ -147,56 +267,33 @@
   /** @param {number} y */
   const yearOpen = (y) => (open ? open.some((day) => day.startsWith(`${y}-`)) : true) && !(max && `${y}-01-01` > max) && !(min && `${y}-12-31` < min)
 
-  /** Switches the grid and puts the focus on its focus cell. @param {'days' | 'months' | 'years'} next */
-  async function showView(next) {
-    if (next !== 'days') {
-      // The focus day may sit in a neighbouring month's overflow; bring it into the shown one.
-      focus = dayIn(yearOf(month), monthIndex(month))
-      month = monthOf(focus)
-    }
-    if (next === 'years') yearsFrom = yearOf(focus) - 4
-    view = next
-    await tick()
-    root?.querySelector('[tabindex="0"]')?.focus()
-  }
+  /** The months of the shown year that hold a day to pick (and the shown one), for the month dropdown. */
+  const monthOptions = $derived(
+    monthNames.map((name, m) => ({ value: m, label: name.long })).filter(({ value: m }) => m === monthIndex(month) || monthOpen(yearOf(month), m)),
+  )
+  /** The years from min to max (without them, 3 back and 1 ahead, stretched to the year shown) that hold a day to pick,
+   *  for the year dropdown. */
+  const yearOptions = $derived.by(() => {
+    const shown = yearOf(month)
+    const first = min ? yearOf(min) : Math.min(yearOf(now) - 3, shown)
+    const last = max ? yearOf(max) : Math.max(yearOf(now) + 1, shown)
+    return Array.from({ length: Math.max(0, last - first + 1) }, (_y, i) => first + i)
+      .filter((y) => y === shown || yearOpen(y))
+      .map((y) => ({ value: y, label: String(y) }))
+  })
 
   /** @param {number} m */
   function pickMonth(m) {
-    if (!monthOpen(yearOf(month), m)) return
     focus = dayIn(yearOf(month), m)
     month = monthOf(focus)
-    void showView('days')
   }
-  /** @param {number} y */
+  /** Moves to year y, in the same month, or the nearest one that holds a day to pick. @param {number} y */
   function pickYear(y) {
-    if (!yearOpen(y)) return
-    focus = dayIn(y, monthIndex(focus))
+    const want = monthIndex(month)
+    const months = [...Array(12).keys()].filter((m) => monthOpen(y, m))
+    const m = months.length ? months.reduce((best, m) => (Math.abs(m - want) < Math.abs(best - want) ? m : best)) : want
+    focus = dayIn(y, m)
     month = monthOf(focus)
-    void showView('months')
-  }
-
-  /** Moves the focus in the months or years grid (n months), paging the years along. @param {number} n */
-  async function moveCell(n) {
-    focus = addMonths(focus, n)
-    month = monthOf(focus)
-    const y = yearOf(focus)
-    if (view === 'years' && (y < yearsFrom || y >= yearsFrom + 12)) yearsFrom += Math.floor((y - yearsFrom) / 12) * 12
-    await tick()
-    root?.querySelector('[tabindex="0"]')?.focus()
-  }
-
-  /** @param {KeyboardEvent} e */
-  function onCellKey(e) {
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      e.stopPropagation()
-      void showView('days')
-      return
-    }
-    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -3, ArrowDown: 3, PageUp: -12, PageDown: 12 }[e.key]
-    if (!step) return
-    e.preventDefault()
-    void moveCell(view === 'years' ? step * 12 : step)
   }
 
   /** Moves the focus to a day, turning the page when it lies in another month. @param {string} day */
@@ -208,28 +305,25 @@
     table?.querySelector(`[data-day="${day}"]`)?.focus()
   }
 
-  /** The arrow buttons turn the page (a month, a year or twelve years) and keep the focus; the focus day moves with them. */
+  /** The arrow buttons turn the page a month and keep the focus; the focus day moves with them. */
   /** @param {number} n */
   async function turn(n) {
     if (!canTurn(n)) return
-    const months = view === 'days' ? n : view === 'months' ? n * 12 : n * 144
-    focus = addMonths(focus, months)
+    const arrow = root?.querySelector(`[data-turn="${n}"]`)
+    const pressed = !!arrow && arrow === document.activeElement
+    focus = addMonths(focus, n)
     month = monthOf(focus)
-    if (view === 'years') yearsFrom += n * 12
     // Reaching the limit disables the pressed arrow, which drops the focus; hand it to the other one.
-    if (!canTurn(n)) {
+    if (pressed && !canTurn(n)) {
       await tick()
       root?.querySelector(`[data-turn="${-n}"]`)?.focus()
     }
   }
   /** Whether the page before (-1) or after (1) holds a day that can be picked. @param {number} n */
   function canTurn(n) {
-    if (view === 'years') return yearOpen(n < 0 ? yearsFrom - 1 : yearsFrom + 12)
-    if (view === 'months') return yearOpen(yearOf(month) + n)
     const next = addMonths(monthOf(month), n)
     return monthOpen(yearOf(next), monthIndex(next))
   }
-  const turnLabel = $derived({ days: 'month', months: 'year', years: 'years' }[view])
 
   /** @param {KeyboardEvent} e */
   function onkeydown(e) {
@@ -260,73 +354,62 @@
     onpick(day)
   }
 
+  /**
+   * Attachment: the wheel turns the page, down to the next month (as the arrows do) and up to the previous, stopping where they do. The wheel's travel adds up to a notch before a page turns, and a turn
+   * waits for the last one's scroll to play out (about four a second), so a trackpad's glide doesn't race through the
+   * months. Not passive: the page behind
+   * doesn't scroll while the pointer is over the calendar. A pinch (ctrlKey) is left to zoom.
+   * @param {HTMLElement} node
+   */
+  function wheelTurns(node) {
+    let travel = 0
+    let last = 0
+    /** @param {WheelEvent} e */
+    const onwheel = (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
+      e.preventDefault()
+      travel += e.deltaMode === WheelEvent.DOM_DELTA_LINE ? e.deltaY * 16 : e.deltaMode === WheelEvent.DOM_DELTA_PAGE ? e.deltaY * 400 : e.deltaY
+      // One turn at a time: as long as a turn's scroll plays.
+      if (Math.abs(travel) < 50 || e.timeStamp - last < durations.medium1) return
+      last = e.timeStamp
+      const n = Math.sign(travel)
+      travel = 0
+      void turn(n)
+    }
+    node.addEventListener('wheel', onwheel, { passive: false })
+    return () => node.removeEventListener('wheel', onwheel)
+  }
+
   /** Attachment: takes the focus when the calendar appears, if asked to. @param {HTMLTableElement} node */
   function takeFocus(node) {
     if (autofocus) void tick().then(() => node.querySelector('[tabindex="0"]')?.focus())
   }
 </script>
 
-<div bind:this={root} class="calendar">
+<div bind:this={root} class="calendar" {@attach wheelTurns}>
   <span id="{uid}-label" class="sr-only">{label}</span>
-  <span id="{uid}-month" class="sr-only" aria-live="polite">{view === 'years' ? `${yearsFrom} – ${yearsFrom + 11}` : view === 'months' ? yearOf(month) : formatMonth(month)}</span>
+  <span id="{uid}-month" class="sr-only" aria-live="polite">{formatMonth(month)}</span>
   <div class="head">
-    <Button iconOnly icon="caretLeft" label="Previous {turnLabel}" data-turn="-1" disabled={!canTurn(-1)} onclick={() => turn(-1)} />
+    <Button iconOnly icon="caretLeft" label="Previous month" data-turn="-1" disabled={!canTurn(-1)} onclick={() => turn(-1)} />
+    <!-- The month and the year, in the locale's order. -->
     <span class="title">
-      {#if view === 'years'}
-        <span class="range">{yearsFrom} – {yearsFrom + 11}</span>
-      {:else}
-        {#each headParts as part (part.type)}
-          {#if part.type === 'month' && view === 'days'}
-            <button type="button" class="pick" {@attach tooltip('Choose month')} onclick={() => showView('months')}>{part.value}</button>
-          {:else if part.type === 'year'}
-            <button type="button" class="pick" {@attach tooltip('Choose year')} onclick={() => showView('years')}>{part.value}</button>
-          {/if}
-        {/each}
-      {/if}
+      {#each headParts as part (part.type)}
+        {#if part.type === 'month'}
+          <Select class="head-pick" ghost hideLabel search={false} id="{uid}-month-pick" label="Month" options={monthOptions} bind:value={() => monthIndex(month), pickMonth} />
+        {:else}
+          <Select class="head-pick data" ghost hideLabel id="{uid}-year-pick" label="Year" options={yearOptions} bind:value={() => yearOf(month), pickYear} />
+        {/if}
+      {/each}
     </span>
-    <Button iconOnly icon="caretRight" label="Next {turnLabel}" data-turn="1" disabled={!canTurn(1)} onclick={() => turn(1)} />
+    <Button iconOnly icon="caretRight" label="Next month" data-turn="1" disabled={!canTurn(1)} onclick={() => turn(1)} />
   </div>
-  {#if view === 'months'}
-    <!-- The keys are its buttons' (arrows move between them, Esc goes back to the days). -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <div class="cells" role="group" aria-labelledby="{uid}-label {uid}-month" onkeydown={onCellKey}>
-      {#each monthNames as name, m (m)}
-        <button
-          type="button"
-          class="cell"
-          class:chosen={m === monthIndex(month)}
-          tabindex={m === monthIndex(focus) ? 0 : -1}
-          aria-label="{name.long} {yearOf(month)}"
-          aria-current={m === monthIndex(month) ? 'true' : undefined}
-          aria-disabled={monthOpen(yearOf(month), m) ? undefined : 'true'}
-          onclick={() => pickMonth(m)}>{name.short}</button
-        >
-      {/each}
-    </div>
-  {:else if view === 'years'}
-    <!-- The keys are its buttons' (arrows move between them, Esc goes back to the days). -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <div class="cells" role="group" aria-labelledby="{uid}-label {uid}-month" onkeydown={onCellKey}>
-      {#each years as y (y)}
-        <button
-          type="button"
-          class="cell data"
-          class:chosen={y === yearOf(month)}
-          tabindex={y === yearOf(focus) ? 0 : -1}
-          aria-current={y === yearOf(month) ? 'true' : undefined}
-          aria-disabled={yearOpen(y) ? undefined : 'true'}
-          onclick={() => pickYear(y)}>{y}</button
-        >
-      {/each}
-    </div>
-  {:else}
   <table bind:this={table} role="grid" aria-labelledby="{uid}-label {uid}-month" {onkeydown} {@attach takeFocus}>
     <thead>
       <tr>
-        {#each names as name, i (i)}<th scope="col" abbr={name.long}>{name.short}</th>{/each}
+        {#each names as name, i (i)}<th scope="col" abbr={name.long} class:split={split(i)}>{name.short}</th>{/each}
       </tr>
     </thead>
-    <tbody>
+    <tbody data-page>
       {#each weeks as week (week[0])}
         <tr>
           {#each week as day, col (day)}
@@ -335,10 +418,11 @@
             {@const inRange = !!span && day >= span[0] && day <= span[1]}
             {@const edge = isEnd(day)}
             {@const between = inRange && !edge}
-            <td role="gridcell" aria-selected={chosen || inRange}>
+            <td role="gridcell" aria-selected={chosen || inRange} class:split={split(col)}>
               <button
                 type="button"
                 data-day={day}
+                data-key={day}
                 class="day"
                 class:outside={!inMonth}
                 class:chosen={chosen || edge}
@@ -361,7 +445,6 @@
       {/each}
     </tbody>
   </table>
-  {/if}
 </div>
 
 <style>
@@ -371,86 +454,63 @@
     -webkit-user-select: none;
     /* A day's width: the cells sit edge to edge, so a range's outline slices (slice()) line up by it. */
     --day: 32px;
+    /* Holds the layer the weeks scroll in as the page turns. */
+    position: relative;
     display: grid;
     gap: var(--space-2);
-    width: max-content;
+    /* As wide as the days, whatever the month: the panel keeps its size as the pages turn. */
+    width: calc(var(--day) * 7);
   }
   .head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
+    gap: 2px;
   }
   .title {
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     gap: 2px;
+    min-width: 0;
+  }
+  /* The month's dropdown takes the room the year's leaves, so a long month name doesn't widen the head. */
+  .title > :global(.field:has(.head-pick:not(.data))) {
+    flex: 1 1 0;
+  }
+  /* The month and year dropdowns: ghost Selects, as tight as the head needs (a Select's button is 120px at least). */
+  .title :global(.trigger.head-pick) {
+    gap: 6px;
+    min-width: 0;
+    min-height: 28px;
+    padding: 0 4px 0 8px;
     font-weight: var(--w-semibold);
-    color: var(--fg);
   }
-  .range {
+  .title :global(.trigger.head-pick.data) {
     font-family: var(--font-data);
     font-variant-numeric: tabular-nums;
-  }
-  .pick {
-    min-height: 24px;
-    padding: 0 var(--space-1);
-    border: 0;
-    border-radius: var(--r);
-    background: none;
-    color: inherit;
-    font: inherit;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-  .pick:hover {
-    background: var(--control-3);
-  }
-  .pick:focus-visible,
-  .cell:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-  }
-  /* Twelve months or years, in the width of the day grid (7 × 32px). */
-  .cells {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-    width: 224px;
-  }
-  .cell {
-    min-height: 40px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--r);
-    background: none;
-    color: var(--fg);
-    font: var(--w-medium) 12px var(--font-body);
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-  .cell.data {
-    font-family: var(--font-data);
-    font-variant-numeric: tabular-nums;
-  }
-  .cell:hover:not([aria-disabled='true']) {
-    background: var(--control-3);
-  }
-  .cell[aria-disabled='true'] {
-    color: var(--faint);
-    text-decoration: line-through;
-    cursor: default;
   }
   table {
     border-collapse: collapse;
   }
+  /* A hairline under the day names, across the grid. */
   th {
     width: 32px;
     height: 24px;
+    border-bottom: 1px solid var(--line);
     font-size: 11px;
     font-weight: var(--w-medium);
-    color: var(--muted);
+    color: var(--faint);
   }
   td {
     padding: 1px 0;
+  }
+  tbody tr:first-child td {
+    padding-top: 4px;
+  }
+  /* A hairline down the grid where the workdays meet the weekend, drawn inside the cell's edge so it takes no width
+     (a range's bar and its outline slices stay a day wide); a day's fill (hover, chosen, a range) covers it. */
+  .split {
+    box-shadow: inset 1px 0 var(--line);
   }
   .day {
     display: grid;

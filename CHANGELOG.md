@@ -24,12 +24,36 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
   Enter in it sets the value and closes. Attributes and attachments now go to the button; `placeholder` is the
   button's text with no value.
 - `DateRangePicker`: after the first press on the calendar, the inputs show that day in "from" and "to" is empty.
+- `Calendar`, `DatePicker`, `DateRangePicker`: weeks start on Monday by default instead of the locale's first day;
+  `weekStart` (1 Monday … 7 Sunday, or 'locale') changes it. `monthGrid` takes the same as a second argument.
+- `Calendar` (and the pickers' calendars): the mouse wheel or a trackpad turns the page (down: next month, up:
+  previous), stopping where the arrows do.
+- `Calendar`: turning the page scrolls the weeks: the weeks two months share glide to their new place, the others slide
+  out and in under the day names. A jump to another month or year slides the whole grid.
+- `Calendar`: the month and the year in its head are dropdowns (ghost `Select`s) instead of buttons that swapped the
+  grid for a page of months or years. The month list holds the months with a day to pick; the year list runs from
+  `min` to `max` (without them, 3 years back to 1 ahead, plus the year shown if it is further) and has a search field
+  when it holds more than 8.
+- `Calendar`: one fixed width (the days' grid), so the pickers' panels keep their size from month to month; a long
+  month name is cut off with an ellipsis in the head rather than widening it.
+- `Calendar`: a hairline under the day names, which are dimmer (`--faint`), and one down the grid where the workdays
+  meet the weekend (the user's locale's; Saturday and Sunday by default). `weekendDays()` in `lib/dates.js` gives it.
+- `DateRangePicker`: no "Pick the first day" hint above the calendar; after the first press, only screen readers are
+  told to pick the last day.
 - `DateInput`: leaving it without an edit no longer re-reads the value.
+- `DatePicker`, `DateRangePicker`, `parseInput`: typed dates are read with any-date-parser (a new dependency), so
+  month names ('18 Nov', '18 novembre'), a missing year ('18/11', this year) and words ('today', 'tomorrow', '3 days
+  ago') read too. Numbers are still day first.
 - `DateRangeSelect`: a calendar icon on the button. The button and the list show months by their short name instead
   of numbers, and a span as briefly as it can be said ('3–18 Nov', '14:30–16:00 18 Nov').
 - **Breaking** `DateField`: the field is a button and the `inputs` snippet is drawn in a box at the top of the panel
   (with the clear button), given `close`. `calendarLabel` is gone; pass the value's text as `text` (and
   `placeholder`). `show()` takes no argument and focuses the panel's `[data-autofocus]` element.
+
+### Fixed
+
+- `DatePicker`, `DateRangePicker` (`DateField`), `FilterBar`'s panels: a press or the focus in a layer opened from
+  inside the panel (a `Select`'s list) no longer closes the panel.
 
 ## [0.1.2] - 2026-11-20
 

@@ -46,6 +46,7 @@
   let due = $state('')
   let stay = $state(/** @type {[string, string]} */ (['', '']))
   let slot = $state('')
+  let sundayDue = $state('')
   let runs = $state(/** @type {[string, string]} */ (['', '']))
   let plan = $state('team')
   let topics = $state(['deploys', 'mentions'])
@@ -308,6 +309,9 @@
     </Case>
     <Case label="Only some days">
       <DatePicker bind:value={slot} id="ks-slot" label="Slot" allowed={SLOTS} />
+    </Case>
+    <Case label="Weeks from Sunday (weekStart: 7)">
+      <DatePicker bind:value={sundayDue} id="ks-sunday" label="Delivery" weekStart={7} />
     </Case>
   </Demo>
   <Demo label="Date range picker">
