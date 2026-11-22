@@ -11,7 +11,8 @@
    *   </DateField>
    *
    * id: the button's (the label points at it). text: the value as the button shows it; placeholder in its place while
-   * it is '' ("Choose a date"). open (bindable). onopen(): runs as it opens (set the calendar and the inputs on the
+   * it is '' ("Choose a date"). longText: the value with more said (the year), shown instead of text while the button
+   * has room for it in full. open (bindable). onopen(): runs as it opens (set the calendar and the inputs on the
    * value). show(): opens it with the focus on the panel's [data-autofocus] element (its text selected, so typing
    * replaces it), else its first focusable day. inputs(close): the typed inputs, in the box at the top of the panel.
    * hasValue + onclear: the clear button at the end of that box (the focus goes to its first input). panel(close): the
@@ -34,6 +35,7 @@
    * @property {string} id
    * @property {string} label
    * @property {string} [text]
+   * @property {string} [longText]
    * @property {string} [placeholder]
    * @property {boolean} [open] bindable
    * @property {() => void} [onopen]
@@ -52,6 +54,7 @@
     id,
     label,
     text = '',
+    longText = '',
     placeholder = 'Choose a date',
     open = $bindable(false),
     onopen,
@@ -76,6 +79,21 @@
   let entry = $state()
   /** @type {HTMLDivElement | undefined} */
   let sheet = $state()
+
+  // The long text, when there is one that says more than text.
+  const long = $derived(text && longText && longText !== text ? longText : '')
+  /** Whether the long text doesn't fit, so the short one shows in its place. */
+  let tight = $state(false)
+  /** Attachment for the long text: measures whether it fits, again as the button resizes, the text changes (the
+   *  argument) or the fonts load. Both texts keep their place in the layout, so a button sized by its content takes
+   *  the long one's width and shows it. @param {string} _text */
+  const fit = (_text) => (/** @type {HTMLElement} */ node) => {
+    const check = () => (tight = node.scrollWidth > node.clientWidth)
+    const observer = new ResizeObserver(check)
+    observer.observe(node)
+    void document.fonts?.ready.then(check)
+    return () => observer.disconnect()
+  }
 
   /** Opens the panel (if it isn't) with the focus on its [data-autofocus] element, else its focus day. */
   export async function show() {
@@ -142,7 +160,14 @@
     onkeydown={onButtonKey}
   >
     <span class="icon"><Icon name="calendar" size="sm" /></span>
-    <span class="value" class:placeholder={!text}>{text || placeholder}</span>
+    <span class="value" class:placeholder={!text} class:stack={long}>
+      {#if long}
+        <span class="long" class:hide={tight} {@attach fit(long)}>{long}</span>
+        <span class="short" class:hide={!tight}>{text}</span>
+      {:else}
+        {text || placeholder}
+      {/if}
+    </span>
     {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
   </button>
   {#if open}
@@ -249,6 +274,23 @@
     overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* The long and short text in one cell, one of them hidden: the long one wide enough to size a button that grows with
+     its content, and measured (left unclipped) to tell whether it fits. */
+  .stack {
+    display: grid;
+  }
+  .stack > span {
+    grid-area: 1 / 1;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .short {
+    overflow: clip;
+    text-overflow: ellipsis;
+  }
+  .hide {
+    visibility: hidden;
   }
   .placeholder {
     font-family: var(--font-body);

@@ -1,6 +1,7 @@
 <script>
   /**
-   * A span of days: a button showing it for reading ('3–18 Nov', '28 Oct – 3 Nov'; see formatSpan in lib/dates.js) that
+   * A span of days: a button showing it for reading ('3–18 Nov 2026', '28 Oct – 3 Nov 2026', dropping this year's number
+   * when the button is too narrow for it; see formatSpan in lib/dates.js) that
    * opens a panel under it, where the two ends are typed (from, to) or picked with two presses on a calendar.
    *
    *   <DateRangePicker bind:value={stay} id="stay" label="Dates" min={today()} />
@@ -141,6 +142,7 @@
   bind:open
   {onopen}
   text={formatSpan(value[0], value[1])}
+  longText={formatSpan(value[0], value[1], { year: true })}
   {placeholder}
   hasValue={!!(first || value[0] || value[1])}
   onclear={clearable ? () => ((value = ['', '']), (first = null), (typed = ['', ''])) : undefined}

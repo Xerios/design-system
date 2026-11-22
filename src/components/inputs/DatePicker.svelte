@@ -1,7 +1,7 @@
 <script>
   /**
-   * One date: a button showing it for reading ('18 Nov', with the year when it isn't this year; see formatShort in
-   * lib/dates.js) that opens a panel under it, where it is typed or picked from a calendar.
+   * One date: a button showing it for reading ('18 Nov 2026', dropping this year's number when the button is too narrow
+   * for it: '18 Nov'; see formatShort in lib/dates.js) that opens a panel under it, where it is typed or picked from a calendar.
    *
    *   <DatePicker bind:value={due} id="due" label="Due date" min={today()} />
    *
@@ -73,6 +73,7 @@
   bind:open
   {onopen}
   text={value ? formatShort(value) : ''}
+  longText={value ? formatShort(value, { year: true }) : ''}
   {placeholder}
   hasValue={!!value}
   onclear={clearable ? () => ((value = ''), (typed = '')) : undefined}

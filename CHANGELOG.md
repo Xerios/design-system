@@ -10,11 +10,14 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 ### Added
 
 - `lib/dates.js`: `formatShort` ('18 Nov', '18 Nov 2025 15:30') and `formatSpan` ('3–18 Nov', '28 Oct – 3 Nov',
-  '14:30–16:00 18 Nov') write a day or a span for reading, with the month's short name and what both ends share once.
+  '14:30–16:00 18 Nov') write a day or a span for reading, with the month's short name and what both ends share once;
+  `year: true` shows the year even when it is this one.
 - `DateInput`: `oncommit(day, enter)` runs after what was typed becomes the value.
 
 ### Changed
 
+- `Empty.Error`: laid out side by side: a larger warning icon on the left, a vertical rule, and the title, message
+  and actions to its right, aligned left (they were stacked and centred).
 - `--brand`, `--accent`, `--link` (and everything built on them: `--accent-soft`, `--accent-line`, `--ring`,
   `--control-*`, `--glow`): the default accent is teal instead of indigo. Primary buttons, focus rings, ticks, links and
   the tint on controls all turn teal; an app that sets its own `--brand` / `--accent` sees no change.
@@ -26,8 +29,17 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - `DateRangePicker`: after the first press on the calendar, the inputs show that day in "from" and "to" is empty.
 - `Calendar`, `DatePicker`, `DateRangePicker`: weeks start on Monday by default instead of the locale's first day;
   `weekStart` (1 Monday … 7 Sunday, or 'locale') changes it. `monthGrid` takes the same as a second argument.
+- `DatePicker`, `DateRangePicker`: the button shows the year whenever it has room for it ('18 Nov 2026',
+  '3–18 Nov 2026'), dropping this year's number only when it is too narrow.
 - `Select`, `OptionList` with `multiple={false}`: the chosen option is filled solid with the brand colour (as a chosen
   day in `Calendar`) instead of carrying a tick, and the rows lose the tick column.
+- Light theme is flat: buttons, select triggers, chosen segments, tiles and upload pills lose their lit top edge,
+  contact ring and drop (`--shadow-btn`, `--solid-edge`, `--raised-edge`, `--raised-base`); fields and switch tracks
+  lose their sunken relief (`--sunken-shadow`, `--shadow-sm`); cards, tables and dialogs lose the lit corner, the
+  `.shine` beam and their resting drop (`--edge-hi`, `--edge-shadow`, `--shine`, `--view-shadow`). Every edge is its
+  plain hairline. Soft shadows stay in three places: a short drop under raised controls (`--shadow-btn`, which also
+  shades them softly from top to bottom so they read as gently rounded) and the view card (`--view-shadow`), and a
+  wide, soft one under floating layers (`--shadow`). `--shadow-md` is quieter. Dark is unchanged.
 - `Calendar` (and the pickers' calendars): the mouse wheel or a trackpad turns the page (down: next month, up:
   previous), stopping where the arrows do.
 - `Calendar`: turning the page scrolls the weeks: the weeks two months share glide to their new place, the others slide

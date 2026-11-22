@@ -215,15 +215,15 @@ export function formatShort(value, { time = true, year } = {}) {
  *   '14:30–16:00 18 Nov'          one day, two times
  *   '17 Nov 14:30 – 18 Nov 09:00' times on different days
  * The year shows once, at the end, when both ends are in the same year but not this one; on both when they differ.
- * time(value): whether to show that end's time (moments only); by default every moment's. One end empty: 'From 3 Nov',
- * 'Until 18 Nov'; both: ''.
- * @param {string} from @param {string} to @param {{ time?: (value: string) => boolean }} [show]
+ * time(value): whether to show that end's time (moments only); by default every moment's. year: true shows the year
+ * even when it is this one ('3–18 Nov 2026'). One end empty: 'From 3 Nov', 'Until 18 Nov'; both: ''.
+ * @param {string} from @param {string} to @param {{ time?: (value: string) => boolean, year?: boolean }} [show]
  */
-export function formatSpan(from, to, { time = () => true } = {}) {
-  if (!from || !to) return from ? `From ${formatShort(from)}` : to ? `Until ${formatShort(to)}` : ''
+export function formatSpan(from, to, { time = () => true, year = false } = {}) {
+  if (!from || !to) return from ? `From ${formatShort(from, { year: year || undefined })}` : to ? `Until ${formatShort(to, { year: year || undefined })}` : ''
   const [a, b] = [dayOf(from), dayOf(to)]
   const [yearA, yearB] = [a.slice(0, 4), b.slice(0, 4)]
-  const yearAtEnd = yearA !== yearB || yearB !== today().slice(0, 4)
+  const yearAtEnd = year || yearA !== yearB || yearB !== today().slice(0, 4)
   const end = yearAtEnd ? ` ${yearB}` : ''
   const [timeA, timeB] = [isMoment(from) && time(from), isMoment(to) && time(to)]
   if (a === b) {
