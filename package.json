@@ -1,6 +1,6 @@
 {
   "name": "@xerios/design-system",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Linear-style design system for Svelte 5: theme tokens, global CSS and generic components",
   "keywords": [
     "svelte",

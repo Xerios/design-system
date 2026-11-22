@@ -7,6 +7,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-22
+
 ### Added
 
 - `ScrollToTop`: a floating "back to top" pill (an up arrow and its label) that rises in at the bottom corner of the
@@ -124,7 +126,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 First release: theme tokens, global CSS (`base`, `effects`, `atoms`), the components listed in the README and the
 `lib/` helpers.
 
-[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/Xerios/design-system/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Xerios/design-system/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Xerios/design-system/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Xerios/design-system/releases/tag/v0.1.0
