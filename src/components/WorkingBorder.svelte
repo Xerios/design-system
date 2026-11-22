@@ -1,7 +1,8 @@
 <script>
   /**
-   * Working border: two comets of colour (an indigo tail running through violet and pink to an amber head) travel round
-   * the edge of their parent at an even speed, with a blurred copy glowing around it. Drop it inside a positioned element
+   * Working border: two comets of light travel round the edge of their parent at an even speed, with a blurred copy
+   * glowing around it. They are the metal of the working shimmer and the new-content glow (--sheen-*): a faint silver
+   * tail running through cyan, indigo, rose and gold to a bright head, silver on dark and violet on light. Drop it inside a positioned element
    * with a 1px border; set --radius to its border-radius (default --r-xl). It fills that element and paints over the
    * border. Purely decorative. Reduced motion holds the comets still (the global rule).
    *
@@ -17,14 +18,15 @@
   /** How much of the perimeter a comet covers, and how many dashes it is drawn with. */
   const LENGTH = 22
   const DASHES = 14
-  /** The comet's colours, tail (0) to head (1). */
+  /** The comet's colours, tail (0) to head (1): the sheen tokens, so they follow the theme. */
   const STOPS = [
     [0, 'transparent'],
-    [0.35, 'rgb(94 106 210 / 0.5)'],
-    [0.6, '#7170ff'],
-    [0.75, '#a855f7'],
-    [0.88, '#ec4899'],
-    [0.97, '#f59e0b'],
+    [0.3, 'color-mix(in lch, var(--sheen-lo) 50%, transparent)'],
+    [0.5, 'var(--sheen-cool)'],
+    [0.64, 'var(--sheen-tint)'],
+    [0.76, 'var(--sheen-rose)'],
+    [0.86, 'var(--sheen-gold)'],
+    [0.95, 'var(--sheen-hi)'],
     [1, 'transparent'],
   ]
 

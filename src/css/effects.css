@@ -1,4 +1,4 @@
-/* Light and motion: scroll-edge fades, the lit edge, corner glow, shine, shell atmosphere, the working shimmer, the spotlight and dialog motion. */
+/* Light and motion: scroll-edge fades, the new-content glow, the lit edge, corner glow, shine, shell atmosphere, the working shimmer, the spotlight and dialog motion. */
 
 /* ---------- scroll fade ---------- */
 /* Set by the scrollFade attachment (../lib/scroll-fade.js) on scroll areas that overflow: the top edge fades while there's
@@ -76,6 +76,241 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scroll-fade] {
     transition: none;
+  }
+}
+
+/* ---------- new-content glow ---------- */
+/* Laid for a while by edgeGlow() (../lib/edge-glow.js) over a scroll area, to say new content arrived past its bottom
+   (.below) or top (.above) edge, in the working shimmer's metal (--sheen-*: silver greys and an indigo glint on dark,
+   grey and violet on light) with the colours it takes on at an angle (steel cyan, dusty rose, champagne gold). The
+   overlay covers the area's visible box and clips to its corners. It has three parts:
+   - .edge-glow-main, the glow on the edge: a soft metallic bloom pooled on the edge's middle, breathing (::before). It
+     holds for --edge-glow-hold (default 1200ms), then fades;
+   - the ripples (.edge-glow-waves, holding an .edge-glow-wave for each; --i is each one's order, --n how many): wide
+     elliptical rings centred on the edge's middle, growing out and fading, like ripples on water, the metal's colours
+     running round the ring. They keep spreading out of the edge after the glow fades, until it all ends; edgeGlow then
+     lets the rings under way finish rather than cutting them off. They are cut out with a mask, which would trim a blur
+     of their own back to a sharp edge (a filter is applied before the mask), so their softness is a filter on the
+     .edge-glow-waves around them instead;
+   - the line on the edge (the overlay's ::after): a 1px metal hairline with a pair of bright glints running out from
+     its middle to both ends with each ripple, where its ring meets the edge. It lasts as long as the ripples: when the
+     glow ends, edgeGlow sets [data-ending] and --edge-glow-line-out (the time the last ring has left), and it fades over
+     that time.
+   Reach: --edge-glow-size on the area or above (default 120px). Strength: --edge-glow-strength. Reduced motion stills
+   it (the global rule in base.css): the rings are hidden at rest, so only the bloom and hairline come and go. */
+@property --edge-glow-turn {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.edge-glow {
+  /* Metal catching the light: from the low tone through a bright band, then the colours of its sheen (cyan, indigo,
+     rose, gold) and bright again, back to the low tone, so it repeats seamlessly. */
+  --edge-glow-hues:
+    var(--sheen-lo), var(--sheen-hi) 14%, var(--sheen-cool) 26%, var(--sheen-tint) 38%, var(--sheen-rose) 52%, var(--sheen-gold) 64%,
+    var(--sheen-hi) 78%, var(--sheen-lo) 92%;
+  position: fixed;
+  z-index: var(--z-overlay);
+  overflow: clip;
+  pointer-events: none;
+  animation: edge-glow-in 480ms var(--ease-enter) both;
+}
+/* The light on the edge: holds, then fades, sooner than the ripples (edgeGlow starts the fade at once if the glow ends
+   before then). */
+.edge-glow-main {
+  position: absolute;
+  inset: 0;
+  animation: edge-glow-out 700ms var(--ease-exit) var(--edge-glow-hold, 1200ms) forwards;
+}
+/* The line: the low metal tone, faded at both ends, with two glints running out from its middle, one each way, each a
+   bright head (the high tone, a cyan fringe ahead) trailing rose and gold back towards the middle. They sit
+   --edge-glow-spread either side of the middle and glow by --edge-glow-lit (mixed into their colours, so the line
+   under them is untouched), both animated by edge-glow-glint. Over the waves. */
+@property --edge-glow-spread {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+@property --edge-glow-lit {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+.edge-glow::after {
+  --edge-glow-r: calc(50% + var(--edge-glow-spread));
+  --edge-glow-l: calc(50% - var(--edge-glow-spread));
+  --edge-glow-g1: color-mix(in lch, var(--sheen-cool) calc(var(--edge-glow-lit) * 100%), transparent);
+  --edge-glow-g2: color-mix(in lch, var(--sheen-hi) calc(var(--edge-glow-lit) * 100%), transparent);
+  --edge-glow-g3: color-mix(in lch, var(--sheen-rose) calc(var(--edge-glow-lit) * 100%), transparent);
+  --edge-glow-g4: color-mix(in lch, var(--sheen-gold) calc(var(--edge-glow-lit) * 100%), transparent);
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(var(--edge-glow-r) - 16%),
+      var(--edge-glow-g4) calc(var(--edge-glow-r) - 10%),
+      var(--edge-glow-g3) calc(var(--edge-glow-r) - 5%),
+      var(--edge-glow-g2) var(--edge-glow-r),
+      var(--edge-glow-g1) calc(var(--edge-glow-r) + 3%),
+      transparent calc(var(--edge-glow-r) + 6%)
+    ),
+    linear-gradient(
+      90deg,
+      transparent calc(var(--edge-glow-l) - 6%),
+      var(--edge-glow-g1) calc(var(--edge-glow-l) - 3%),
+      var(--edge-glow-g2) var(--edge-glow-l),
+      var(--edge-glow-g3) calc(var(--edge-glow-l) + 5%),
+      var(--edge-glow-g4) calc(var(--edge-glow-l) + 10%),
+      transparent calc(var(--edge-glow-l) + 16%)
+    ),
+    linear-gradient(90deg, transparent, color-mix(in lch, var(--sheen-lo) 70%, transparent) 25% 75%, transparent);
+  animation: edge-glow-glint 800ms linear infinite;
+}
+/* Ending: it fades out as the last ring spreads (the glints, first in the list, carry on undisturbed). */
+.edge-glow[data-ending]::after {
+  animation:
+    edge-glow-glint 800ms linear infinite,
+    edge-glow-out var(--edge-glow-line-out, 700ms) var(--ease-in) forwards;
+}
+.edge-glow.above::after {
+  top: 0;
+  bottom: auto;
+}
+/* The bloom: a metallic light pooled on the edge, fading away from it and towards the sides. */
+.edge-glow-main::before {
+  content: '';
+  position: absolute;
+  inset-inline: 10%;
+  bottom: 0;
+  height: calc(var(--edge-glow-size, 120px) * 0.4);
+  max-height: 100%;
+  opacity: var(--edge-glow-strength);
+  filter: blur(14px);
+  background: linear-gradient(90deg, var(--edge-glow-hues)) 0 0 / 200% 100%;
+  -webkit-mask-image: radial-gradient(50% 100% at 50% 100%, #000 20%, transparent);
+  mask-image: radial-gradient(50% 100% at 50% 100%, #000 20%, transparent);
+  transform-origin: 50% 100%;
+  animation:
+    edge-glow-bloom 640ms var(--ease-enter) both,
+    edge-glow-hue 6s linear infinite alternate,
+    edge-glow-breathe 1.6s ease-in-out 640ms infinite alternate;
+}
+/* Above: the same bloom with its light and its origin moved up, not flipped (a flip turns it about one of its edges,
+   which carries it off the edge it belongs on). */
+.edge-glow.above .edge-glow-main::before {
+  top: 0;
+  bottom: auto;
+  -webkit-mask-image: radial-gradient(50% 100% at 50% 0, #000 20%, transparent);
+  mask-image: radial-gradient(50% 100% at 50% 0, #000 20%, transparent);
+  transform-origin: 50% 0;
+}
+/* What holds the rings, softening them (see above). */
+.edge-glow-waves {
+  position: absolute;
+  inset: 0;
+  filter: blur(3px);
+}
+/* A ring: a wide ellipse centred on the edge's middle (only its half inside the area shows), drawn as a soft ring of the
+   hues turning round it, growing from a sliver at the edge, bright as it leaves and gone as it lands. Hidden at rest,
+   so a still one (reduced motion) never shows; edge-glow-ripple brings it in. */
+.edge-glow-wave {
+  position: absolute;
+  opacity: 0;
+  left: 50%;
+  bottom: 0;
+  width: 170%;
+  height: calc(var(--edge-glow-size, 120px) * 2);
+  translate: -50% 50%;
+  background: conic-gradient(from var(--edge-glow-turn), var(--edge-glow-hues));
+  -webkit-mask-image: radial-gradient(closest-side, transparent 72%, #000 88%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 72%, #000 88%, transparent 100%);
+  animation:
+    edge-glow-ripple 2400ms var(--ease-out) calc(var(--i) * 2400ms / var(--n)) infinite backwards,
+    edge-glow-turn 5s linear infinite;
+}
+.edge-glow.above .edge-glow-wave {
+  top: 0;
+  bottom: auto;
+  translate: -50% -50%;
+}
+
+@keyframes edge-glow-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes edge-glow-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes edge-glow-bloom {
+  from {
+    opacity: 0;
+    scale: 0.4 0.2;
+  }
+}
+/* The glints ride out with each ripple's ring, at the brightest part of it where it meets the edge: 88% of the ring's
+   half-width (85% of the line) from the middle, so 74.8% × the ring's scale. A ring starts every 800ms (2400ms / 3) and
+   has reached the line's ends by then, so the glints repeat at that period and follow the first third of a ring's
+   spread: its scale on --ease-out sampled at each quarter (0.15, 0.2825, 0.4137, 0.5354, 0.6421) and run linearly
+   between. They light as the ring does and are dark again as the loop restarts, so it doesn't jump. */
+@keyframes edge-glow-glint {
+  0% {
+    --edge-glow-spread: 11.22%;
+    --edge-glow-lit: 0;
+  }
+  25% {
+    --edge-glow-spread: 21.13%;
+  }
+  36% {
+    --edge-glow-lit: 1;
+  }
+  50% {
+    --edge-glow-spread: 30.95%;
+  }
+  75% {
+    --edge-glow-spread: 40.05%;
+  }
+  100% {
+    --edge-glow-spread: 48.03%;
+    --edge-glow-lit: 0;
+  }
+}
+@keyframes edge-glow-hue {
+  to {
+    background-position-x: 100%;
+  }
+}
+/* From full, where the bloom's entry leaves it, so it eases down into the breath rather than dropping to it. */
+@keyframes edge-glow-breathe {
+  from {
+    opacity: var(--edge-glow-strength);
+  }
+  to {
+    opacity: calc(var(--edge-glow-strength) * 0.55);
+  }
+}
+@keyframes edge-glow-turn {
+  to {
+    --edge-glow-turn: 360deg;
+  }
+}
+@keyframes edge-glow-ripple {
+  0% {
+    scale: 0.15 0.05;
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--edge-glow-strength);
+  }
+  100% {
+    scale: 1;
+    opacity: 0;
   }
 }
 
@@ -185,22 +420,30 @@
 }
 
 /* ---------- working shimmer ---------- */
-/* Linear's "working" badge: a blurred, tilted stripe (indigo and greys, the image below) sweeps along the pill's hairline
-   every 2s. Put .shimmer on the pill and a Shimmer label inside it. Reduced motion leaves it still. */
+/* Linear's "working" badge: a soft, tilted stripe sweeps along the pill's hairline every 2s, in the metal of the
+   new-content glow (--sheen-*: silver and an indigo glint, with the cyan, rose and gold of its sheen). Put .shimmer on
+   the pill and a Shimmer label inside it. Reduced motion leaves it still. */
 :root {
-  /* The stripe, two ways: on dark, indigo with pale greys (Linear's); on light the greys would vanish into the
-     surface, so it is a deeper indigo, violet and dark grey, blurred less, so more of it lands on the 1px edge. */
-  --shimmer-image-dark: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20180%2072%22%20fill%3D%22none%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22blur%22%20x%3D%22-100%25%22%20y%3D%22-100%25%22%20width%3D%22300%25%22%20height%3D%22300%25%22%3E%0A%20%20%20%20%20%20%3CfeGaussianBlur%20stdDeviation%3D%226%22%20%2F%3E%0A%20%20%20%20%3C%2Ffilter%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Cg%20transform%3D%22rotate(-30%2090%2036)%22%20filter%3D%22url(%23blur)%22%3E%0A%20%20%20%20%3Crect%20x%3D%2272%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%235e6ad2%22%20fill-opacity%3D%221%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%23e4e5e9%22%20fill-opacity%3D%220.5%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2290%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%239c9da1%22%20fill-opacity%3D%221%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%23e4e5e9%22%20fill-opacity%3D%220.4%22%20%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E');
-  --shimmer-image-light: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20180%2072%22%20fill%3D%22none%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22blur%22%20x%3D%22-100%25%22%20y%3D%22-100%25%22%20width%3D%22300%25%22%20height%3D%22300%25%22%3E%0A%20%20%20%20%20%20%3CfeGaussianBlur%20stdDeviation%3D%224%22%20%2F%3E%0A%20%20%20%20%3C%2Ffilter%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Cg%20transform%3D%22rotate%28-30%2090%2036%29%22%20filter%3D%22url%28%23blur%29%22%3E%0A%20%20%20%20%3Crect%20x%3D%2272%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%234f46e5%22%20fill-opacity%3D%221%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%238b5cf6%22%20fill-opacity%3D%220.7%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2290%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%233c4149%22%20fill-opacity%3D%220.9%22%20%2F%3E%0A%20%20%20%20%3Crect%20x%3D%2281%22%20y%3D%2218%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%236366f1%22%20fill-opacity%3D%220.5%22%20%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E');
-  --shimmer-image: var(--shimmer-image-light);
-}
-:root[data-theme='dark'] {
-  --shimmer-image: var(--shimmer-image-dark);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --shimmer-image: var(--shimmer-image-dark);
-  }
+  /* The stripe: one 120 × 72px tile (repeated along the pill, centred on it), tilted 30° from upright, about 36px across:
+     the low metal tone at its edges, bright and coloured through its middle, its soft stops standing in for a blur. The
+     --sheen-* tokens differ by theme, so it does too (silver on dark; grey and violet on light, where pale greys would
+     vanish). */
+  --shimmer-image: linear-gradient(
+    60deg,
+    transparent 30%,
+    var(--sheen-lo) 36%,
+    var(--sheen-hi) 41%,
+    var(--sheen-cool) 45%,
+    var(--sheen-tint) 49%,
+    var(--sheen-rose) 54%,
+    var(--sheen-gold) 58%,
+    var(--sheen-hi) 62%,
+    var(--sheen-lo) 65%,
+    transparent 70%
+  );
+  /* Deprecated: the stripe for each theme, from when it was an image per theme. Both are --shimmer-image now. */
+  --shimmer-image-dark: var(--shimmer-image);
+  --shimmer-image-light: var(--shimmer-image);
 }
 .shimmer {
   position: relative;

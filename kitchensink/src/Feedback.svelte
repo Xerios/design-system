@@ -1,5 +1,6 @@
 <script>
-  /** Kitchen sink: notices, errors, working states, empty states, the toast and the spotlight. */
+  /** Kitchen sink: notices, errors, working states, empty states, the toast, the spotlight and the new-content glow. */
+  import { tick } from 'svelte'
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
@@ -11,6 +12,38 @@
   import Toast from '@xerios/design-system/components/Toast.svelte'
   import WorkingBorder from '@xerios/design-system/components/WorkingBorder.svelte'
   import { spotlight } from '@xerios/design-system/lib/spotlight.js'
+  import { edgeGlow } from '@xerios/design-system/lib/edge-glow.js'
+  import { scrollFade } from '@xerios/design-system/lib/scroll-fade.js'
+
+  // Edge glow: three short feeds, each adding a row where its glow points.
+  let feeds = $state({
+    below: Array.from({ length: 8 }, (_, i) => `Message ${i + 1}`),
+    above: Array.from({ length: 8 }, (_, i) => `Item ${i + 1}`),
+    held: Array.from({ length: 8 }, (_, i) => `Entry ${i + 1}`),
+  })
+  /** @type {Record<string, HTMLElement | undefined>} */
+  const feedEls = {}
+  let added = 0
+  /** @param {'below' | 'above' | 'held'} key */
+  async function arrive(key) {
+    const el = feedEls[key]
+    if (!el) return
+    added += 1
+    if (key === 'above') {
+      // At the top a new row lands in view, and there is nothing to point at: go to the end first, as a feed someone
+      // has read down would be. Then hold the rows in view where they are while the new one goes in above them (by
+      // hand, so it doesn't hang on the browser's scroll anchoring, which the feed turns off).
+      if (el.scrollTop < 1) el.scrollTop = el.scrollHeight
+      const from = el.scrollHeight - el.scrollTop
+      feeds.above.unshift(`New item ${added}`)
+      await tick()
+      el.scrollTop = el.scrollHeight - from
+      edgeGlow(el, { side: 'above', announce: 'New item above' })
+    } else {
+      feeds[key].push(`New ${key === 'held' ? 'entry' : 'message'} ${added}`)
+      edgeGlow(el, { duration: key === 'held' ? Infinity : 3000, announce: 'New message below' })
+    }
+  }
 
   /** @param {number} ms */
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -87,6 +120,17 @@
     <Button onclick={() => spotlight('ks-spot')}>Point at the target</Button>
     <span id="ks-spot" class="spot">The target</span>
   </Demo>
+  <Demo label="Edge glow">
+    <Case label="New below: fades after 3s, or once scrolled to the end">
+      {@render feed('below')}
+    </Case>
+    <Case label="New above: from the end, as someone reading down would be">
+      {@render feed('above')}
+    </Case>
+    <Case label="Held until seen (duration: Infinity)">
+      {@render feed('held')}
+    </Case>
+  </Demo>
   <Demo label="Empty">
     <Case label="Empty">
       <Empty title="Nothing here yet" body="Things you add show up here.">
@@ -103,6 +147,17 @@
   <Toast {toasts} onhold={hold} ondismiss={(id) => dismiss(Number(id))} />
 {/if}
 
+{#snippet feed(/** @type {'below' | 'above' | 'held'} */ key)}
+  <div class="stack feed-case">
+    <div class="feed-box">
+      <ul class="feed" bind:this={feedEls[key]} {@attach scrollFade({ size: 24 })}>
+      {#each feeds[key] as line (line)}<li class="small">{line}</li>{/each}
+      </ul>
+    </div>
+    <div><Button small icon="plus" onclick={() => arrive(key)}>{key === 'above' ? 'Add above' : 'Add below'}</Button></div>
+  </div>
+{/snippet}
+
 <style>
   .stack {
     display: grid;
@@ -118,6 +173,25 @@
     border: 1px solid var(--line);
     border-radius: var(--r-xl);
     color: var(--fg-2);
+  }
+  .feed-case {
+    width: 100%;
+  }
+  .feed-box {
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+  .feed {
+    height: 160px;
+    border-radius: calc(var(--r-lg) - 1px);
+    margin: 0;
+    padding: var(--space-2) var(--space-3);
+    overflow: auto;
+    list-style: none;
+    overflow-anchor: none;
+  }
+  .feed li {
+    padding-block: var(--space-1);
   }
   .spot {
     padding: var(--space-1) var(--space-2);

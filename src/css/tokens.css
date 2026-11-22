@@ -49,6 +49,21 @@
   /* How strongly the working sweep along a pill's edge shows (.shimmer: Select loading, a busy Button, status pills).
      Its image is indigo and greys, so light surfaces need all of it, dark ones less: 1 here, 0.7 in dark (below). */
   --shimmer-strength: 1;
+  /* Metallic sheen, the working shimmer's stripe (.shimmer, the "Deploying" chip) as colours: a low and a high
+     metal tone and an indigo glint. Dark: silver greys; light: a cool grey and violet, as pale greys vanish on white
+     (the shimmer's dark grey would smudge in a glow wider than its 1px line). For effects that catch the light the
+     same way (the new-content glow, css/effects.css). */
+  --sheen-lo: light-dark(#8b8f98, #9c9da1);
+  --sheen-hi: light-dark(#8b5cf6, #e4e5e9);
+  --sheen-tint: light-dark(#4f46e5, #5e6ad2);
+  /* The colours metal takes on where it catches the light at an angle (anodised titanium, an oil sheen on steel), muted so
+     they stay metal rather than paint: a steel cyan, a dusty rose and a champagne gold. Deeper on light. */
+  --sheen-cool: light-dark(#2f8fa6, #7cc6d6);
+  --sheen-rose: light-dark(#c2668a, #e3a6bd);
+  --sheen-gold: light-dark(#b88a3e, #e6c891);
+  /* How strongly the new-content glow shows: lighter on light surfaces, where saturated colour reads as a stain, fuller
+     on dark (0.85, below). */
+  --edge-glow-strength: 0.5;
   /* Raised relief (the chosen segment of a RadioGroup): the top inner edge catches the light and the bottom inner edge
      falls into shade, so the box reads as standing off the surface. Use both: inset 0 1px 0 …-edge, inset 0 -1px 0 …-base.
      Dark only; light is flat. */
@@ -297,10 +312,12 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
   --shimmer-strength: 0.7;
+  --edge-glow-strength: 0.85;
 }
 /* Dark values that aren't colours (light-dark() only takes colours), when the OS is dark and no theme is pinned. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --shimmer-strength: 0.7;
+    --edge-glow-strength: 0.85;
   }
 }

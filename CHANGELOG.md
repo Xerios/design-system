@@ -15,6 +15,12 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
   scrolls on by a screenful, or to the end (`toEnd`); shown until the area is scrolled, or whenever more is below
   (`until="end"`).
 - `Icon`: the built-in `arrowUp`, `arrowUpBold` and `arrowDownBold` glyphs.
+- `lib/edge-glow.js`: `edgeGlow(area, { side, duration, announce })` lights a scroll area's bottom (or top) edge with a
+  soft metallic glow and sends ripples out of it, to say new content arrived past it. The glow fades first; the
+  ripples, and the line on the edge, last until it ends, after a while or once that edge is scrolled to.
+- Tokens: `--sheen-lo`, `--sheen-hi` and `--sheen-tint` (the working shimmer's metal tones and indigo glint),
+  `--sheen-cool`, `--sheen-rose` and `--sheen-gold` (the muted colours of metal's sheen) and
+  `--edge-glow-strength`.
 - `lib/dates.js`: `formatShort` ('18 Nov', '18 Nov 2025 15:30') and `formatSpan` ('3–18 Nov', '28 Oct – 3 Nov',
   '14:30–16:00 18 Nov') write a day or a span for reading, with the month's short name and what both ends share once;
   `year: true` shows the year even when it is this one.
@@ -22,6 +28,9 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Changed
 
+- `.shimmer` (the working sweep along a pill's edge: a busy `Button`, `Select` loading, status pills) and
+  `WorkingBorder`: in the metal of the new-content glow (`--sheen-*`), silver with an indigo glint and touches of cyan,
+  rose and gold on dark, grey and violet on light, instead of indigo and greys (and violet, pink and amber comets).
 - `Empty.Error`: laid out side by side: a larger warning icon on the left, a vertical rule, and the title, message
   and actions to its right, aligned left (they were stacked and centred).
 - `--brand`, `--accent`, `--link` (and everything built on them: `--accent-soft`, `--accent-line`, `--ring`,
@@ -69,6 +78,11 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - **Breaking** `DateField`: the field is a button and the `inputs` snippet is drawn in a box at the top of the panel
   (with the clear button), given `close`. `calendarLabel` is gone; pass the value's text as `text` (and
   `placeholder`). `show()` takes no argument and focuses the panel's `[data-autofocus]` element.
+
+### Deprecated
+
+- `--shimmer-image-dark` and `--shimmer-image-light`: the working stripe is one image for both themes now; use
+  `--shimmer-image`.
 
 ### Fixed
 
