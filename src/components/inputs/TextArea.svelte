@@ -1,7 +1,7 @@
 <script>
   /**
    * Multi-line text field matching TextField (Linear's composer): the shared .field-box (faint fill, inset hairline
-   * with a lit top edge, 8px corners, indigo hairline and ring while focused). Grows with its content up to 40% of the window, then scrolls; resizable.
+   * with a lit top edge, 8px corners, accent hairline and ring while focused). Grows with its content up to 40% of the window, then scrolls; resizable.
    * Other props (placeholder, events, autofocus, data-*) go to the <textarea>. Call focus() to jump into it.
    * error: a message from the app; the field turns red and shows it in a bubble underneath, which can be dismissed. Native constraints (`required`,
    * `minlength`…) report the browser's own message the same way. See lib/validity.js.

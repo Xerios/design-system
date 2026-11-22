@@ -1,6 +1,6 @@
 <script>
   /**
-   * A typed day, the text part of DatePicker and DateRangePicker (use those). It shows the value as DD/MM/YYYY
+   * A typed day, the text part of DatePicker and DateRangePicker, in their panels (use those). It shows the value as DD/MM/YYYY
    * ('18/11/2026') and reads what is typed when the field is left or Enter is pressed: that form with any
    * separators, two-digit years, or ISO ('2026-11-18'). See lib/dates.js.
    *
@@ -10,7 +10,10 @@
    * it may be (or null for any).
    * onproblem(message): what is wrong with what was typed ('' once it reads); the picker shows it as the field's error.
    * onopen(focus): asks for the calendar: a click does (focus false: typing carries on), and ArrowDown does with the
-   * focus moving onto it (focus true). errorId: as the invalid attachment's.
+   * focus moving onto it (focus true). oncommit(day, enter): after what was typed reads and becomes the value (day ''
+   * when emptied), enter true when Enter did it (the pickers then close, or move to the next input). Leaving the input
+   * without an edit reads nothing.
+   * errorId: as the invalid attachment's.
    * Esc puts back the value's text after an edit. Other attributes (aria-labelledby, placeholder…) go to the <input>.
    */
   import { composing } from '../../lib/dom.js'
@@ -27,9 +30,10 @@
    * @property {string | false | null | undefined} [errorId]
    * @property {(focus: boolean) => void} [onopen]
    * @property {(message: string) => void} [onproblem]
+   * @property {(day: string, enter: boolean) => void} [oncommit]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLInputAttributes, keyof Props>} */
-  let { value = $bindable(''), id, min = null, max = null, allowed = null, errorId, onopen, onproblem, placeholder, ...rest } = $props()
+  let { value = $bindable(''), id, min = null, max = null, allowed = null, errorId, onopen, onproblem, oncommit, placeholder, ...rest } = $props()
 
   const format = inputFormat()
   // As wide as a date takes (the format, or a longer placeholder), in the data font's even-width characters: an input
@@ -44,12 +48,16 @@
   // The text in the box: the value's, until it is edited (a writable derived: picking a day elsewhere resets it).
   let text = $derived(value ? formatInput(value) : '')
 
-  /** Reads what was typed; a day that reads becomes the value, anything else is reported and left to fix. */
-  function commit() {
+  /** Reads what was typed; a day that reads becomes the value, anything else is reported and left to fix.
+   *  @param {boolean} [enter] */
+  function commit(enter = false) {
     const typed = text.trim()
+    // Left without an edit: nothing to read (Enter still confirms what is there).
+    if (!enter && typed === (value ? formatInput(value) : '')) return
     if (!typed) {
       onproblem?.('')
       if (value) value = ''
+      oncommit?.('', enter)
       return
     }
     const day = parseInput(typed)
@@ -63,13 +71,17 @@
     onproblem?.('')
     value = day
     text = formatInput(day)
+    oncommit?.(day, enter)
   }
 
   /** @param {KeyboardEvent} e */
   function onkeydown(e) {
     // Enter and Esc inside an IME composition belong to the input method.
     if (composing(e)) return
-    if (e.key === 'Enter') commit()
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commit(true)
+    }
     else if (e.key === 'ArrowDown') {
       e.preventDefault()
       onopen?.(true)
@@ -92,7 +104,7 @@
   style:--chars={chars}
   {@attach invalid(errorId)}
   {@attach showFormat}
-  onblur={commit}
+  onblur={() => commit()}
   onclick={() => onopen?.(false)}
   {onkeydown}
 />

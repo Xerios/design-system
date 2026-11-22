@@ -1,27 +1,30 @@
 <script>
   /**
-   * The field the date pickers share: a label, a box holding the picker's typed inputs (DateInput), a clear button while
-   * there is a value, a calendar button that opens a panel under the box, and the error bubble. DatePicker and
-   * DateRangePicker put a Calendar in the panel; use those.
+   * The field the date pickers share: a label, a button showing the value for reading ('3–18 Nov', see formatSpan in
+   * lib/dates.js) that opens a panel under it, and the error bubble. The panel starts with a box holding the picker's
+   * typed inputs (DateInput) and a clear button while there is a value; the picker's Calendar follows. DatePicker and
+   * DateRangePicker fill it; use those.
    *
-   *   <DateField bind:this={field} {id} {label} bind:open {onopen} hasValue={!!value} onclear={() => (value = '')} {error}>
-   *     {#snippet inputs()}<DateInput bind:value {id} onopen={() => field.show()} … />{/snippet}
+   *   <DateField {id} {label} bind:open {onopen} text={formatShort(value)} hasValue={!!value} onclear={() => (value = '')} {error}>
+   *     {#snippet inputs(close)}<DateInput bind:value id="{id}-typed" data-autofocus … />{/snippet}
    *     {#snippet panel(close)}<Calendar … onpick={(day) => ((value = day), close())} />{/snippet}
    *   </DateField>
    *
-   * id: the first input's (the label points at it). open (bindable). onopen(): runs as it opens (set the calendar on the
-   * value). show(focus = true): opens it and, with focus, moves the focus onto the calendar (an input's ArrowDown);
-   * a click in an input opens it without, so typing carries on. hasValue + onclear: the clear button. panel(close): the panel's
-   * content; close() shuts it and puts the focus back on the calendar button. calendarLabel: that button's name
-   * ("Choose a date"). error, info, note, hideLabel, disabled: as on the other fields. Other attributes and attachments go to
-   * the field's wrapper.
-   * Keyboard: the calendar button or ArrowDown in an input opens the panel with the focus in it; a click in an input opens
-   * it too, leaving the focus there; Esc closes it; tabbing out of the field (or the panel) closes it.
+   * id: the button's (the label points at it). text: the value as the button shows it; placeholder in its place while
+   * it is '' ("Choose a date"). open (bindable). onopen(): runs as it opens (set the calendar and the inputs on the
+   * value). show(): opens it with the focus on the panel's [data-autofocus] element (its text selected, so typing
+   * replaces it), else its first focusable day. inputs(close): the typed inputs, in the box at the top of the panel.
+   * hasValue + onclear: the clear button at the end of that box (the focus goes to its first input). panel(close): the
+   * rest of the panel; close() shuts it and puts the focus back on the button. error, info, note, hideLabel, disabled: as on the
+   * other fields. Other attributes and attachments go to the button.
+   * Keyboard: Enter, Space, ArrowDown or ArrowUp on the button opens the panel with the focus in it; Esc closes it;
+   * tabbing out of the panel closes it.
    */
   import { tick } from 'svelte'
   import Icon from '../Icon.svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
   import FieldLabel from './FieldLabel.svelte'
+  import { invalid } from '../../lib/invalid.js'
   import { topLayer } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
@@ -30,28 +33,30 @@
    * @typedef {object} Props
    * @property {string} id
    * @property {string} label
+   * @property {string} [text]
+   * @property {string} [placeholder]
    * @property {boolean} [open] bindable
    * @property {() => void} [onopen]
    * @property {boolean} [hasValue]
    * @property {() => void} [onclear]
-   * @property {string} [calendarLabel]
    * @property {boolean} [hideLabel]
    * @property {string} [error]
    * @property {string} [info]
    * @property {string} [note] dimmed text after the label, e.g. '(optional)'
    * @property {boolean} [disabled]
-   * @property {import('svelte').Snippet} inputs
+   * @property {import('svelte').Snippet<[() => void]>} inputs
    * @property {import('svelte').Snippet<[() => void]>} panel
    */
-  /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
+  /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
     id,
     label,
+    text = '',
+    placeholder = 'Choose a date',
     open = $bindable(false),
     onopen,
     hasValue = false,
     onclear,
-    calendarLabel = 'Choose a date',
     hideLabel = false,
     error = '',
     info = '',
@@ -68,98 +73,76 @@
   /** @type {HTMLButtonElement | undefined} */
   let button = $state()
   /** @type {HTMLDivElement | undefined} */
-  let box = $state()
+  let entry = $state()
   /** @type {HTMLDivElement | undefined} */
   let sheet = $state()
 
-  /**
-   * Opens the panel (if it isn't) and, with `focus`, moves the focus into it: onto its focus day (the element with
-   * tabindex 0, or [data-autofocus]). A click in a typed input opens it without, so typing carries on.
-   * @param {boolean} [focus]
-   */
-  export async function show(focus = true) {
+  /** Opens the panel (if it isn't) with the focus on its [data-autofocus] element, else its focus day. */
+  export async function show() {
     if (disabled) return
     if (!open) {
       onopen?.()
       open = true
     }
-    if (!focus) return
     await tick()
     const target = /** @type {HTMLElement | null | undefined} */ (sheet?.querySelector('[data-autofocus], [tabindex="0"]'))
     target?.focus()
+    if (target instanceof HTMLInputElement) target.select()
   }
-  async function close(refocus = true) {
+  /** Closes the panel; with refocus, the focus goes back on the button (at once, so a Tab moves on from there). */
+  function close(refocus = true) {
     open = false
-    if (refocus) {
-      await tick()
-      button?.focus()
-    }
+    if (refocus) button?.focus()
   }
 
   /** @param {KeyboardEvent} e */
+  function onButtonKey(e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+    e.preventDefault()
+    void show()
+  }
+  /** @param {KeyboardEvent} e */
   function onPanelKey(e) {
-    if (e.key !== 'Escape') return
+    if (e.key !== 'Escape' || e.defaultPrevented) return
     e.preventDefault()
     e.stopPropagation()
-    void close()
-  }
-  /** Leaving the field with the focus still in the box (the panel open without it) closes the panel too. @param {FocusEvent} e */
-  function onBoxFocusOut(e) {
-    const to = /** @type {Node | null} */ (e.relatedTarget)
-    if (open && to && !sheet?.contains(to) && !box?.contains(to)) void close(false)
-  }
-  /** Esc in the box (an input) closes an open panel; the focus stays where it is. @param {KeyboardEvent} e */
-  function onBoxKey(e) {
-    if (e.key !== 'Escape' || !open || e.defaultPrevented) return
-    e.preventDefault()
-    e.stopPropagation()
-    void close(false)
+    close()
   }
   /** Tabbing out of the panel closes it. @param {FocusEvent} e */
   function onfocusout(e) {
     const to = /** @type {Node | null} */ (e.relatedTarget)
-    if (to && !sheet?.contains(to) && !box?.contains(to)) void close(false)
+    if (to && !sheet?.contains(to)) close(false)
   }
-  /** A press outside the field and its panel closes it. @param {PointerEvent} e */
+  /** A press outside the field and its panel closes it. The label counts as the button. @param {PointerEvent} e */
   const outside = (e) => {
     const target = /** @type {Element} */ (e.target)
-    if (open && !sheet?.contains(target) && !box?.contains(target) && !target.closest?.(`label[for="${id}"]`)) void close(false)
+    if (open && !sheet?.contains(target) && !button?.contains(target) && !target.closest?.(`label[for="${id}"]`)) close(false)
   }
 </script>
 
 <svelte:document onpointerdowncapture={outside} />
 
-<div class={['field', className]} {...rest}>
+<div class="field">
   <FieldLabel for={id} id="{id}-label" {label} {note} {info} {hideLabel} />
-  <!-- The keys and focus are its inputs'; the box only listens for Esc and for the focus leaving. -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div bind:this={box} class="box field-box" class:disabled style:anchor-name={anchor} onfocusout={onBoxFocusOut} onkeydown={onBoxKey}>
-    {@render inputs()}
-    <!-- Kept in place while there is nothing to clear (hidden and disabled), so the field doesn't change width as a value
-         comes and goes. -->
-    {#if onclear}
-      <button
-        type="button"
-        class="tool"
-        class:hidden={!hasValue || disabled}
-        disabled={!hasValue || disabled}
-        aria-label="Clear {label}"
-        {@attach tooltip('Clear')}
-        onclick={() => (onclear(), box?.querySelector('input')?.focus())}><Icon name="x" size="sm" /></button
-      >
-    {/if}
-    <button
-      bind:this={button}
-      type="button"
-      class="tool"
-      {disabled}
-      aria-label="{calendarLabel}, {label}"
-      aria-haspopup="dialog"
-      aria-expanded={open}
-      {@attach tooltip(calendarLabel)}
-      onclick={() => (open ? close() : show(true))}><Icon name="calendar" size="sm" /></button
-    >
-  </div>
+  <button
+    {id}
+    bind:this={button}
+    type="button"
+    class={['trigger', className]}
+    style:anchor-name={anchor}
+    {...rest}
+    {disabled}
+    aria-haspopup="dialog"
+    aria-expanded={open}
+    aria-labelledby="{id}-label {id}"
+    {@attach invalid(error && `${id}-error`)}
+    onclick={() => (open ? close() : show())}
+    onkeydown={onButtonKey}
+  >
+    <span class="icon"><Icon name="calendar" size="sm" /></span>
+    <span class="value" class:placeholder={!text}>{text || placeholder}</span>
+    {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
+  </button>
   {#if open}
     <div
       bind:this={sheet}
@@ -170,14 +153,30 @@
       data-floating
       style:position-anchor={anchor}
       {@attach topLayer(button)}
-      transition:pop={{ from: box }}
+      transition:pop={{ from: button }}
       onkeydown={onPanelKey}
       {onfocusout}
     >
-      {@render panel(() => void close())}
+      <div bind:this={entry} class="entry field-box">
+        {@render inputs(() => close())}
+        <!-- Kept in place while there is nothing to clear (hidden and disabled), so the box doesn't change width as a
+             value comes and goes. -->
+        {#if onclear}
+          <button
+            type="button"
+            class="clear"
+            class:hidden={!hasValue}
+            disabled={!hasValue}
+            aria-label="Clear {label}"
+            {@attach tooltip('Clear')}
+            onclick={() => (onclear(), entry?.querySelector('input')?.focus())}><Icon name="x" size="sm" /></button
+          >
+        {/if}
+      </div>
+      {@render panel(() => close())}
     </div>
   {/if}
-  <ErrorMessage floating id="{id}-error" message={error} ondismiss={() => box?.querySelector('input')?.focus()} />
+  <ErrorMessage floating id="{id}-error" message={error} ondismiss={() => button?.focus()} />
 </div>
 
 <style>
@@ -188,17 +187,90 @@
     gap: 3px;
     min-width: 0;
   }
-  .box {
+  /* Raised like Select's button: pressed to open a panel. */
+  .trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 120px;
+    max-width: 100%;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r);
+    background: var(--control-2);
+    color: var(--fg);
+    font: var(--w-medium) 13px var(--font-data);
+    font-variant-numeric: tabular-nums;
+    text-align: left;
+    cursor: pointer;
+    --raise: var(--shadow-btn);
+    box-shadow: var(--raise);
+    transition:
+      background-color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+  .trigger:hover:not(:disabled) {
+    background: var(--control-3);
+  }
+  .trigger[aria-expanded='true'] {
+    background: var(--control-4);
+    box-shadow: none;
+  }
+  .trigger:disabled {
+    --raise: 0 0 transparent;
+    background: none;
+    border-color: var(--line);
+    cursor: default;
+  }
+  /* Focused, it sits flat inside the ring, as Select's does. */
+  .trigger:focus-visible {
+    border-color: var(--accent-line);
+    box-shadow: var(--ring);
+    outline: none;
+  }
+  .trigger:global([aria-invalid='true']) {
+    border-color: var(--danger);
+  }
+  .trigger:global([aria-invalid='true']):focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
+  }
+  .icon {
+    flex: none;
+    display: inline-flex;
+    color: var(--muted);
+  }
+  .value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .placeholder {
+    font-family: var(--font-body);
+    color: var(--muted);
+  }
+  .caret {
+    flex: none;
+    display: inline-flex;
+    color: var(--muted);
+    transition: rotate var(--dur) var(--ease-out);
+  }
+  .caret.flip {
+    rotate: 180deg;
+  }
+  /* The typed inputs' box, at the top of the panel, with the clear button at its end. */
+  .entry {
     display: flex;
     align-items: center;
     gap: 2px;
     min-height: 32px;
-    padding-inline: var(--space-1);
+    margin-block-end: var(--space-2);
+    padding-inline-end: 4px;
   }
-  .box.disabled {
-    opacity: 0.5;
-  }
-  .tool {
+  .clear {
     display: inline-grid;
     place-items: center;
     flex: none;
@@ -210,15 +282,16 @@
     background: none;
     color: var(--muted);
   }
-  .tool.hidden {
+  .clear.hidden {
     visibility: hidden;
   }
-  .tool:hover:not(:disabled),
-  .tool[aria-expanded='true'] {
+  .clear:hover:not(:disabled) {
     background: var(--control-3);
     color: var(--fg-2);
   }
   /* Anchored under the field, flipping above or to its other side when there's no room. */
+  /* No user-select here: the panel holds the typed inputs, and Safari won't type in a field under it (Calendar and the
+     hints set their own). */
   .panel {
     position: fixed;
     z-index: calc(var(--z-overlay) + 1);
@@ -228,8 +301,8 @@
       flip-inline,
       flip-block flip-inline;
     position-visibility: anchors-visible;
-    /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
-       end at the field's right edge: a flip swaps the inline margins too). */
+    /* A touch to the left of the field, so the panel's content lines up under the field's own (mirrored when it flips
+       to end at the field's right edge: a flip swaps the inline margins too). */
     margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
     padding: var(--space-3);

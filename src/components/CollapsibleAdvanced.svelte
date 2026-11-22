@@ -6,7 +6,7 @@
    *
    * Header, left to right: chevron, `lead` (e.g. a status icon), `title`, `meta` (e.g. a phase), then `end` pushed
    * to the right (e.g. timings). `actions` sits in the top-right corner outside the toggle (e.g. a ⋯ menu).
-   * `variant`: 'default', 'active' (indigo border, for something in progress) or 'empty' (dashed, muted title).
+   * `variant`: 'default', 'active' (accent border, for something in progress) or 'empty' (dashed, muted title).
    * `dimmed` fades the whole card (pending or skipped). `open` sets whether it starts open; it re-applies when it changes.
    * `expandable={false}` locks the card shut (nothing inside yet): no hover, faded chevron, clicks and keys do nothing. When
    * it turns expandable again the card opens per `open`, so content that arrives unfolds by itself.

@@ -1,7 +1,7 @@
 /* Shared atoms: buttons, data tables, counts, tones, label chips, field labels, dots and modal dialogs. Anything bigger is a component. */
 
 /* ---------- controls ---------- */
-/* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid indigo; icon buttons are ghost circles.
+/* Linear's pill buttons: secondary is a translucent fill with an inset hairline; primary is solid teal; icon buttons are ghost circles.
    The solid buttons (primary, danger) are raised: their top inner edge catches the light. */
 .btn {
   display: inline-flex;

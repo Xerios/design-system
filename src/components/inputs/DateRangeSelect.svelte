@@ -7,11 +7,13 @@
    *
    * value (bindable): [from, to], each one of `dates`, from ≤ to (equal for one date); ['', ''] for none.
    * dates: ISO days ('2026-11-18') or ISO moments ('2026-11-18T14:30:00Z'), in any order; they are ordered as text, so
-   * keep to one form and one offset. The list shows them newest first as DD/MM/YYYY, under a heading per month when
-   * they span more than one (monthRuns in lib/dates.js), moments with the time in the user's
-   * time zone. The button shows a moment's time only where the day alone is ambiguous: both ends on the same day, or
-   * another date on that end's day. The year shows once, at the end, when both ends are in the same past year; not at
-   * all when it is this year; on both ends when they differ.
+   * keep to one form and one offset. The list shows them newest first with the month's short name ('18 Nov', the year
+   * when it isn't this year), under a heading per month when they span more than one (monthRuns in lib/dates.js),
+   * moments with the time in the user's time zone. The button shows the span as briefly as it can be said
+   * (formatSpan in lib/dates.js): '3–18 Nov' in one month, '28 Oct – 3 Nov' across months, '14:30–16:00 18 Nov' on one
+   * day; a moment's time only where the day alone is ambiguous (both ends on the same day, or another date on that
+   * end's day). The year shows once, at the end, when both ends are in the same past year; not at all when it is this
+   * year; on both ends when they differ.
    * shortcuts: ready-made spans above the list, [{ label, range(dates) }], range given the dates oldest first and
    * returning [from, to], or null to show it disabled. Default: Most recent, Last 3, This month (dateListShortcuts in
    * lib/dates.js); [] for none. One press sets it and closes.
@@ -35,7 +37,7 @@
   import { pop } from '../../lib/motion.js'
   import { reveal } from '../../lib/reveal.js'
   import DashOutline from '../DashOutline.svelte'
-  import { compare, dateListShortcuts, dayOf, formatWhen, monthRuns, today } from '../../lib/dates.js'
+  import { compare, dateListShortcuts, dayOf, formatShort, formatSpan, monthRuns } from '../../lib/dates.js'
 
   /**
    * @typedef {object} Props
@@ -95,20 +97,13 @@
   )
   /** How many dates fall on each (local) day. */
   const perDay = $derived(oldest.reduce((counts, when) => counts.set(dayOf(when), (counts.get(dayOf(when)) ?? 0) + 1), new Map()))
-  /**
-   * One end of the value: its time only when the day alone doesn't tell it apart; its year unless both ends are in
-   * this year, and only on the last end when both are in the same year.
-   * @param {string} end @param {string} other @param {boolean} last
-   */
-  function formatEnd(end, other, last) {
-    const year = dayOf(end).slice(0, 4)
-    const sameYear = year === dayOf(other).slice(0, 4)
-    return formatWhen(end, {
-      time: dayOf(end) === dayOf(other) || perDay.get(dayOf(end)) > 1,
-      year: !sameYear || (last && year !== today().slice(0, 4)),
-    })
-  }
-  const shown = $derived(value[0] && value[1] ? (value[0] === value[1] ? formatEnd(value[0], value[0], true) : `${formatEnd(value[0], value[1], false)} – ${formatEnd(value[1], value[0], true)}`) : '')
+  /** The value for reading ('3–18 Nov', '14:30–16:00 18 Nov'; formatSpan in lib/dates.js): an end's time only where
+   *  the day alone doesn't tell it apart (both ends on one day, or another date on its day). */
+  const shown = $derived(
+    value[0] && value[1]
+      ? formatSpan(value[0], value[1], { time: (end) => (dayOf(value[0]) === dayOf(value[1]) && value[0] !== value[1]) || perDay.get(dayOf(end)) > 1 })
+      : '',
+  )
   const empty = $derived(!newest.length)
 
   async function show() {
@@ -223,7 +218,7 @@
     onpointerenter={() => ((active = i), first && (pointed = day))}
     onclick={() => pick(day)}
   >
-    {formatWhen(day)}
+    {formatShort(day)}
   </li>
 {/snippet}
 
@@ -244,6 +239,7 @@
     onclick={() => (open ? close() : show())}
     onkeydown={onButtonKey}
   >
+    <span class="icon"><Icon name="calendar" size="sm" /></span>
     <span class="value" class:placeholder={!shown}>{shown || (empty ? 'No dates' : placeholder)}</span>
     {#if !disabled && !empty}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
   </button>
@@ -261,7 +257,7 @@
       onkeydown={onPanelKey}
     >
       <div class="top">
-        <p class="hint small muted" id="{id}-hint" aria-live="polite">{first ? `From ${formatWhen(first)}: pick the last date` : 'Pick the first date'}</p>
+        <p class="hint small muted" id="{id}-hint" aria-live="polite">{first ? `From ${formatShort(first)}: pick the last date` : 'Pick the first date'}</p>
         {#if shortcuts.length}<RangeShortcuts items={presets} {value} onpick={choose} />{/if}
       </div>
       <ul
@@ -307,12 +303,11 @@
   .trigger {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     min-width: 120px;
     max-width: 100%;
     min-height: 32px;
-    padding: 0 8px 0 10px;
+    padding: 0 8px;
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
     background: var(--control-2);
@@ -353,7 +348,13 @@
   .trigger:global([aria-invalid='true']):focus-visible {
     box-shadow: 0 0 0 2px color-mix(in lch, var(--danger) 30%, transparent);
   }
+  .icon {
+    flex: none;
+    display: inline-flex;
+    color: var(--muted);
+  }
   .value {
+    flex: 1 1 auto;
     min-width: 0;
     overflow: clip;
     text-overflow: ellipsis;

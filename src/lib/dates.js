@@ -167,6 +167,63 @@ export function formatWhen(value, { time = true, year = true } = {}) {
   const date = value.length > 10 && time ? new Date(value) : null
   return date && !Number.isNaN(date.getTime()) ? `${text} ${pad(date.getHours())}:${pad(date.getMinutes())}` : text
 }
+/** Whether a value is an ISO moment (with a time) rather than a day. @param {string} value */
+const isMoment = (value) => value.length > 10 && !Number.isNaN(new Date(value).getTime())
+/** A moment's time where the user is ('15:30'). @param {string} value */
+const timeOf = (value) => {
+  const date = new Date(value)
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+/** The month's short name in the user's language ('Nov'). @param {string} day */
+const shortMonth = (day) => new Intl.DateTimeFormat(undefined, { ...utc, month: 'short' }).format(parse(monthOf(day)) ?? undefined)
+/** '3 Nov', from an ISO day. @param {string} day */
+const dayMonth = (day) => `${Number(day.slice(8, 10))} ${shortMonth(day)}`
+
+/**
+ * A day or moment for reading, with the month's short name: '18 Nov', '18 Nov 2025' (the year only when it isn't this
+ * year), '18 Nov 15:30' for a moment (its time where the user is). time: false leaves a moment's time out; year: true or
+ * false forces the year in or out.
+ * @param {string} value @param {{ time?: boolean, year?: boolean }} [show]
+ */
+export function formatShort(value, { time = true, year } = {}) {
+  const day = dayOf(value)
+  const withYear = year ?? day.slice(0, 4) !== today().slice(0, 4)
+  const text = `${dayMonth(day)}${withYear ? ` ${day.slice(0, 4)}` : ''}`
+  return time && isMoment(value) ? `${text} ${timeOf(value)}` : text
+}
+
+/**
+ * A span of days or moments for reading, as short as it can be said, the month by its short name and what both ends
+ * share written once:
+ *   '18 Nov'                      one day
+ *   '3–18 Nov'                    one month
+ *   '28 Oct – 3 Nov'              one year
+ *   '28 Dec 2025 – 3 Jan 2026'    across years
+ *   '14:30–16:00 18 Nov'          one day, two times
+ *   '17 Nov 14:30 – 18 Nov 09:00' times on different days
+ * The year shows once, at the end, when both ends are in the same year but not this one; on both when they differ.
+ * time(value): whether to show that end's time (moments only); by default every moment's. One end empty: 'From 3 Nov',
+ * 'Until 18 Nov'; both: ''.
+ * @param {string} from @param {string} to @param {{ time?: (value: string) => boolean }} [show]
+ */
+export function formatSpan(from, to, { time = () => true } = {}) {
+  if (!from || !to) return from ? `From ${formatShort(from)}` : to ? `Until ${formatShort(to)}` : ''
+  const [a, b] = [dayOf(from), dayOf(to)]
+  const [yearA, yearB] = [a.slice(0, 4), b.slice(0, 4)]
+  const yearAtEnd = yearA !== yearB || yearB !== today().slice(0, 4)
+  const end = yearAtEnd ? ` ${yearB}` : ''
+  const [timeA, timeB] = [isMoment(from) && time(from), isMoment(to) && time(to)]
+  if (a === b) {
+    if (timeA && timeB && timeOf(from) !== timeOf(to)) return `${timeOf(from)}–${timeOf(to)} ${dayMonth(b)}${end}`
+    return `${dayMonth(b)}${end}${timeA || timeB ? ` ${timeOf(timeA ? from : to)}` : ''}`
+  }
+  const first = formatShort(from, { time: timeA, year: yearA !== yearB })
+  const last = formatShort(to, { time: timeB, year: yearAtEnd })
+  if (timeA || timeB || yearA !== yearB) return `${first} – ${last}`
+  if (a.slice(5, 7) === b.slice(5, 7)) return `${Number(a.slice(8, 10))}–${last}`
+  return `${first} – ${last}`
+}
+
 /**
  * Splits days or moments, in their order (either way), into a run per month, wherever the month or the year differs
  * from the date before: [{ key: '2026-11', label, items: [{ item, index }] }]. label: the month in full, with the

@@ -1,7 +1,7 @@
 /* Theme tokens, light and dark. Token names are stable across themes; components only ever read tokens.
    Design language: Linear's app (as in the interactive demo on linear.app). Surfaces are near-black (or white) with
    translucent hairlines, translucent fills for hover/active, pill-shaped controls, Inter at 13px with weights 510/590
-   (JetBrains Mono for data), and one indigo accent.
+   (JetBrains Mono for data), and one teal accent.
    Text: --fg (primary), --fg-2 (secondary), --muted (tertiary), --faint (quaternary).
    Fills (translucent, stack on any surface): --fill-1 resting, --fill-2 hover, --fill-3 pressed/raised, --fill-4 active.
    Controls take the same steps tinted with the brand hue (--control-1..4), so they stand apart from neutral surfaces.
@@ -70,7 +70,7 @@
   /* Atmosphere: a soft light in the top-left corner of the shell (Linear's sidebar glow), and a fine film grain for the
      modal backdrops. The grain's strength is baked into its alpha (the matrix's last value), so it can be one background
      layer over a colour. */
-  --glow: light-dark(color-mix(in lch, #5e6ad2 7%, transparent), rgb(255 255 255 / 0.04));
+  --glow: light-dark(color-mix(in lch, var(--brand) 7%, transparent), rgb(255 255 255 / 0.04));
   --grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 .13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   /* Lit relief (Surface Lab: texture 0.3, reflection 0.2, light 137°), painted under the frame. A lit fractal-noise bump map
      that overlay-blends into --bg, so flat areas stay neutral and only the relief reads; works on light and dark alike.
@@ -84,7 +84,7 @@
   --fill-4: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08));
   /* Control fills: the --fill-* scale with a faint cast of the brand hue, for anything you can press, type into or drag
      (buttons, fields, triggers, segments, tracks, menu items). Surfaces and their fills stay neutral grey, so a control
-     reads apart from the elevation it sits on. --control-hue is a deep indigo on light, a pale one on dark, so the
+     reads apart from the elevation it sits on. --control-hue is a deep teal on light, a pale one on dark, so the
      cast darkens light surfaces and lightens dark ones as the plain fills do. */
   --control-hue: light-dark(color-mix(in lch, var(--brand), black 25%), color-mix(in lch, var(--brand), white 20%));
   --control-1: color-mix(in lch, var(--control-hue) 5%, transparent);
@@ -95,14 +95,14 @@
   --fg-2: light-dark(#3c4149, #d0d6e0);
   --muted: light-dark(#6f6e77, #8a8f98);
   --faint: light-dark(#8f8d96, #62666d);
-  --accent: light-dark(#5e6ad2, #7170ff);
-  --brand: #5e6ad2;
+  --accent: light-dark(#0f766e, #14b8a6);
+  --brand: #0f766e;
   --accent-ink: #ffffff;
   --accent-soft: light-dark(color-mix(in lch, var(--accent) 10%, transparent), color-mix(in lch, var(--brand) 18%, transparent));
   --accent-line: light-dark(color-mix(in lch, var(--accent) 36%, transparent), color-mix(in lch, var(--accent) 45%, transparent));
-  /* Link text (a, .linklike): a brighter, more vivid indigo than --accent so links stand out from accented text.
-     AA on every surface: 5.2:1 on light --surface, 6.7:1 on dark --surface. */
-  --link: light-dark(#4c5ce8, #8f95ff);
+  /* Link text (a, .linklike): a brighter, more vivid teal than --accent so links stand out from accented text.
+     AA on every surface: 5.3:1 on light --surface, 9.6:1 on dark --surface. */
+  --link: light-dark(#00787f, #2dd4bf);
 
   /* Semantic tones (separate from the accent): Linear's green / blue / yellow / grey / red. Each has a translucent -soft
      fill for chips and tinted rows. Set data-tone="success|info|warning|neutral|danger" on an element to get --tone / --tone-soft. */
