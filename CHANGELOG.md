@@ -26,6 +26,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - `DateRangePicker`: after the first press on the calendar, the inputs show that day in "from" and "to" is empty.
 - `Calendar`, `DatePicker`, `DateRangePicker`: weeks start on Monday by default instead of the locale's first day;
   `weekStart` (1 Monday … 7 Sunday, or 'locale') changes it. `monthGrid` takes the same as a second argument.
+- `Select`, `OptionList` with `multiple={false}`: the chosen option is filled solid with the brand colour (as a chosen
+  day in `Calendar`) instead of carrying a tick, and the rows lose the tick column.
 - `Calendar` (and the pickers' calendars): the mouse wheel or a trackpad turns the page (down: next month, up:
   previous), stopping where the arrows do.
 - `Calendar`: turning the page scrolls the weeks: the weeks two months share glide to their new place, the others slide

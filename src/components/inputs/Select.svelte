@@ -208,9 +208,6 @@
     onpointerenter={() => (active = i)}
     onclick={() => choose(i)}
   >
-    <span class="tick"
-      >{#if o.value === value}<Icon name="check" size="sm" />{/if}</span
-    >
     <span class="label" title={o.label}>{text(o)}</span>
     {#if o.hint}<span class="hint">{o.hint}</span>{/if}
   </li>
@@ -471,14 +468,18 @@
     .list {
       border-color: CanvasText;
     }
+    li[aria-selected='true'] {
+      background: Highlight;
+      color: HighlightText;
+    }
   }
   li {
     display: grid;
-    grid-template-columns: 14px minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 6px;
     align-items: center;
     min-height: 32px;
-    padding: 0 10px 0 8px;
+    padding: 0 10px;
     border-radius: var(--r-sm);
     font-size: 13px;
     color: var(--fg);
@@ -488,9 +489,18 @@
   li.active {
     background: var(--control-3);
   }
-  .tick {
-    display: inline-flex;
-    color: var(--accent);
+  /* The chosen option is solid brand, as Calendar's chosen day, whether or not the keyboard is on it. With the keyboard
+     on it, a lighter brand line inside the edge keeps that visible. */
+  li[aria-selected='true'] {
+    background: var(--brand);
+    color: var(--accent-ink);
+  }
+  li[aria-selected='true'].active {
+    box-shadow: inset 0 0 0 2px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
+  }
+  li[aria-selected='true'] .hint {
+    color: inherit;
+    opacity: 0.75;
   }
   /* Group headings: small muted labels, a hairline between groups. */
   /* Square, and widened over the list's 4px padding so the hairline runs edge to edge. */

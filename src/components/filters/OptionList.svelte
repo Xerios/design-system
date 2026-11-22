@@ -2,7 +2,8 @@
   /**
    * A list to tick values in (several, or one with `multiple={false}`), drawn flat to sit inside a floating panel: the
    * value editor of a filter, the field list of FilterBar's add button, or any popover of your own. Each row has a check
-   * box, an optional icon (in a tone's colour) and a muted hint on the right, such as how many items have that value.
+   * box (several) or, picking one, a solid brand fill on the picked row, an optional icon (in a tone's colour) and a
+   * muted hint on the right, such as how many items have that value.
    * The ticked values move to the top, above a rule, when the list opens; ticking while it is open leaves the rows where
    * they are, so the one under the pointer doesn't jump away.
    *
@@ -79,9 +80,6 @@
   const others = $derived(found.filter((o) => !pinned.has(o.value)))
   const shown = $derived([...top, ...others])
   const hasLead = $derived(!!lead || options.some((o) => o.icon))
-  // A single list marks its pick with a tick; with nothing picked (a list of things to pick from, such as FilterBar's
-  // fields), it has no tick column, so its rows don't start with an empty gap.
-  const hasTick = $derived(multiple || options.some((o) => o.value === value))
   // The row holding the keyboard: back to the top whenever the search changes; on the picked one as a single list opens.
   let active = $derived.by(() => {
     void query
@@ -173,8 +171,6 @@
   >
     {#if multiple}
       <span class="box" aria-hidden="true"><Icon name="checkBold" size="sm" /></span>
-    {:else if hasTick}
-      <span class="tick" aria-hidden="true">{#if isOn(o.value)}<Icon name="check" size="sm" />{/if}</span>
     {/if}
     {#if hasLead}
       <span class="lead" data-tone={o.tone} aria-hidden="true">
@@ -186,7 +182,7 @@
   </li>
 {/snippet}
 
-<div class={['option-list', className]} {...rest}>
+<div class={['option-list', !multiple && 'single', className]} {...rest}>
   {#if searchable}
     <ListSearch
       value={query}
@@ -204,7 +200,7 @@
     <ul
       id="{uid}-list"
       bind:this={list}
-      class="list"
+      class={['list', !multiple && 'single']}
       role="listbox"
       aria-label={label}
       aria-multiselectable={multiple || undefined}
@@ -263,10 +259,30 @@
   .list:focus-visible .option.active {
     box-shadow: inset 0 0 0 2px var(--accent);
   }
+  /* Picking one, the picked row is solid brand (as Calendar's chosen day), its icon and hint in the same ink; with the
+     keyboard on it, a lighter brand line inside the edge keeps that visible. */
+  .single [aria-selected='true'],
+  .option-list.single:is(:focus-within, :hover) [aria-selected='true'].active {
+    background: var(--brand);
+    color: var(--accent-ink);
+  }
+  .single [aria-selected='true'] :is(.lead, .hint) {
+    color: inherit;
+  }
+  .single [aria-selected='true'] .hint {
+    opacity: 0.75;
+  }
+  .option-list.single:is(:focus-within, :hover) [aria-selected='true'].active {
+    box-shadow: inset 0 0 0 2px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
+  }
+  .list.single:focus-visible [aria-selected='true'].active {
+    box-shadow:
+      inset 0 0 0 2px var(--accent),
+      inset 0 0 0 3px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
+  }
   /* The check box (Tile's): hidden on rows that are neither ticked nor under the pointer or keyboard, so the column of
      empty boxes doesn't crowd the list; brand-filled with a tick once ticked. */
   .box,
-  .tick,
   .lead {
     flex: none;
     width: 16px;
@@ -304,10 +320,6 @@
   [aria-selected='true'] .box :global(.icon) {
     opacity: 1;
     scale: 1;
-  }
-  .tick {
-    display: inline-flex;
-    color: var(--accent);
   }
   .lead {
     display: inline-flex;
@@ -347,6 +359,10 @@
     }
     [aria-selected='true'] .box {
       background: Highlight;
+    }
+    .single [aria-selected='true'] {
+      background: Highlight;
+      color: HighlightText;
     }
   }
 </style>
