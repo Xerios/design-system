@@ -38,7 +38,7 @@
     padding-top: 0;
   }
   h2 {
-    font: var(--w-semibold) 16px var(--font-display);
+    font: var(--w-semibold) 30px/1.2 var(--font-display);
     color: var(--fg);
     /* A jump to the area scrolls its heading into view: leave room above it, so it doesn't sit against the top edge. */
     scroll-margin-top: var(--space-8);
@@ -48,6 +48,7 @@
   }
   .intro {
     max-width: 75ch;
+    font-size: 17px;
     color: var(--muted);
   }
   /* Its Demos, one under the other, each with its rule above. A container, so a Demo can tell whether there is room for
