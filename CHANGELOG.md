@@ -7,6 +7,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-24
+
 ### Added
 
 - `ActionCard` (`components/action-card/`): a card of content with the actions that apply to it (edit, copy,
@@ -164,7 +166,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 First release: theme tokens, global CSS (`base`, `effects`, `atoms`), the components listed in the README and the
 `lib/` helpers.
 
-[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/Xerios/design-system/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/Xerios/design-system/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/Xerios/design-system/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Xerios/design-system/compare/v0.1.1...v0.1.2
