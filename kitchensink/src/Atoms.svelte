@@ -19,7 +19,7 @@
 </script>
 
 <Section id="atoms" title="Atoms" intro="Classes for plain elements, for the small things that don't need a component.">
-  <Demo label="Field row (.field-row): buttons line up with the field's control, not its label">
+  <Demo label="Field row" description=".field-row: buttons line up with the field's control, not its label.">
     <Case label="A Select with a button (as tall as the field) and a ghost icon button (centred on it)">
       <div class="field-row">
         <Select bind:value={branch} options={BRANCHES} id="ks-row-branch" label="Branch" />
@@ -42,7 +42,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Held (.held, .keyed, .holds, .keys): the item the pointer or keyboard is on">
+  <Demo label="Held" description=".held, .keyed, .holds, .keys: the item the pointer or keyboard is on.">
     <Case label="In a list: a chosen row held, another the keyboard is on">
       <ul class="held-list">
         <li>Draft</li>
@@ -76,7 +76,7 @@
       <button type="button" class="chip-btn outlined"><span class="label-dot" style:--dot="var(--warning)"></span>Core experience</button>
     </Case>
   </Demo>
-  <Demo label="Label chips and tones">
+  <Demo label="Label chips" description="Its tones, with an icon, suggested, icon only.">
     {#each ['success', 'info', 'warning', 'neutral', 'danger'] as tone (tone)}
       <span class="label-chip" data-tone={tone}><span class="label-dot"></span>{tone}</span>
     {/each}
@@ -93,7 +93,7 @@
     <button type="button" class="linklike">A button that reads as a link</button>
     <a href="#atoms">A plain link</a>
   </Demo>
-  <Demo label="Plain .data-table">
+  <Demo label="Data table" description=".data-table, on a plain table.">
     <div class="data-table full">
       <table>
         <thead><tr><th scope="col">Region</th><th scope="col" class="num">Latency</th></tr></thead>
@@ -104,15 +104,15 @@
       </table>
     </div>
   </Demo>
-  <Demo label="Shine (.shine): a beam on the edge, placed with --shine-x and --shine-y">
+  <Demo label="Shine" description=".shine: a beam on the edge, placed with --shine-x and --shine-y.">
     <div class="specimen shine">Default</div>
     <div class="specimen shine" style:--shine-x="100%" style:--shine-y="0">Top right</div>
   </Demo>
-  <Demo label="Corner glow (.corner-glow): a soft light from the top-left corner">
+  <Demo label="Corner glow" description=".corner-glow: a soft light from the top-left corner.">
     <div class="specimen">Without</div>
     <div class="specimen"><span class="corner-glow" aria-hidden="true"></span>With</div>
   </Demo>
-  <Demo label="Grain (--grain): film grain over the scrim, as modal backdrops draw it">
+  <Demo label="Grain" description="--grain: film grain over the scrim, as modal backdrops draw it.">
     <div class="specimen scrim">Scrim</div>
     <div class="specimen scrim grain">Scrim with grain</div>
   </Demo>

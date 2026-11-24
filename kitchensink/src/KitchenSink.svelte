@@ -13,7 +13,9 @@
    * nav (default true): a row of links to the areas at the top. Turn it off when the page shows KitchenSinkNav instead
    * (a sidebar menu that follows the scroll).
    * Each area is its own component in this folder, made of Section and Demo; a new component gets one Demo in the area
-   * it belongs to, with each of its cases in a captioned Case inside it. The areas run from what you interact with (Actions, Inputs, Overlays),
+   * it belongs to, with each of its cases in a captioned Case inside it. Laid out as most kitchen sinks and docs sites
+   * are: each component an entry with its name as a heading (beside its examples on a wide page, above them on a narrow
+   * one), its cases in a grid of frames across the width. The areas run from what you interact with (Actions, Inputs, Overlays),
    * through what shows content and state (Content, Feedback), to what everything is built from (Atoms, Typography, Foundations).
    * Section rules run edge to edge: set --page-inset on the scroll area to its side padding so they reach through it.
    */

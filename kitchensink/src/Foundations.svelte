@@ -2,6 +2,7 @@
   /** Kitchen sink: the tokens (colour, type, radius, spacing, elevation) and every registered icon. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
+  import Case from './Case.svelte'
   import Icon, { iconNames } from '@xerios/design-system/components/Icon.svelte'
 
   const COLOURS = [
@@ -17,15 +18,17 @@
 </script>
 
 <Section id="foundations" title="Foundations" intro="The tokens everything is drawn with (css/tokens.css). Switch the theme to see both sides of each.">
-  {#each COLOURS as { group, tokens } (group)}
-    <Demo label={group}>
-      <ul class="swatches">
-        {#each tokens as token (token)}
-          <li><span class="swatch" style:background="var({token})"></span><code>{token}</code></li>
-        {/each}
-      </ul>
-    </Demo>
-  {/each}
+  <Demo label="Colours" description="By what they are for.">
+    {#each COLOURS as { group, tokens } (group)}
+      <Case label={group}>
+        <ul class="swatches">
+          {#each tokens as token (token)}
+            <li><span class="swatch" style:background="var({token})"></span><code>{token}</code></li>
+          {/each}
+        </ul>
+      </Case>
+    {/each}
+  </Demo>
   <Demo label="Type">
     <div class="type">
       <span class="body">Body, 13px: the default for text and controls</span>
@@ -38,15 +41,15 @@
   <Demo label="Radii">
     {#each RADII as token (token)}<span class="radius" style:border-radius="var({token})"><code>{token.slice(2)}</code></span>{/each}
   </Demo>
-  <Demo label="Spacing (4px base)">
+  <Demo label="Spacing" description="On a 4px base.">
     <ul class="spacing">
       {#each SPACING as token (token)}<li><span class="bar" style:width="var({token})"></span><code>{token}</code></li>{/each}
     </ul>
   </Demo>
-  <Demo label="Elevation (floating layers only)">
+  <Demo label="Elevation" description="For floating layers only.">
     {#each SHADOWS as token (token)}<span class="raised" style:box-shadow="var({token})"><code>{token.slice(2)}</code></span>{/each}
   </Demo>
-  <Demo label="Icons, as registered (Phosphor regular)" wide>
+  <Demo label="Icons" description="As registered: Phosphor's regular weight." wide>
     <ul class="icons">
       {#each iconNames() as name (name)}
         <li><Icon {name} /><code>{name}</code></li>

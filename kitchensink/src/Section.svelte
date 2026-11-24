@@ -1,6 +1,7 @@
 <script>
   /**
-   * Kitchen sink: one area of the catalogue, with a heading the page's jump list links to.
+   * Kitchen sink: one area of the catalogue (Actions, Inputs…), with a heading the side menu links to, then its
+   * components, one Demo each, stacked down the page.
    *
    *   <Section id="inputs" title="Inputs" intro="Every field shares the label, ⓘ and error bubble.">…demos…</Section>
    *
@@ -10,8 +11,6 @@
    * @property {string} [intro]
    * @property {import('svelte').Snippet} children
    */
-  import { masonry } from './masonry.js'
-
   /** @type {Props} */
   let { id, title, intro = '', children } = $props()
 </script>
@@ -19,7 +18,7 @@
 <section {id} aria-labelledby="{id}-title" class="section">
   <h2 id="{id}-title" tabindex="-1">{title}</h2>
   {#if intro}<p class="intro">{intro}</p>{/if}
-  <div class="demos" {@attach masonry}>{@render children()}</div>
+  <div class="demos">{@render children()}</div>
 </section>
 
 <style>
@@ -27,9 +26,9 @@
      host), with the content kept where it was. */
   .section {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-1);
     margin-inline: calc(var(--page-inset, 0px) * -1);
-    padding: var(--space-6) var(--page-inset, 0px);
+    padding: var(--space-8) var(--page-inset, 0px) var(--space-2);
     border-top: 1px solid var(--line);
     scroll-margin-top: var(--space-6);
   }
@@ -51,13 +50,11 @@
     max-width: 75ch;
     color: var(--muted);
   }
-  /* Columns at least 300px wide, laid out as masonry (see masonry.js; it needs align-items: start). A container, so a
-     Demo can tell how many columns there are room for. */
+  /* Its Demos, one under the other, each with its rule above. A container, so a Demo can tell whether there is room for
+     its heading beside its examples. */
   .demos {
-    container: demos / inline-size;
+    container: area / inline-size;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-    gap: var(--space-4);
-    align-items: start;
+    margin-top: var(--space-2);
   }
 </style>

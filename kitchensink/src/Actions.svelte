@@ -51,7 +51,7 @@
   title="Actions"
   intro="Button runs async work itself: a spinner while the promise runs, presses ignored meanwhile, a rejection shown under it."
 >
-  <Demo label="Button">
+  <Demo label="Button" description="Variants, icons, and async work with its pending and error states.">
     <Case label="Variants">
       <Button>Secondary</Button>
       <Button variant="primary" icon="plus">Primary</Button>
@@ -79,12 +79,12 @@
       <Button href="#actions">A link drawn as a button</Button>
     </Case>
   </Demo>
-  <Demo label="Context menu and its ⋯ twin">
+  <Demo label="Context menu" description="Right-click, Shift+F10 or the Menu key; MenuButton is its visible ⋯ twin.">
     <button type="button" class="target" {@attach contextMenu(menuItems, 'Demo item')}>Right-click, Shift+F10 or the Menu key</button>
     <MenuButton items={menuItems} label="Demo item" />
     <span class="small muted">Picked: {picked}, compact rows {compact ? 'on' : 'off'}</span>
   </Demo>
-  <Demo label="ScrollToTop">
+  <Demo label="ScrollToTop" description="A way back to the top once a screenful down.">
     <Case label="Appears a screenful down">
       <div class="scroller">
         {#each lines as line}<p>{line}</p>{/each}
@@ -92,7 +92,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="ScrollMore">
+  <Demo label="ScrollMore" description="Says there is more below, and goes there.">
     <Case label="Minimal: until you scroll">
       <div class="scroller">
         {#each lines as line}<p>{line}</p>{/each}
@@ -106,7 +106,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Tile" span={2}>
+  <Demo label="Tile" description="A card that is a link or a button." span={2}>
     <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
       <div class="tiles">
         <Tile title="Typography" icon="document" href="#typography" cta="See the styles">Headings, lists, quotes and code for long-form text.</Tile>

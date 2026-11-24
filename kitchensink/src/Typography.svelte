@@ -27,86 +27,88 @@ export function byVersion(entries) {
       </div>
     </Case>
   </Demo>
-  <Demo label="Headings">
-    <div class="prose full specimen">
-      <h1>Heading 1, 26px</h1>
-      <h2>Heading 2, 20px</h2>
-      <h3>Heading 3, 17px</h3>
-      <h4>Heading 4, 15px</h4>
-      <h5>Heading 5, 14px</h5>
-      <h6>Heading 6, 14px and muted</h6>
-    </div>
+  <Demo label="Elements" description="Each element .prose styles, on its own." span={2}>
+    <Case label="Headings">
+      <div class="prose full specimen">
+        <h1>Heading 1, 26px</h1>
+        <h2>Heading 2, 20px</h2>
+        <h3>Heading 3, 17px</h3>
+        <h4>Heading 4, 15px</h4>
+        <h5>Heading 5, 14px</h5>
+        <h6>Heading 6, 14px and muted</h6>
+      </div>
+    </Case>
+    <Case label="Running text and inline elements">
+      <div class="prose full">
+        <p>
+          Body text is 15px on a 24px line, with room between the lines for reading. It holds <a href="#typography">links</a>,
+          <strong>strong</strong> and <em>emphasised</em> words, <code>inline code</code>, keys such as <kbd>⌘</kbd>
+          <kbd>K</kbd>, <mark>highlighted text</mark>, an <abbr title="Application programming interface">API</abbr> with its expansion on hover,
+          <small>small print</small>, <del>removed</del> and <ins>inserted</ins> words,
+          <s>no longer true</s>, H<sub>2</sub>O and 2<sup>10</sup>.
+        </p>
+        <p>A second paragraph starts 20px below the first. Lines never end in a lone word where the browser can avoid it.</p>
+      </div>
+    </Case>
+    <Case label="Lists">
+      <div class="prose full">
+        <ul>
+          <li>An unordered list</li>
+          <li>
+            With a list inside it
+            <ul>
+              <li>Hollow markers one level down</li>
+              <li>Closer together than paragraphs</li>
+            </ul>
+          </li>
+          <li>And a last item</li>
+        </ul>
+        <ol>
+          <li>An ordered list</li>
+          <li>
+            With steps inside a step
+            <ol>
+              <li>Lettered one level down</li>
+              <li>Numbers in the data face</li>
+            </ol>
+          </li>
+          <li>And a third step</li>
+        </ol>
+        <dl>
+          <dt>A term</dt>
+          <dd>Its description, set in under it.</dd>
+          <dt>Another term</dt>
+          <dd>And what it means.</dd>
+        </dl>
+      </div>
+    </Case>
+    <Case label="Quote, code block and rule">
+      <div class="prose full">
+        <blockquote>
+          <p>Make it work, make it right, make it fast.</p>
+          <cite>Kent Beck</cite>
+        </blockquote>
+        <hr />
+        <pre><code>{CODE}</code></pre>
+      </div>
+    </Case>
+    <Case label="Table in a figure">
+      <figure class="prose full">
+        <table>
+          <thead>
+            <tr><th scope="col">Region</th><th scope="col">Median</th><th scope="col">Slowest</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Frankfurt</td><td>12 ms</td><td>48 ms</td></tr>
+            <tr><td>Virginia</td><td>86 ms</td><td>210 ms</td></tr>
+            <tr><td>Singapore</td><td>184 ms</td><td>402 ms</td></tr>
+          </tbody>
+        </table>
+        <figcaption>Response times over the past week.</figcaption>
+      </figure>
+    </Case>
   </Demo>
-  <Demo label="Running text and inline elements">
-    <div class="prose full">
-      <p>
-        Body text is 15px on a 24px line, with room between the lines for reading. It holds <a href="#typography">links</a>,
-        <strong>strong</strong> and <em>emphasised</em> words, <code>inline code</code>, keys such as <kbd>⌘</kbd>
-        <kbd>K</kbd>, <mark>highlighted text</mark>, an <abbr title="Application programming interface">API</abbr> with its expansion on hover,
-        <small>small print</small>, <del>removed</del> and <ins>inserted</ins> words,
-        <s>no longer true</s>, H<sub>2</sub>O and 2<sup>10</sup>.
-      </p>
-      <p>A second paragraph starts 20px below the first. Lines never end in a lone word where the browser can avoid it.</p>
-    </div>
-  </Demo>
-  <Demo label="Lists">
-    <div class="prose full">
-      <ul>
-        <li>An unordered list</li>
-        <li>
-          With a list inside it
-          <ul>
-            <li>Hollow markers one level down</li>
-            <li>Closer together than paragraphs</li>
-          </ul>
-        </li>
-        <li>And a last item</li>
-      </ul>
-      <ol>
-        <li>An ordered list</li>
-        <li>
-          With steps inside a step
-          <ol>
-            <li>Lettered one level down</li>
-            <li>Numbers in the data face</li>
-          </ol>
-        </li>
-        <li>And a third step</li>
-      </ol>
-      <dl>
-        <dt>A term</dt>
-        <dd>Its description, set in under it.</dd>
-        <dt>Another term</dt>
-        <dd>And what it means.</dd>
-      </dl>
-    </div>
-  </Demo>
-  <Demo label="Quote, code block and rule">
-    <div class="prose full">
-      <blockquote>
-        <p>Make it work, make it right, make it fast.</p>
-        <cite>Kent Beck</cite>
-      </blockquote>
-      <hr />
-      <pre><code>{CODE}</code></pre>
-    </div>
-  </Demo>
-  <Demo label="Table in a figure">
-    <figure class="prose full">
-      <table>
-        <thead>
-          <tr><th scope="col">Region</th><th scope="col">Median</th><th scope="col">Slowest</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Frankfurt</td><td>12 ms</td><td>48 ms</td></tr>
-          <tr><td>Virginia</td><td>86 ms</td><td>210 ms</td></tr>
-          <tr><td>Singapore</td><td>184 ms</td><td>402 ms</td></tr>
-        </tbody>
-      </table>
-      <figcaption>Response times over the past week.</figcaption>
-    </figure>
-  </Demo>
-  <Demo label="All of it together, as a page reads" wide>
+  <Demo label="A whole page" description="All of it together, as a page reads." wide>
     <article class="prose page">
       <AnchorHeading id="ks-prose-changelog" level={1}>Keep a changelog</AnchorHeading>
       <p>

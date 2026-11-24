@@ -118,7 +118,7 @@
 </script>
 
 <Section id="content" title="Content" intro="Containers and data: sections that fold, tables that sort and group, panels that resize.">
-  <Demo label="Collapsible (bindable, with a count and an ⓘ)">
+  <Demo label="Collapsible" description="Bindable, with a count and an ⓘ.">
     <div class="full">
       <Collapsible title="Requirements" count={3} info="What has to be true before it ships." bind:open>
         <p class="small">Tests pass, the docs say what changed, and someone else has read it.</p>
@@ -126,7 +126,7 @@
       <Collapsible title="Closed to start" open={false}><p class="small">Opened.</p></Collapsible>
     </div>
   </Demo>
-  <Demo label="Collapsible card: default, active, empty, locked, working">
+  <Demo label="Collapsible card" description="Default, active, empty, locked and working.">
     <div class="full stack">
       <CollapsibleAdvanced title="Build">
         {#snippet lead()}<Icon name="check" size="sm" />{/snippet}
@@ -139,7 +139,7 @@
       <CollapsibleAdvanced title="Smoke tests" variant="empty" expandable={false} />
     </div>
   </Demo>
-  <Demo label="Side menu: header with a main action, a count, folding groups and rows, nested rows with and without icons, a footer">
+  <Demo label="Side menu" description="A header with a main action, a count, folding groups and rows, nested rows with and without icons, a footer.">
     <div class="side-menu-stage">
       <SideMenu label="Example menu">
         {#snippet header()}<span class="brand"><Icon name="monitor" size="lg" />Workspace</span>{/snippet}
@@ -187,7 +187,7 @@
       <p class="small muted">Picked: {level}</p>
     </Case>
   </Demo>
-  <Demo label="Table: sortable columns, groups, row menu (right-click a row)" wide>
+  <Demo label="Table" description="Sortable columns, groups, and a row menu (right-click a row)." wide>
     <div class="full">
       <Table
         label="People"
@@ -200,14 +200,14 @@
       />
     </div>
   </Demo>
-  <Demo label="Splitter (drag, arrows, double-click resets)" wide>
+  <Demo label="Splitter" description="Drag it or use the arrow keys; a double-click resets it." wide>
     <div class="split">
       <div class="pane">Main</div>
       <Splitter value={width} min={160} max={480} defaultValue={260} side="end" oninput={(w) => (width = w)} />
       <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
   </Demo>
-  <Demo label="Action card: actions in the corner of their content" span={2}>
+  <Demo label="Action card" description="Actions in the corner of their content." span={2}>
     <Case label="With a title: edit, polish (async) and copy">
       <div class="full">
         <ActionCard title="Reply draft" icon="chatsCircle" copy={() => draft}>
@@ -341,10 +341,10 @@
       <Button onclick={() => intro?.restart()}>Replay</Button>
     </Case>
   </Demo>
-  <Demo label="Inline markdown, no {'{@html}'}">
+  <Demo label="Inline markdown" description={'Rendered without {@html}.'}>
     <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
   </Demo>
-  <Demo label="Scroll fade">
+  <Demo label="Scroll fade" description="The edges fade where there is more to scroll.">
     <ul class="scroll full" {@attach scrollFade({ size: 24 })}>
       {#each LINES as line (line)}<li class="small">{line}</li>{/each}
     </ul>

@@ -103,12 +103,12 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Working">
+  <Demo label="Working" description="Shimmering text, and a border that runs while a card is at work.">
     <Shimmer>Checking the server…</Shimmer>
     <span class="label-chip shimmer"><Shimmer>Deploying</Shimmer></span>
     <div class="busy">A card at work<WorkingBorder /></div>
   </Demo>
-  <Demo label="Toast (bottom of the window; hover the stack to fan it out)">
+  <Demo label="Toast" description="At the bottom of the window; hover the stack to fan it out.">
     <Button onclick={() => show('Saved.')}>Show a toast</Button>
     <Button
       onclick={() => ['Build started.', 'Uploaded 12 files.', 'Cache cleared.', 'Saved.'].forEach((m, i) => setTimeout(() => show(m), i * 300))}
@@ -116,7 +116,7 @@
     >
     <Button onclick={() => show('Deleted 3 items.', { label: 'Undo', run: () => show('Restored.') })}>With an action</Button>
   </Demo>
-  <Demo label="Spotlight">
+  <Demo label="Spotlight" description="Points at something on the page.">
     <Button onclick={() => spotlight('ks-spot')}>Point at the target</Button>
     <span id="ks-spot" class="spot">The target</span>
   </Demo>

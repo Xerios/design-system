@@ -12,16 +12,17 @@ export const AREAS = [
 ]
 
 /**
- * Jumps to an area: scrolls its heading into view, moves the focus there (so Tab carries on from it) and puts it in the
- * address. For the links' onclick; without script they still jump, as plain #anchors.
+ * Jumps to an area or a component (a Demo, by its id): scrolls it into view (its top, not its heading, which a Demo
+ * keeps sticky), moves the focus to its heading (so Tab carries on from it) and puts it in the address. For the links' onclick; without script they still jump, as plain #anchors.
  * @param {MouseEvent} e
  * @param {string} id
  */
 export function jump(e, id) {
+  const target = document.getElementById(id)
   const heading = document.getElementById(`${id}-title`)
-  if (!heading) return
+  if (!target || !heading) return
   e.preventDefault()
-  heading.scrollIntoView({ block: 'start' })
+  target.scrollIntoView({ block: 'start' })
   heading.focus({ preventScroll: true })
   history.replaceState(history.state, '', `#${id}`)
 }

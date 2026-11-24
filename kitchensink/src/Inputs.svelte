@@ -196,7 +196,7 @@
   title="Inputs"
   intro="Every field has a label, an optional ⓘ, and one way of showing its error (the invalid attachment and a bubble under it)."
 >
-  <Demo label="Text field">
+  <Demo label="Text field" description="A labelled input, with an optional ⓘ and an error bubble.">
     <Case label="With an ⓘ">
       <TextField bind:value={name} id="ks-name" label="Name" type="text" placeholder="Ada Lovelace" info="What people call you. Shown on your profile." />
     </Case>
@@ -206,13 +206,13 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Search (Esc clears, / focuses)">
+  <Demo label="Search field" description="Esc clears it; / focuses it from anywhere.">
     <SearchField bind:value={search} id="ks-search" label="Search" placeholder="Search" shortcut="/" />
   </Demo>
-  <Demo label="Text area (grows with its text)">
+  <Demo label="Text area" description="Grows with its text.">
     <TextArea bind:value={notes} id="ks-notes" label="Notes" placeholder="Anything worth writing down" />
   </Demo>
-  <Demo label="Select">
+  <Demo label="Select" description="One of a list: groups, search, detail beside it, rows of your own.">
     <Case label="Grouped">
       <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
     </Case>
@@ -250,16 +250,22 @@
         {/snippet}
       </Select>
     </Case>
-    <Case label="Loading, ghost, error, disabled">
+    <Case label="Loading">
+      <Select value="eu" options={REGIONS} id="ks-region-2" label="Region" loading="Checking regions…" />
+    </Case>
+    <Case label="Ghost">
+      <Select value="eu" options={REGIONS} id="ks-region-3" label="Region" ghost />
+    </Case>
+    <Case label="With an error">
       <div class="bubble-room">
-        <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
-        <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
-        <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
-        <Select value="eu" options={REGIONS} id="ks-region-5" label="Disabled" disabled />
+        <Select value="eu" options={REGIONS} id="ks-region-4" label="Region" error="This region is full." />
       </div>
     </Case>
+    <Case label="Disabled">
+      <Select value="eu" options={REGIONS} id="ks-region-5" label="Region" disabled />
+    </Case>
   </Demo>
-  <Demo label="Filter bar" wide>
+  <Demo label="Filter bar" description="The applied filters as chips, and a button to add one." wide>
     <Case label="Applied filters: a relative date and a list of values">
       <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
     </Case>
@@ -270,7 +276,7 @@
       <FilterBar bind:filters={noFilters} fields={FIELDS} label="Job filters" />
     </Case>
   </Demo>
-  <Demo label="Filter chip">
+  <Demo label="Filter chip" description="One filter: a field, a condition and its values.">
     <Case label="A condition menu and a list of values">
       {#if chipGone}
         <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>
@@ -293,7 +299,7 @@
       </FilterChip>
     </Case>
   </Demo>
-  <Demo label="Option list (inside a panel)">
+  <Demo label="Option list" description="A list to pick from, inside a panel.">
     <Case label="Several, with icons, tones and counts">
       <div class="panel-like"><OptionList bind:value={picked} options={STAGES} label="Application" autofocus={false} /></div>
     </Case>
@@ -307,7 +313,7 @@
       <div class="panel-like"><OptionList bind:value={pickedLevelDetail} options={LEVEL_DETAILS} multiple={false} label="Seniority" autofocus={false} /></div>
     </Case>
   </Demo>
-  <Demo label="Tags (Enter or comma adds)">
+  <Demo label="Tag input" description="Enter or a comma adds a tag.">
     <TagInput
       bind:value={tags}
       id="ks-tags"
@@ -319,7 +325,7 @@
   <Demo label="Switch">
     <Switch bind:checked={live} id="ks-live" label="Live" hint={live ? 'on' : 'off'} />
   </Demo>
-  <Demo label="Segmented, ButtonGroup, RadioGroup">
+  <Demo label="Segmented, ButtonGroup, RadioGroup" description="One of a few options.">
     <div class="stack">
       <Segmented
         value={view}
@@ -351,7 +357,7 @@
       />
     </div>
   </Demo>
-  <Demo label="Slider and range slider">
+  <Demo label="Slider" description="One value, or a range.">
     <Case label="Fine steps: no ticks">
       <div class="stack">
         <Slider bind:value={opacity} id="ks-opacity" label="Opacity" format={(v) => `${v}%`} />
@@ -365,7 +371,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Date picker">
+  <Demo label="Date picker" description="A date from a calendar.">
     <Case label="Within the next 90 days">
       <DatePicker bind:value={due} id="ks-due" label="Due date" min={today()} max={addDays(today(), 90)} info="Within the next 90 days." />
     </Case>
@@ -376,13 +382,13 @@
       <DatePicker bind:value={sundayDue} id="ks-sunday" label="Delivery" weekStart={7} />
     </Case>
   </Demo>
-  <Demo label="Date range picker">
+  <Demo label="Date range picker" description="A start and an end date.">
     <DateRangePicker bind:value={stay} id="ks-stay" label="Stay" />
   </Demo>
-  <Demo label="Range from a list of dates">
+  <Demo label="Date range select" description="A range picked out of a list of dates.">
     <DateRangeSelect bind:value={runs} dates={RUNS} id="ks-runs" label="Runs" />
   </Demo>
-  <Demo label="Upload" span={2}>
+  <Demo label="Upload" description="Files, folders and images, picked or dropped." span={2}>
     <Case label="File: pick or drop, and the button becomes the file">
       <Upload.File bind:file={upFile} />
       <span class="small muted">file: <span class="data">{upFile?.name ?? 'null'}</span></span>
@@ -428,7 +434,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Tile group" span={2}>
+  <Demo label="Tile group" description="Choices drawn as tiles: one, or several." span={2}>
     <Case label="One choice: arrows move and choose">
       <div class="full">
         <TileGroup label="Plan" bind:value={plan} columns={3} info="Change it any time. The new price starts on the day it changes.">
@@ -474,7 +480,7 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Field label (for a custom control)">
+  <Demo label="Field label" description="The label, note and ⓘ for a control of your own.">
     <Case label="Plain">
       <FieldLabel for="ks-fl-plain" label="Project" />
     </Case>
@@ -485,7 +491,7 @@
       <FieldLabel for="ks-fl-info" label="Budget" note="(per month)" info="Spending stops once it is reached." />
     </Case>
   </Demo>
-  <Demo label="A form: errors only after Submit" wide>
+  <Demo label="Form" description="Errors show only after Submit." wide>
     <form class="form" novalidate onsubmit={submit}>
       <TextField bind:value={form.title} id="ks-f-title" label="Title" type="text" {...errors.field('title')} />
       <TextField bind:value={form.url} id="ks-f-url" label="Address" type="text" placeholder="https://" {...errors.field('url')} />

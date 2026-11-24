@@ -42,7 +42,7 @@
 </script>
 
 <Section id="overlays" title="Overlays" intro="Everything that floats draws in the top layer, so it shows above modal dialogs too.">
-  <Demo label="Tooltip">
+  <Demo label="Tooltip" description="On hover and keyboard focus.">
     <Case label="Attachment (hover or keyboard focus)">
       <button type="button" class="icon-btn" aria-label="Copy" {@attach tooltip('Copy')}><Icon name="external" /></button>
       <button type="button" class="btn" {@attach tooltip('Search everything', { shortcut: '/' })}>With a shortcut</button>
@@ -54,7 +54,7 @@
       </Tooltip>
     </Case>
   </Demo>
-  <Demo label="ⓘ tips: hover, and pinnable (click to keep it open)">
+  <Demo label="Info tip" description="ⓘ beside a label, open on hover; a pinnable one stays open on a click.">
     <span class="field-head"
       ><span class="field-label">Retention</span><InfoTip lines={[{ text: 'How long logs are kept before they are deleted.' }]} label="About retention" /></span
     >
@@ -69,7 +69,7 @@
       /></span
     >
   </Demo>
-  <Demo label="Side tip">
+  <Demo label="Side tip" description="Detail beside a list, level with its row.">
     <Case label="Beside a list of your own, level with the row under the pointer or the focus">
       <ul class="targets" bind:this={targetList}>
         {#each TARGETS as t, i (t.label)}
@@ -92,7 +92,7 @@
       {/if}
     </Case>
   </Demo>
-  <Demo label="Popover">
+  <Demo label="Popover" description="A panel opened from its button.">
     <Popover id="ks-popover" label="Filters" badge={onlyMine ? 1 : null}>
       {#snippet trigger()}<Icon name="funnel" />{/snippet}
       {#snippet children({ close })}
@@ -103,14 +103,14 @@
       {/snippet}
     </Popover>
   </Demo>
-  <Demo label="Modal (asks before throwing away what's typed)">
+  <Demo label="Modal" description="Asks before throwing away what's typed.">
     <Button onclick={() => modal?.show()}>Open the modal</Button>
   </Demo>
-  <Demo label="Drawer (drag its edge; Esc, the backdrop or ✕ closes)">
+  <Demo label="Drawer" description="Drag its edge to resize it; Esc, the backdrop or ✕ closes it.">
     <Button onclick={() => drawer?.show()}>Open the drawer</Button>
     <span class="small muted">Width: {drawerWidth ? `${drawerWidth}px` : 'default'}</span>
   </Demo>
-  <Demo label="Alert, confirm, prompt">
+  <Demo label="Alert, confirm, prompt" description="Plain questions, awaited from script.">
     <Button onclick={async () => (await alertDialog({ title: 'Upload failed', body: 'The file is over 50 MB.' }), (answer = 'alert closed'))}>Alert</Button>
     <Button onclick={async () => (answer = String(await confirmDialog({ title: 'Delete 3 items?', confirmLabel: 'Delete', danger: true })))}>Confirm</Button>
     <Button
