@@ -7,6 +7,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-24
+
 ### Added
 
 - `.field-row`: a field with buttons beside it. The buttons sit on the field's control rather than its label: a `.btn`
@@ -146,7 +148,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 First release: theme tokens, global CSS (`base`, `effects`, `atoms`), the components listed in the README and the
 `lib/` helpers.
 
-[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/Xerios/design-system/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/Xerios/design-system/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Xerios/design-system/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Xerios/design-system/compare/v0.1.0...v0.1.1
