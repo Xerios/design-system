@@ -217,8 +217,11 @@
     background: linear-gradient(var(--control-4), var(--control-4)), var(--surface);
     color: var(--fg);
   }
+  /* As wide as the tile, in one column that may shrink below the name's width (an auto column grows to the unwrapped
+     name, running it under the next thumbnail), so a long name is cut off with an ellipsis. */
   .caption {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 96px;
   }
   .caption > span {

@@ -30,6 +30,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Fixed
 
+- `Upload` file cards and image thumbnails: a long file name is cut off with an ellipsis (shown whole in the Replace
+  tooltip) instead of running under the ✕ or under the next thumbnail.
 - `Popover` with `scrim`: the panel shows above the dimmed page instead of under it, wherever the popover sits.
 - `portalNear`: inside a modal dialog the node goes into the dialog, so it isn't inert.
 - `Select`, `DateField`, `DateRangeSelect`: a press inside the floating panel they sit in (a Popover's, a filter's)

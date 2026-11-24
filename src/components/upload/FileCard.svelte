@@ -226,8 +226,11 @@
     line-height: 12px;
     translate: -50% 0;
   }
+  /* One column that may shrink below the name's width (an auto column grows to the unwrapped name instead), so a long
+     name is cut off with an ellipsis before the ✕; the Replace tooltip shows it whole. */
   .text {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
   }
   .name {
@@ -236,6 +239,7 @@
     font-size: 13px;
     line-height: 18px;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .detail {
     overflow: clip;
@@ -245,6 +249,7 @@
     font-weight: var(--w-normal);
     font-variant-numeric: tabular-nums;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .card :global(.clear) {
     margin-inline-end: var(--space-2);
