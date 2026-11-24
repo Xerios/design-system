@@ -28,6 +28,8 @@ import table from '@phosphor-icons/core/regular/table.svg?raw'
 import textAa from '@phosphor-icons/core/regular/text-aa.svg?raw'
 import textbox from '@phosphor-icons/core/regular/textbox.svg?raw'
 import trash from '@phosphor-icons/core/regular/trash.svg?raw'
+import pencil from '@phosphor-icons/core/regular/pencil-simple.svg?raw'
+import sparkle from '@phosphor-icons/core/regular/sparkle.svg?raw'
 
 export function registerAppIcons() {
   registerIcons({
@@ -41,6 +43,8 @@ export function registerAppIcons() {
     lock,
     rocket,
     trash,
+    pencil,
+    sparkle,
     briefcase,
     buildings,
     chatsCircle,

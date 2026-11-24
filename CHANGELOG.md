@@ -7,6 +7,17 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Added
+
+- `ActionCard` (`components/action-card/`): a card of content with the actions that apply to it (edit, copy,
+  polish…) attached: in its top-right corner (on the title's row or, with no title, floated with the text wrapping
+  round them), or in a row under it (`placement="bottom"`, `align`). `ActionCard.Action` is one action, an icon and a
+  label: with `labels="fit"` (the default at the bottom) the labels show while they fit and the actions drop to icons
+  with tooltips once the card is too narrow. `inline` puts a line of content (a command, a key) and its actions on one
+  row. `copy` adds a Copy action that turns to a tick once copied;
+  `reveal="hover"` hides the actions until the card is hovered or focused.
+- `Icon`: the built-in `copy` glyph.
+
 ### Changed
 
 - `Select`, `DatePicker`, `DateRangePicker`, `DateRangeSelect`: disabled, the button keeps its caret, faded, and shows

@@ -60,6 +60,7 @@ const ICONS = {
   minusCircle: 'regular/minus-circle',
   stop: 'fill/stop-fill',
   stopCircle: 'regular/stop-circle',
+  copy: 'regular/copy',
 }
 
 /** Drawn, in the danger colour, for a name nobody registered. Not in the registry, so iconNames() leaves it out. */

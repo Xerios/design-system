@@ -12,6 +12,8 @@
   import Button from '@xerios/design-system/components/Button.svelte'
   import Table from '@xerios/design-system/components/Table.svelte'
   import Metadata from '@xerios/design-system/components/metadata/index.js'
+  import ActionCard from '@xerios/design-system/components/action-card/index.js'
+  import TextArea from '@xerios/design-system/components/inputs/TextArea.svelte'
   import Case from './Case.svelte'
   import Canvas from '@xerios/design-system/components/Canvas.svelte'
   import { theme } from './theme.svelte.js'
@@ -47,6 +49,22 @@
     { name: 'Core experience', tone: 'warning' },
   ])
   let displaysOpen = $state(false)
+
+  // ActionCard: Polish waits a moment and tidies the draft; Regenerate fails, to show the error bubble.
+  let draft = $state('thanks for the quick turnaround, the new layout works great on mobile. could we get the dark theme in before friday?')
+  let editing = $state(false)
+  const wait = (/** @type {number} */ ms) => new Promise((done) => setTimeout(done, ms))
+  async function polish() {
+    await wait(1200)
+    draft = 'Thanks for the quick turnaround: the new layout works well on mobile. Could the dark theme land before Friday?'
+  }
+  async function regenerate() {
+    await wait(900)
+    throw new Error('The service is busy. Try again in a minute.')
+  }
+  const SNIPPET = 'pnpm add @xerios/design-system'
+  const NOTES =
+    'The release adds a date range picker, a copyable code block and quieter hover states across the menus. Two fixes land with it: selects no longer jump when they open near the bottom of the window, and tooltips close when the page scrolls.'
 
   // Canvas: the drawings read their colour from the canvas's CSS `color` (var(--accent)), so they follow the theme; the
   // still ones read theme.value as well, so switching it redraws them.
@@ -189,6 +207,78 @@
       <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
   </Demo>
+  <Demo label="Action card: actions in the corner of their content" span={2}>
+    <Case label="With a title: edit, polish (async) and copy">
+      <div class="full">
+        <ActionCard title="Reply draft" icon="chatsCircle" copy={() => draft}>
+          {#snippet actions()}
+            <ActionCard.Action icon="pencil" label={editing ? 'Done editing' : 'Edit'} onclick={() => (editing = !editing)} />
+            <ActionCard.Action icon="sparkle" label="Polish" onclick={polish} />
+          {/snippet}
+          {#if editing}
+            <TextArea label="Reply draft" hideLabel bind:value={draft} />
+          {:else}
+            <p>{draft}</p>
+          {/if}
+        </ActionCard>
+      </div>
+    </Case>
+    <Case label="No title: the text wraps around the actions; one fails">
+      <div class="full">
+        <ActionCard copy={NOTES}>
+          {#snippet actions()}
+            <ActionCard.Action icon="refresh" label="Regenerate" onclick={regenerate} />
+          {/snippet}
+          <p>{NOTES}</p>
+        </ActionCard>
+      </div>
+    </Case>
+    <Case label="At the bottom, labels while they fit: drag the corner to narrow it">
+      <div class="full resizable">
+        <ActionCard placement="bottom" copy={() => draft}>
+          {#snippet actions()}
+            <ActionCard.Action icon="pencil" label="Edit" onclick={() => (editing = !editing)} />
+            <ActionCard.Action icon="sparkle" label="Polish" pendingLabel="Polishing…" onclick={polish} />
+            <ActionCard.Action icon="refresh" label="Regenerate" onclick={regenerate} />
+          {/snippet}
+          <p>{draft}</p>
+        </ActionCard>
+      </div>
+    </Case>
+    <Case label="At the top with a title, labels while they fit; at the bottom, at the end">
+      <div class="full resizable stack">
+        <ActionCard title="Weekly summary" icon="document" labels="fit" copy={NOTES}>
+          {#snippet actions()}
+            <ActionCard.Action icon="sparkle" label="Polish" onclick={polish} />
+          {/snippet}
+          <p>{NOTES}</p>
+        </ActionCard>
+        <ActionCard placement="bottom" align="end" labels="shown" copy={NOTES}>
+          <p>{NOTES}</p>
+        </ActionCard>
+      </div>
+    </Case>
+    <Case label="Inline: one line, the actions at its end; with labels; with a title">
+      <div class="full resizable stack">
+        <ActionCard inline copy={SNIPPET}>
+          <code>{SNIPPET}</code>
+        </ActionCard>
+        <ActionCard inline labels="fit" copy={SNIPPET}>
+          <code>{SNIPPET}</code>
+        </ActionCard>
+        <ActionCard inline title="Install" icon="code" copy={SNIPPET}>
+          <code>{SNIPPET}</code>
+        </ActionCard>
+      </div>
+    </Case>
+    <Case label="Shown on hover or focus (always on touch screens)">
+      <div class="full">
+        <ActionCard reveal="hover" title="Install" icon="code" copy={SNIPPET}>
+          <code>{SNIPPET}</code>
+        </ActionCard>
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Metadata" span={2}>
     <Case label="Chip buttons as values, a label that adds one (Labels), a description under it">
       <div class="full">
@@ -287,6 +377,14 @@
   .full {
     width: 100%;
     min-width: 0;
+  }
+  /* Drag its corner to see the actions drop to icons. */
+  .resizable {
+    min-width: 160px;
+    max-width: 100%;
+    padding-bottom: var(--space-2);
+    overflow: auto;
+    resize: horizontal;
   }
   .described {
     margin-top: var(--space-8);
