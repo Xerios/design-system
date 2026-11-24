@@ -8,7 +8,8 @@
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
    * ghost: a flat button with no raised edges (for toolbars and dense rows); the default is raised.
-   * disabled: shows the value but doesn't open, flat with no fill or caret (e.g. when there is only one choice).
+   * disabled: shows the value but doesn't open: flat with no fill, a faded caret and the not-allowed cursor (e.g. when
+   * there is only one choice).
    * error: a message from the app; the button turns red (aria-invalid, set by lib/invalid.js) and shows it in a bubble underneath, which can be dismissed.
    * info: what the choice is for, behind an ⓘ next to the label (see InfoTip).
    * note: dimmed text after the label, such as '(optional)' (see .label-note); screen readers read it as part of the label.
@@ -272,7 +273,7 @@
       {:else}
         <span class="value" {@attach watchCut(current?.label)}>{current?.label ?? ''}</span>
       {/if}
-      {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
+      <span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>
     </button>
     {#if open}
       {@const activeId = visible.includes(active) ? `${id}-opt-${active}` : undefined}
@@ -413,7 +414,11 @@
     --raise: 0 0 transparent;
     background: none;
     border-color: var(--line);
-    cursor: default;
+    cursor: not-allowed;
+  }
+  /* The caret stays, faded: it is still a dropdown, just not one that opens now. */
+  .trigger:disabled .caret {
+    opacity: 0.4;
   }
   /* Focused, it sits flat inside the ring: the raise's outer contact ring would draw a dark line through it. */
   .trigger:focus-visible {

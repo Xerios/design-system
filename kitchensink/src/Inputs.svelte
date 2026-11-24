@@ -34,6 +34,7 @@
   let search = $state('')
   let notes = $state('')
   let region = $state('eu')
+  let longRegion = $state('ap')
   let tags = $state(['alpha', 'beta'])
   let live = $state(true)
   let view = $state('list')
@@ -129,7 +130,7 @@
     { value: 'eu', label: 'Europe', hint: 'Frankfurt', group: 'Close by' },
     { value: 'uk', label: 'United Kingdom', hint: 'London', group: 'Close by' },
     { value: 'us', label: 'United States', hint: 'Virginia', group: 'Further away' },
-    { value: 'ap', label: 'Asia Pacific (a long name that gets cut off on the button)', hint: 'Singapore', group: 'Further away' },
+    { value: 'ap', label: 'Asia Pacific (Singapore, Sydney, Tokyo and Mumbai edge locations)', hint: 'Singapore', group: 'Further away' },
   ]
 
   // Options with detail: a card beside the list while one is under the pointer or the keyboard.
@@ -215,6 +216,11 @@
     <Case label="Grouped">
       <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
     </Case>
+    <Case label="A long value in a narrow place: cut off on the button, whole in its tooltip">
+      <div class="narrow-field">
+        <Select bind:value={longRegion} options={REGIONS} id="ks-region-long" label="Region" />
+      </div>
+    </Case>
     <Case label="Many options: a search field narrows the list">
       <Select bind:value={location} options={LOCATIONS} id="ks-location" label="Location" />
     </Case>
@@ -244,11 +250,12 @@
         {/snippet}
       </Select>
     </Case>
-    <Case label="Loading, ghost, error">
+    <Case label="Loading, ghost, error, disabled">
       <div class="bubble-room">
         <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
         <Select value="eu" options={REGIONS} id="ks-region-3" label="Ghost" ghost />
         <Select value="eu" options={REGIONS} id="ks-region-4" label="With an error" error="This region is full." />
+        <Select value="eu" options={REGIONS} id="ks-region-5" label="Disabled" disabled />
       </div>
     </Case>
   </Demo>
@@ -601,5 +608,10 @@
     flex: none;
     color: var(--muted);
     font-size: 12px;
+  }
+  /* Narrower than the long value, wherever the demo's column is: the button stops at its container and cuts it off. */
+  .narrow-field {
+    width: 200px;
+    max-width: 100%;
   }
 </style>

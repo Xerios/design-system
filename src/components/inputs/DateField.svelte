@@ -168,7 +168,7 @@
         {text || placeholder}
       {/if}
     </span>
-    {#if !disabled}<span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>{/if}
+    <span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>
   </button>
   {#if open}
     <div
@@ -249,7 +249,11 @@
     --raise: 0 0 transparent;
     background: none;
     border-color: var(--line);
-    cursor: default;
+    cursor: not-allowed;
+  }
+  /* The caret stays, faded: it is still a dropdown, just not one that opens now. */
+  .trigger:disabled .caret {
+    opacity: 0.4;
   }
   /* Focused, it sits flat inside the ring, as Select's does. */
   .trigger:focus-visible {

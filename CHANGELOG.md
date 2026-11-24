@@ -7,6 +7,11 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Changed
+
+- `Select`, `DatePicker`, `DateRangePicker`, `DateRangeSelect`: disabled, the button keeps its caret, faded, and shows
+  the not-allowed cursor, so it still reads as a dropdown that can't be opened right now (the caret used to disappear).
+
 ## [0.1.4] - 2026-11-24
 
 ### Added
