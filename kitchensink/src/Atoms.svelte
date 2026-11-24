@@ -1,6 +1,6 @@
 <script>
   /**
-   * Kitchen sink: the global classes in css/atoms.css drawn on plain elements: chips, counts, keys, links, the plain table;
+   * Kitchen sink: the global classes in css/atoms.css drawn on plain elements: a field row (fields with buttons), chips, counts, keys, links, the plain table;
    * and the light and texture from css/effects.css and the tokens: shine, corner glow, grain.
    */
   import Section from './Section.svelte'
@@ -8,9 +8,40 @@
   import Case from './Case.svelte'
   import Icon from '@xerios/design-system/components/Icon.svelte'
   import { tooltip } from '@xerios/design-system/lib/tooltip.js'
+  import Button from '@xerios/design-system/components/Button.svelte'
+  import Select from '@xerios/design-system/components/inputs/Select.svelte'
+  import TextField from '@xerios/design-system/components/inputs/TextField.svelte'
+
+  const BRANCHES = ['main', 'release', 'next'].map((b) => ({ value: b, label: b }))
+  let branch = $state('main')
+  let invite = $state('')
+  let rowSearch = $state('')
 </script>
 
 <Section id="atoms" title="Atoms" intro="Classes for plain elements, for the small things that don't need a component.">
+  <Demo label="Field row (.field-row): buttons line up with the field's control, not its label">
+    <Case label="A Select with a button (as tall as the field) and a ghost icon button (centred on it)">
+      <div class="field-row">
+        <Select bind:value={branch} options={BRANCHES} id="ks-row-branch" label="Branch" />
+        <Button icon="refresh">Sync</Button>
+        <button type="button" class="icon-btn" aria-label="Branch settings" {@attach tooltip('Branch settings')}><Icon name="gear" /></button>
+      </div>
+    </Case>
+    <Case label="A text field with a primary button and a small one (centred)">
+      <div class="field-row">
+        <TextField bind:value={invite} type="email" id="ks-row-invite" label="Invite by email" placeholder="name@example.com" />
+        <Button variant="primary" icon="plus">Invite</Button>
+        <button type="button" class="btn btn-small">Paste list</button>
+      </div>
+    </Case>
+    <Case label="Compact: --control-h: 28px on the row">
+      <div class="field-row" style:--control-h="28px">
+        <TextField bind:value={rowSearch} compact hideLabel id="ks-row-search" label="Search" placeholder="Search…" />
+        <Button>Apply</Button>
+        <button type="button" class="icon-btn" aria-label="Clear filters" {@attach tooltip('Clear filters')}><Icon name="x" /></button>
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Chip buttons">
     <Case label="Borderless: hover for the fill">
       <button type="button" class="chip-btn"><Icon name="circleDashed" />Planned</button>

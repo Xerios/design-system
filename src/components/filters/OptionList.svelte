@@ -11,7 +11,7 @@
    *   <OptionList value={field} options={FIELDS} multiple={false} label="Filter by" onpick={(key) => open(key)} />
    *
    * value (bindable): the ticked values, an array (in the options' order); with `multiple={false}`, one value.
-   * options: [{ value, label, icon?, tone?, hint? }]. `icon` is an Icon name; `tone` (success, warning, danger, info,
+   * options: [{ value, label, icon?, tone?, hint?, detail? }]. `icon` is an Icon name; `tone` (success, warning, danger, info,
    * neutral or an app's own) colours it through [data-tone]; `hint` sits on the right in tabular figures ("15 projects").
    * label: the list's accessible name. multiple: tick several (default) or pick one.
    * search: 'auto' (default: a ListSearch field to narrow the list when it has more than 8 options), true or false.
@@ -19,6 +19,9 @@
    * onchange(value): after every tick. onpick(value): a pick in a single list (the host closes on it).
    * onback(): Backspace with the search empty (FilterBar goes back to the field list with it).
    * lead: snippet (option) drawing the left of a row in place of the icon, for something an icon name can't say.
+   * detail: an option's `detail` (any value) puts a card beside the panel (SideTip) while that row is under the pointer,
+   * or the keyboard's while the list has the focus, read with the row: a string is its text, { title, text } a heading
+   * and text. The `detail` snippet (option) draws it instead, for anything richer, from whatever `detail` holds.
    * autofocus: takes the focus as it appears (default true).
    * Keyboard: ArrowUp / ArrowDown move, Home / End (without a search field) jump to the ends, Space (without a search
    * field) or Enter ticks or picks; without a search field a letter jumps to the next option starting with it. Esc clears
@@ -30,9 +33,10 @@
   import ListSearch from '../inputs/ListSearch.svelte'
   import { matches, wantsSearch } from '../../lib/list-search.js'
   import { reveal } from '../../lib/reveal.js'
+  import SideTip from '../SideTip.svelte'
 
   /**
-   * @typedef {{ value: any, label: string, icon?: string, tone?: string, hint?: string }} Option
+   * @typedef {{ value: any, label: string, icon?: string, tone?: string, hint?: string, detail?: any }} Option
    * @typedef {object} Props
    * @property {any} [value] bindable: an array, or one value when not `multiple`
    * @property {Option[]} options
@@ -45,6 +49,7 @@
    * @property {(value: any) => void} [onpick]
    * @property {() => void} [onback]
    * @property {import('svelte').Snippet<[Option]>} [lead]
+   * @property {import('svelte').Snippet<[Option]>} [detail] draws an option's detail card
    * @property {boolean} [autofocus]
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
@@ -60,6 +65,7 @@
     onpick,
     onback,
     lead,
+    detail,
     autofocus = true,
     class: className,
     ...rest
@@ -154,6 +160,18 @@
     if (autofocus) tick().then(() => node.focus({ preventScroll: true }))
   }
   const activeId = $derived(shown.length ? `${uid}-o-${active}` : undefined)
+
+  // The detail card follows the keyboard's row while the list is in use (under the pointer or holding the focus), as
+  // the row's highlight does; beside the floating panel the list sits in, else beside the list itself.
+  /** @type {HTMLDivElement | undefined} */
+  let root = $state()
+  let hovered = $state(false)
+  let focused = $state(false)
+  const beside = $derived(root ? (/** @type {HTMLElement | null} */ (root.closest('[data-floating], [data-top-layer]')) ?? root) : null)
+  const described = $derived((hovered || focused) && shown[active]?.detail != null ? shown[active] : null)
+  /** Plain detail (no snippet): a string is the text, an object its title and text. */
+  const plain = (/** @type {Option} */ o) =>
+    detail ? {} : typeof o.detail === 'object' ? { title: o.detail.title, text: o.detail.text } : { text: String(o.detail) }
 </script>
 
 {#snippet row(/** @type {Option} */ o, /** @type {number} */ i)}
@@ -166,6 +184,7 @@
     class:active={i === active}
     role="option"
     aria-selected={isOn(o.value)}
+    aria-describedby={described && i === active ? `${uid}-detail` : undefined}
     onpointerenter={() => (active = i)}
     onclick={() => choose(o)}
   >
@@ -182,7 +201,15 @@
   </li>
 {/snippet}
 
-<div class={['option-list', !multiple && 'single', className]} {...rest}>
+<div
+  bind:this={root}
+  class={['option-list', !multiple && 'single', className]}
+  {...rest}
+  onpointerenter={() => (hovered = true)}
+  onpointerleave={() => (hovered = false)}
+  onfocusin={() => (focused = true)}
+  onfocusout={(e) => (focused = !!root?.contains(/** @type {Node | null} */ (e.relatedTarget)))}
+>
   {#if searchable}
     <ListSearch
       value={query}
@@ -216,6 +243,9 @@
     </ul>
   {:else}
     <p class="empty" id="{uid}-list" role="status">{empty}</p>
+  {/if}
+  {#if described}
+    <SideTip id="{uid}-detail" for="{uid}-o-{active}" {beside} {...plain(described)}>{@render detail?.(described)}</SideTip>
   {/if}
 </div>
 

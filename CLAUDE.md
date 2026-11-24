@@ -29,6 +29,15 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
 - An icon beside text that can wrap aligns to the top, with the first line, never to the middle of the block: give the
   icon a box one line tall (`height: 1lh`) and `align-items: flex-start` on the row. The same goes for a trailing
   button (dismiss, clear) beside wrapping text.
+- A button beside a field lines up with the field's control, not with the field and its label: put them in a
+  `.field-row` (never a hand-made flex row with `align-items: center` or `end`). There a `.btn` is as tall as the
+  control (`--control-h`), and a ghost `.icon-btn` (or `.btn-small`, `.chip-btn`) keeps its size, centred on the
+  control. The same goes for any field: a `Select`, `TextField`, `DatePicker` or `TagInput` with an action beside it.
+  For compact fields set `--control-h: 28px` on the row; a new field component sizes its control line from
+  `--control-h`, never a fixed 32px.
+- A description of a list's option (what it means, before it is chosen) is its `detail`, shown in a `SideTip` beside
+  the list while the option is under the pointer or the keyboard (`Select`, `OptionList`), not a second line in the row
+  or a `title`. Rich content goes through the `detail` snippet. A list of your own uses `SideTip` the same way.
 - Controls (anything you press, type into or drag) take the tinted control fills (`--control-1` … `--control-4`) at
   rest and for hover, pressed and active; non-interactive things use the neutral `--fill-*`. Both are translucent, never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.
@@ -118,8 +127,9 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   line in `CHANGELOG.md` under `## [Unreleased]`, in the same change, under `Added`, `Changed`, `Deprecated`, `Removed`
   or `Fixed`. Name the component, class or token first and say what an app sees, not how it was done. Internal work
   (kitchen sink, scripts, refactors with no visible effect) stays out.
-- Releasing: bump `version` in `package.json`, rename `[Unreleased]` in `CHANGELOG.md` to `[x.y.z] - YYYY-MM-DD`,
-  open a fresh empty `[Unreleased]` above it, update the compare links at the bottom, and tag the commit `vx.y.z`.
+- Releasing: `pnpm release [patch|minor|major|x.y.z]` (scripts/release.js) bumps `version` in `package.json`, renames
+  `[Unreleased]` in `CHANGELOG.md` to `[x.y.z] - YYYY-MM-DD` under a fresh empty `[Unreleased]`, updates the compare
+  links at the bottom, checks the builds, and commits and tags `vx.y.z`. Do it by hand only if the script can't.
 - Global CSS goes in the matching file (`base`, `effects`, `atoms`); component styles stay scoped in the
   `.svelte` file. Keep selectors low-specificity so apps can override them.
 - Relative imports only inside `src/` (`../lib/dom.js`), never the package name, so the built `dist/` stays

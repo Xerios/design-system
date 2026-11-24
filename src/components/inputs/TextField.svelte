@@ -123,7 +123,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    min-height: 32px;
+    min-height: var(--control-h);
     padding: 0 6px 0 10px;
   }
   /* Compact (toolbars): shorter. */
@@ -140,7 +140,10 @@
     min-width: 0;
     font-size: 13px;
     color: var(--fg);
-    padding-block: 6px;
+    /* As tall as the box, so the box is exactly --control-h (28px compact) whatever the text size (16px when narrow),
+       and a press anywhere on its height lands in the field. */
+    align-self: stretch;
+    padding-block: 0;
   }
   input::placeholder {
     color: var(--faint);

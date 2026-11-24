@@ -3,7 +3,7 @@
   /**
    * Single-choice dropdown with a listbox popover. Keyboard: arrows, Home/End, type-ahead, Enter, Escape; with a search
    * field the focus stays in it, arrows and Enter work the list, and Home/End, Space and letters are the field's.
-   * Options: { value, label, text?, hint?, group? }. `label` shows on the button, `text` (if set) in the list.
+   * Options: { value, label, text?, hint?, group?, detail? }. `label` shows on the button, `text` (if set) in the list.
    * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
@@ -15,9 +15,22 @@
    * search: 'auto' (default: a ListSearch field at the top of the list when there are more than 8 options), true or
    * false. Typing narrows the list (anywhere in an option's text, ignoring case and accents; lib/list-search.js) and
    * puts the keyboard on the first match; Esc clears the text, then closes. searchPlaceholder: its text ("Filter…").
+   * detail: an option's `detail` (any value) puts a card beside the list while that option is under the pointer or the
+   * keyboard (SideTip), read with the option: a string is its text, { title, text } a heading and text. The `detail`
+   * snippet (option) draws it instead, for anything richer (headings, lists, code), from whatever `detail` holds.
+   * item: snippet (option, { selected, active }) drawing an option's row in the list in place of its text and hint: an
+   * avatar or icon, a second line, a badge. The button still shows `label`, and type-ahead and the search still go by
+   * `text ?? label`, so keep those the words the row says. On the chosen row (solid brand) --fg, --fg-2, --muted and
+   * --faint turn to the brand's ink, so text drawn in them stays readable; `selected` is there for anything else.
    * Other attributes (class…) and attachments go to the button.
    *
+   *   <Select bind:value={owner} options={PEOPLE} id="owner" label="Owner">
+   *     {#snippet item(o)}<img class="avatar" src={o.avatar} alt="" /><span>{o.label}<small>{o.email}</small></span>{/snippet}
+   *   </Select>
    *   <Select bind:value={region} options={REGIONS} id="region" label="Region" info="Where the files are served from." />
+   *   <Select bind:value={plan} options={PLANS} id="plan" label="Plan">
+   *     {#snippet detail(o)}<h4>{o.label}</h4><p>{o.detail.summary}</p><ul>{#each o.detail.perks as p}<li>{p}</li>{/each}</ul>{/snippet}
+   *   </Select>
    */
   import { tick } from 'svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
@@ -31,9 +44,10 @@
   import ListSearch from './ListSearch.svelte'
   import { matches, wantsSearch } from '../../lib/list-search.js'
   import { reveal } from '../../lib/reveal.js'
+  import SideTip from '../SideTip.svelte'
 
   /**
-   * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string }} Option
+   * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string, detail?: any }} Option
    * @typedef {object} Props
    * @property {any} [value] bindable
    * @property {Option[]} options
@@ -49,6 +63,8 @@
    * @property {boolean} [disabled]
    * @property {'auto' | boolean} [search]
    * @property {string} [searchPlaceholder]
+   * @property {import('svelte').Snippet<[Option]>} [detail] draws an option's detail card
+   * @property {import('svelte').Snippet<[Option, { selected: boolean, active: boolean }]>} [item] draws an option's row in the list
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
@@ -66,6 +82,8 @@
     disabled = false,
     search = 'auto',
     searchPlaceholder = 'Filter…',
+    detail,
+    item,
     class: className,
     ...rest
   } = $props()
@@ -79,6 +97,11 @@
   const current = $derived(options.find((o) => o.value === value) ?? options[0])
   const text = (o) => o.text ?? o.label
   const searchable = $derived(wantsSearch(search, options.length))
+  // The option whose detail card shows: the keyboard's (the pointer's too), while it is in the list and has a detail.
+  const described = $derived(open && visible.includes(active) && options[active]?.detail != null ? options[active] : null)
+  /** Plain detail (no snippet): a string is the text, an object its title and text. */
+  const plain = (/** @type {Option} */ o) =>
+    detail ? {} : typeof o.detail === 'object' ? { title: o.detail.title, text: o.detail.text } : { text: String(o.detail) }
   // The options the search leaves, each with its index into `options` (what keyboard and ids use).
   const shown = $derived(options.map((o, i) => ({ o, i })).filter(({ o }) => matches(text(o), query)))
   const visible = $derived(shown.map(({ i }) => i))
@@ -204,12 +227,18 @@
     data-i={i}
     role="option"
     aria-selected={o.value === value}
+    aria-describedby={described && i === active ? `${id}-detail` : undefined}
     class:active={i === active}
+    class:custom={!!item}
     onpointerenter={() => (active = i)}
     onclick={() => choose(i)}
   >
-    <span class="label" title={o.label}>{text(o)}</span>
-    {#if o.hint}<span class="hint">{o.hint}</span>{/if}
+    {#if item}
+      {@render item(o, { selected: o.value === value, active: i === active })}
+    {:else}
+      <span class="label" title={o.label}>{text(o)}</span>
+      {#if o.hint}<span class="hint">{o.hint}</span>{/if}
+    {/if}
   </li>
 {/snippet}
 
@@ -304,6 +333,12 @@
         </ul>
       </div>
     {/if}
+    <!-- Its own block, never inside the one above: a block whose only node is the list (moved to the top layer) is
+         removed cleanly; with a second node left behind in .wrap, removing it would sweep up whatever follows the list
+         in <body>, such as another Select's list opening as this one closes. -->
+    {#if described}
+      <SideTip id="{id}-detail" for="{id}-opt-{active}" beside={list} {...plain(described)}>{@render detail?.(described)}</SideTip>
+    {/if}
   </div>
   <ErrorMessage floating id="{id}-error" message={error} ondismiss={() => button?.focus()} />
 </div>
@@ -329,7 +364,7 @@
     gap: 8px;
     min-width: 120px;
     max-width: 100%;
-    min-height: 32px;
+    min-height: var(--control-h);
     text-align: left;
     padding: 0 8px 0 10px;
     font-size: 13px;
@@ -423,14 +458,15 @@
       flip-block flip-inline;
     position-visibility: anchors-visible;
     /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
-       end at the field's right edge: a flip swaps the inline margins too). */
+       end at the field's right edge: a flip swaps the inline margins too), and as much wider, so it overhangs the
+       field's right edge by the same amount. */
     margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
     display: flex;
     flex-direction: column;
     width: max-content;
-    min-width: anchor-size(width);
-    max-width: min(max(anchor-size(width), 440px), calc(100dvw - 32px));
+    min-width: calc(anchor-size(width) + var(--space-1) * 2);
+    max-width: min(max(calc(anchor-size(width) + var(--space-1) * 2), 440px), calc(100dvw - 32px));
     max-height: min(320px, calc(100dvh - 16px));
     overflow: hidden;
     border: 1px solid transparent;
@@ -491,9 +527,21 @@
   }
   /* The chosen option is solid brand, as Calendar's chosen day, whether or not the keyboard is on it. With the keyboard
      on it, a lighter brand line inside the edge keeps that visible. */
+  /* The text tokens turn to the brand's ink too, so a custom row's quieter text (item snippet) stays readable on it. */
   li[aria-selected='true'] {
     background: var(--brand);
     color: var(--accent-ink);
+    --fg: var(--accent-ink);
+    --fg-2: var(--accent-ink);
+    --muted: color-mix(in lch, var(--accent-ink) 80%, transparent);
+    --faint: color-mix(in lch, var(--accent-ink) 70%, transparent);
+  }
+  /* A row drawn by the item snippet: its content in a row, free to wrap or take a second line (it grows past 32px). */
+  li.custom {
+    display: flex;
+    gap: var(--space-2);
+    padding-block: var(--space-1);
+    white-space: normal;
   }
   li[aria-selected='true'].active {
     box-shadow: inset 0 0 0 2px color-mix(in lch, var(--brand), var(--accent-ink) 45%);

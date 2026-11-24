@@ -1,5 +1,5 @@
 <script>
-  /** Kitchen sink: tooltips, ⓘ tips, the popover, a modal with an unsaved-input guard, and alert / confirm / prompt. */
+  /** Kitchen sink: tooltips, ⓘ tips, a side tip beside a list, the popover, a modal with an unsaved-input guard, and alert / confirm / prompt. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
@@ -10,6 +10,7 @@
   import Drawer from '@xerios/design-system/components/Drawer.svelte'
   import Popover from '@xerios/design-system/components/Popover.svelte'
   import Tooltip from '@xerios/design-system/components/Tooltip.svelte'
+  import SideTip from '@xerios/design-system/components/SideTip.svelte'
   import Switch from '@xerios/design-system/components/inputs/Switch.svelte'
   import TextField from '@xerios/design-system/components/inputs/TextField.svelte'
   import { alertDialog, confirmDialog, promptDialog } from '@xerios/design-system/lib/dialogs.svelte.js'
@@ -23,6 +24,16 @@
   /** @type {Drawer | undefined} */
   let drawer = $state()
   let drawerWidth = $state(/** @type {number | undefined} */ (undefined))
+
+  // A list of your own with a SideTip: the row under the pointer or the focus says more.
+  const TARGETS = [
+    { label: 'Production', title: 'Production', text: 'What people use. A deploy here goes out to everyone at once.' },
+    { label: 'Staging', title: 'Staging', text: 'A copy of production, on its own data, for a last look before release.' },
+    { label: 'Preview', title: 'Preview', text: 'One per branch, gone a week after its last push.' },
+  ]
+  let targetAt = $state(-1)
+  /** @type {HTMLUListElement | undefined} */
+  let targetList = $state()
 
   async function confirmDiscard() {
     if (!draft.trim()) return true
@@ -57,6 +68,29 @@
         ]}
       /></span
     >
+  </Demo>
+  <Demo label="Side tip">
+    <Case label="Beside a list of your own, level with the row under the pointer or the focus">
+      <ul class="targets" bind:this={targetList}>
+        {#each TARGETS as t, i (t.label)}
+          <li>
+            <button
+              type="button"
+              class="target"
+              id="ks-target-{i}"
+              aria-describedby={targetAt === i ? 'ks-target-tip' : undefined}
+              onpointerenter={() => (targetAt = i)}
+              onpointerleave={() => (targetAt = -1)}
+              onfocus={() => (targetAt = i)}
+              onblur={() => (targetAt = -1)}>{t.label}</button
+            >
+          </li>
+        {/each}
+      </ul>
+      {#if targetAt >= 0}
+        <SideTip id="ks-target-tip" for="ks-target-{targetAt}" beside={targetList} title={TARGETS[targetAt].title} text={TARGETS[targetAt].text} />
+      {/if}
+    </Case>
   </Demo>
   <Demo label="Popover">
     <Popover id="ks-popover" label="Filters" badge={onlyMine ? 1 : null}>
@@ -123,5 +157,32 @@
     gap: var(--space-3);
     justify-items: start;
     padding: var(--space-3);
+  }
+  .targets {
+    display: grid;
+    gap: 2px;
+    width: 200px;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    user-select: none;
+  }
+  .target {
+    width: 100%;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: none;
+    color: var(--fg);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .target:hover,
+  .target:focus-visible {
+    background: var(--control-3);
   }
 </style>

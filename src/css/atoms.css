@@ -538,6 +538,48 @@
   margin-block: -5px;
 }
 
+/* A field with buttons beside it (a Select and its Refresh, a TextField and its Add): everything sits on the field's
+   control, not on its label. The row aligns its children by their bottom edge (a field's error bubble floats, so it
+   adds no height); a .btn beside a field grows to the field's height (--control-h); a smaller button (.icon-btn,
+   .btn-small, .chip-btn) or a .label-chip stays its size, centred on the control. Fields grow to fill the
+   row; the row wraps when narrow. Beside a field taller than one line (TextArea, TagInput that wrapped) the buttons
+   sit at its bottom. For compact (28px) fields set --control-h: 28px on the row. */
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Fields share what the buttons leave, down to 160px each; only then does the row wrap. */
+.field-row > :where(*) {
+  flex: 1 1 0%;
+  min-width: min(160px, 100%);
+}
+
+.field-row > :where(.btn, .icon-btn, .chip-btn, .label-chip) {
+  flex: none;
+  min-width: auto;
+}
+
+.field-row > :where(.btn:not(.btn-small)) {
+  min-height: var(--control-h);
+}
+
+/* Centred on the control: lifted by half of what it lacks of the control's height. */
+.field-row > :where(.icon-btn) {
+  margin-block-end: calc((var(--control-h) - 28px) / 2);
+}
+
+.field-row > :where(.btn-small, .chip-btn) {
+  margin-block-end: calc((var(--control-h) - 24px) / 2);
+}
+
+.field-row > :where(.label-chip) {
+  margin-block-end: calc((var(--control-h) - 22px) / 2);
+}
+
 /* Unread / new marker: a small accent dot (Popover's `dot` uses it; use it on rows, cards and list items too). */
 .new-dot {
   display: inline-block;

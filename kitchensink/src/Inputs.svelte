@@ -132,6 +132,32 @@
     { value: 'ap', label: 'Asia Pacific (a long name that gets cut off on the button)', hint: 'Singapore', group: 'Further away' },
   ]
 
+  // Options with detail: a card beside the list while one is under the pointer or the keyboard.
+  const MODELS = [
+    { value: 'swift', label: 'Swift', hint: 'fast', detail: 'Answers in a blink. Good for short replies and autocomplete.' },
+    { value: 'steady', label: 'Steady', hint: 'balanced', detail: { title: 'Steady, the default', text: 'Strong at most tasks at a fair speed and cost.' } },
+    { value: 'deep', label: 'Deep', hint: 'thorough', detail: { title: 'Deep', text: 'Takes its time on long documents and hard problems.' } },
+    { value: 'legacy', label: 'Legacy' },
+  ]
+  let model = $state('steady')
+  const TIERS = [
+    { value: 'free', label: 'Free', hint: '€0', detail: { summary: 'For trying it out on your own.', perks: ['3 projects', '1 GB storage'], limit: '100 requests a day' } },
+    { value: 'team', label: 'Team', hint: '€12', detail: { summary: 'For a team shipping together.', perks: ['Unlimited projects', '50 GB storage', 'Shared views'], limit: '10,000 requests a day' } },
+    { value: 'scale', label: 'Scale', hint: '€40', detail: { summary: 'For many teams, with controls for admins.', perks: ['Everything in Team', 'SSO and audit log', 'Priority support'], limit: 'No limit' } },
+  ]
+  let tier = $state('team')
+  // Rows of your own: initials, a name and an email under it, and a role on the right.
+  const PEOPLE = [
+    { value: 'ada', label: 'Ada Brandt', email: 'ada@example.com', role: 'Owner' },
+    { value: 'kofi', label: 'Kofi Mensah', email: 'kofi@example.com', role: 'Editor' },
+    { value: 'li', label: 'Li Wei', email: 'li.wei@example.com', role: 'Editor' },
+    { value: 'sam', label: 'Sam Okafor', email: 'sam.okafor@example.com', role: 'Viewer' },
+  ]
+  let assignee = $state('kofi')
+  const initials = (/** @type {string} */ name) => name.split(' ').map((w) => w[0]).join('')
+  const LEVEL_DETAILS = LEVELS.map((o, i) => ({ ...o, detail: { title: o.label, text: `About ${2 + i * 3} years in, give or take.` } }))
+  let pickedLevelDetail = $state('mid-level')
+
   // A form: nothing shows until Submit; after that a field rechecks when it's left and clears as it's edited.
   let form = $state({ title: '', url: '', when: '' })
   const errors = fieldErrors(() => ({
@@ -192,6 +218,32 @@
     <Case label="Many options: a search field narrows the list">
       <Select bind:value={location} options={LOCATIONS} id="ks-location" label="Location" />
     </Case>
+    <Case label="Detail beside the list: hover an option or arrow through them">
+      <Select bind:value={model} options={MODELS} id="ks-model" label="Model" />
+    </Case>
+    <Case label="Rich detail, drawn by the detail snippet">
+      <Select bind:value={tier} options={TIERS} id="ks-tier" label="Plan">
+        {#snippet detail(o)}
+          <h4>{o.label}</h4>
+          <p>{o.detail.summary}</p>
+          <ul>{#each o.detail.perks as perk (perk)}<li>{perk}</li>{/each}</ul>
+          <hr />
+          <small>{o.detail.limit}</small>
+        {/snippet}
+      </Select>
+    </Case>
+    <Case label="Rows of your own, drawn by the item snippet">
+      <Select bind:value={assignee} options={PEOPLE} id="ks-assignee" label="Assignee">
+        {#snippet item(o)}
+          <span class="person-initials" aria-hidden="true">{initials(o.label)}</span>
+          <span class="person">
+            <span>{o.label}</span>
+            <span class="person-email">{o.email}</span>
+          </span>
+          <span class="person-role">{o.role}</span>
+        {/snippet}
+      </Select>
+    </Case>
     <Case label="Loading, ghost, error">
       <div class="bubble-room">
         <Select value="eu" options={REGIONS} id="ks-region-2" label="Loading" loading="Checking regions…" />
@@ -243,6 +295,9 @@
     </Case>
     <Case label="One, no icons">
       <div class="panel-like"><OptionList bind:value={pickedLevel} options={LEVELS} multiple={false} label="Seniority" autofocus={false} /></div>
+    </Case>
+    <Case label="With detail beside it: hover a row, or arrow through with the focus in it">
+      <div class="panel-like"><OptionList bind:value={pickedLevelDetail} options={LEVEL_DETAILS} multiple={false} label="Seniority" autofocus={false} /></div>
     </Case>
   </Demo>
   <Demo label="Tags (Enter or comma adds)">
@@ -516,5 +571,35 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
+  }
+  .person-initials {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--r-pill);
+    background: var(--fill-3);
+    color: var(--fg-2);
+    font-size: 11px;
+    font-weight: var(--w-semibold);
+  }
+  .person {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.3;
+  }
+  .person-email {
+    color: var(--muted);
+    font: 12px var(--font-data);
+    overflow: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .person-role {
+    flex: none;
+    color: var(--muted);
+    font-size: 12px;
   }
 </style>

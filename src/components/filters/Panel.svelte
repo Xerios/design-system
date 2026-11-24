@@ -93,13 +93,14 @@
       flip-block flip-inline;
     position-visibility: anchors-visible;
     /* A touch to the left of the field, so the list's text lines up under the field's own (mirrored when it flips to
-       end at the field's right edge: a flip swaps the inline margins too). */
+       end at the field's right edge: a flip swaps the inline margins too), and as much wider, so it overhangs the
+       field's right edge by the same amount. */
     margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
     display: flex;
     flex-direction: column;
     width: max-content;
-    min-width: 240px;
+    min-width: max(calc(anchor-size(width) + var(--space-1) * 2), 240px);
     max-width: min(480px, calc(100dvw - 16px));
     max-height: min(480px, calc(100dvh - 16px));
     overflow: auto;

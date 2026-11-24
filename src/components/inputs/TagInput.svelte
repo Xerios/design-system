@@ -225,7 +225,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 4px;
-    min-height: 32px;
+    min-height: var(--control-h);
     padding: 3px 6px 3px 4px;
     cursor: text;
   }

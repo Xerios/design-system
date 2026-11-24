@@ -7,6 +7,26 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Added
+
+- `.field-row`: a field with buttons beside it. The buttons sit on the field's control rather than its label: a `.btn`
+  grows to the field's height, and a ghost `.icon-btn` (or `.btn-small`, `.chip-btn`, `.label-chip`) is centred on it.
+- `--control-h` (32px): the height of a form control's line. `TextField`, `Select`, `TagInput`, `DatePicker`,
+  `DateRangePicker` and `DateRangeSelect` read it, so setting it on a container resizes them together.
+- `SideTip`: a card of rich detail (a heading, text, lists, code) beside a list, level with its active item.
+- `Select`, `OptionList`: an option's `detail` shows a `SideTip` card beside the list while that option is under the
+  pointer or the keyboard, read with the option. A string is its text, `{ title, text }` a heading and text; the
+  `detail` snippet draws anything richer.
+- `Select`: an `item` snippet draws each option's row in the list (an avatar, a second line, a badge) in place of its
+  text and hint; it gets the option and `{ selected, active }`. On the chosen row the text tokens turn to the brand's
+  ink, so a row's muted text stays readable there.
+
+### Fixed
+
+- `Select`, `DateRangeSelect`, `DatePicker`, `DateRangePicker` and `FilterBar`'s panels: the list, pulled a little to
+  the left of its field, is as much wider, so it overhangs both edges of the field evenly instead of falling short on
+  the right.
+
 ## [0.1.3] - 2026-11-22
 
 ### Added

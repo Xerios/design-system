@@ -221,7 +221,7 @@
     gap: 6px;
     min-width: 120px;
     max-width: 100%;
-    min-height: 32px;
+    min-height: var(--control-h);
     padding: 0 8px;
     border: 1px solid var(--line-strong);
     border-radius: var(--r);
@@ -346,8 +346,10 @@
       flip-block flip-inline;
     position-visibility: anchors-visible;
     /* A touch to the left of the field, so the panel's content lines up under the field's own (mirrored when it flips
-       to end at the field's right edge: a flip swaps the inline margins too). */
+       to end at the field's right edge: a flip swaps the inline margins too), and at least as much wider than it, so it
+       overhangs the field's right edge by the same amount. */
     margin-inline-start: calc(var(--space-1) * -1);
+    min-width: calc(anchor-size(width) + var(--space-1) * 2);
     margin-block: 4px;
     padding: var(--space-3);
     border: 1px solid var(--line-float);
