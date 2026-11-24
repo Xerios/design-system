@@ -7,6 +7,7 @@
   import { MediaQuery } from 'svelte/reactivity'
   import KitchenSink from './KitchenSink.svelte'
   import KitchenSinkNav from './KitchenSinkNav.svelte'
+  import { PACKAGE } from './package.js'
   import Button from '@xerios/design-system/components/Button.svelte'
   import Dialogs from '@xerios/design-system/components/Dialogs.svelte'
   import Drawer from '@xerios/design-system/components/Drawer.svelte'
@@ -21,7 +22,7 @@
   {#if narrow.current}
     <header class="bar">
       <Button iconOnly icon="sidebar" label="Open the menu" onclick={() => drawer?.show()} />
-      <span class="bar-title">Design system</span>
+      <span class="bar-title">{PACKAGE}</span>
     </header>
     <Drawer bind:this={drawer} label="Menu" side="start" defaultWidth={280} resizable={false}>
       <KitchenSinkNav onpick={() => drawer?.close()} />

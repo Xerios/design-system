@@ -1,15 +1,19 @@
-// Cuts a release: `pnpm release [patch|minor|major|x.y.z] [--dry] [--no-git]`.
+// Cuts a release: `pnpm release [patch|minor|major|x.y.z] [--dry] [--no-git] [--no-shot]`.
 // Bumps `version` in package.json, turns `## [Unreleased]` in CHANGELOG.md into `## [x.y.z] - YYYY-MM-DD` under a
-// fresh empty `[Unreleased]`, updates the compare links at the bottom, checks the build, then commits and tags `vx.y.z`.
+// fresh empty `[Unreleased]`, updates the compare links at the bottom, checks the build, retakes the README's
+// screenshot (docs/screenshot.png, from the kitchen sink's demo page in the dark theme: `pnpm screenshot`) and points
+// the README's image at the new tag, so the npm page of each version shows that version; then commits and tags `vx.y.z`.
+// `--no-shot` keeps the screenshot as it is (the kitchen sink is still built, as a check).
 // With no level it picks one from the changelog: a **Breaking** entry bumps the minor while on 0.x (the major after),
 // anything else the patch. `--dry` prints what it would do and writes nothing; `--no-git` skips the commit and tag.
 // It never pushes or publishes: it prints the commands for that at the end.
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const args = process.argv.slice(2)
 const dry = args.includes('--dry')
 const git = !args.includes('--no-git')
+const shot = !args.includes('--no-shot')
 const level = args.find((a) => !a.startsWith('--'))
 
 const fail = (msg) => {
@@ -21,6 +25,9 @@ const read = (cmd) => execSync(cmd, { encoding: 'utf8' }).trim()
 
 const pkgText = readFileSync('package.json', 'utf8')
 const log = readFileSync('CHANGELOG.md', 'utf8')
+const readme = readFileSync('README.md', 'utf8')
+const SHOT = 'docs/screenshot.png'
+const shotBefore = existsSync(SHOT) ? readFileSync(SHOT) : null
 const current = JSON.parse(pkgText).version
 
 // What is under [Unreleased], up to the next release heading or the link list.
@@ -68,6 +75,12 @@ logOut = logOut.replace(
 	`[Unreleased]: ${repo}/compare/v${next}...HEAD\n[${next}]: ${repo}/compare/v${current}...v${next}`,
 )
 
+// README.md: the screenshot's address names the tag (raw.githubusercontent.com/<owner>/<repo>/<ref>/docs/screenshot.png),
+// as npm shows the README of each version and can only show an image by its full address.
+const shotUrl = /(https:\/\/raw\.githubusercontent\.com\/[^/\s]+\/[^/\s]+\/)[^/\s]+(\/docs\/screenshot\.png)/
+if (!shotUrl.test(readme)) fail(`README.md has no raw.githubusercontent.com address of ${SHOT}`)
+const readmeOut = readme.replace(shotUrl, `$1v${next}$2`)
+
 console.log(`release: ${current} → ${next}${level ? '' : ` (${auto}${breaking ? ', has breaking changes' : ''})`}`)
 if (dry) {
 	console.log(`\n## [${next}] - ${date}\n\n${notes}\n\n(dry run: nothing written)`)
@@ -76,21 +89,25 @@ if (dry) {
 
 writeFileSync('package.json', pkgOut)
 writeFileSync('CHANGELOG.md', logOut)
+writeFileSync('README.md', readmeOut)
 const undo = () => {
 	writeFileSync('package.json', pkgText)
 	writeFileSync('CHANGELOG.md', log)
+	writeFileSync('README.md', readme)
+	if (shotBefore) writeFileSync(SHOT, shotBefore)
 }
 
 try {
 	run('pnpm build')
-	run('pnpm build:kitchensink')
+	// The screenshot builds the kitchen sink first, so either way it is checked.
+	run(shot ? 'pnpm screenshot' : 'pnpm build:kitchensink')
 } catch {
 	undo()
-	fail('the build failed; package.json and CHANGELOG.md are back as they were')
+	fail(`the build${shot ? ' or the screenshot' : ''} failed; package.json, CHANGELOG.md, README.md and the screenshot are back as they were`)
 }
 
 if (git) {
-	run('git add package.json CHANGELOG.md')
+	run(`git add package.json CHANGELOG.md README.md ${SHOT}`)
 	run(`git commit -m "Release v${next}"`)
 	run(`git tag -a v${next} -m "v${next}"`)
 }

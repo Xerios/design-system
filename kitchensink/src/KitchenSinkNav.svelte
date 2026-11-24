@@ -14,6 +14,7 @@
   import ButtonGroup from '@xerios/design-system/components/inputs/ButtonGroup.svelte'
   import SideMenu from '@xerios/design-system/components/side-menu/index.js'
   import { AREAS, jump } from './areas.js'
+  import { PACKAGE } from './package.js'
   import { THEMES, setTheme, theme } from './theme.svelte.js'
 
   /** @type {{ onpick?: () => void } & import('svelte/elements').HTMLAttributes<HTMLElement>} */
@@ -70,7 +71,7 @@
 </script>
 
 <SideMenu label="Design system areas" {...rest} {@attach follow}>
-  {#snippet header()}<span class="brand"><Icon name="swatches" size="lg" />Design system</span>{/snippet}
+  {#snippet header()}<span class="brand"><Icon name="swatches" size="lg" />{PACKAGE}</span>{/snippet}
 
   <SideMenu.Group>
     {#each AREAS as a (a.id)}
@@ -93,6 +94,9 @@
         {/each}
       </SideMenu.Item>
     {/each}
+  </SideMenu.Group>
+  <SideMenu.Group title="Together">
+    <SideMenu.Item href="demo.html" icon="eye" label="Demo page" />
   </SideMenu.Group>
 
   {#snippet footer()}

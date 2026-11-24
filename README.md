@@ -5,6 +5,8 @@ A note of warning: This is **designed for personal use and building local web-ap
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
 
+![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://raw.githubusercontent.com/Xerios/design-system/main/docs/screenshot.png)
+
 Nothing in it knows about the apps that use it: anything domain-specific stays in the app.
 
 Plain JavaScript with JSDoc types, Svelte 5 runes. It ships as Svelte source (compiled by your bundler, like any
@@ -152,10 +154,18 @@ per component, each of its states in a captioned `Case` inside it). Its side men
 Glyphs the demos need beyond the built-in set are registered in `kitchensink/src/icons.js`, as an app would; a name
 left out shows the missing-icon placeholder and a console error.
 
+Beside it, `demo.html` (`kitchensink/src/demo/`, linked from the kitchen sink's side menu) is one screen of a made-up
+issue tracker built only from the design system, to see the parts working together. The screenshot at the top of this
+README is taken of it, in the dark theme, by `pnpm screenshot` (`kitchensink/scripts/screenshot.js`: it builds the
+kitchen sink and opens the page in headless Chromium through `playwright-core`) and written to `docs/screenshot.png`.
+It downloads no browser: it uses `CHROME_PATH` if set, else the newest Chromium in Playwright's cache
+(`~/.cache/ms-playwright`), else Chrome, Chromium or Brave on the `PATH`.
+
 ```sh
 pnpm install
-pnpm dev                  # the kitchen sink, with hot reload
+pnpm dev                  # the kitchen sink, with hot reload (the demo at /demo.html)
 pnpm build:kitchensink    # a static build in kitchensink/dist
+pnpm screenshot           # docs/screenshot.png, from the demo page (--light for the light theme)
 ```
 
 It imports the library by its package name, exactly as an app does, and its Vite config resolves that name to `src/`
@@ -405,9 +415,12 @@ pnpm icons        # regenerate components/icons.js after editing scripts/icons.j
 ```
 
 To release, run `pnpm release` (or `pnpm release patch|minor|major|x.y.z`; `--dry` to preview, `--no-git` to skip the
-commit and tag). It bumps `version` in `package.json` (from the changelog when no level is given: a **Breaking** entry
+commit and tag, `--no-shot` to keep the screenshot). It bumps `version` in `package.json` (from the changelog when no level is given: a **Breaking** entry
 bumps the minor while on 0.x, anything else the patch), turns `[Unreleased]` in `CHANGELOG.md` into the dated release
-under a fresh `[Unreleased]`, updates the compare links, checks both builds, then commits and tags `vx.y.z`. Push with
+under a fresh `[Unreleased]`, updates the compare links, checks both builds, retakes the screenshot (`pnpm screenshot`)
+and points this README's image at the new tag, then commits and tags `vx.y.z`. The image is addressed in full
+(raw.githubusercontent.com), since npm shows the README of each version but not the image file, which is not published;
+it appears once the tag is pushed. Push with
 `git push --follow-tags`, then `pnpm publish`. `prepack` rebuilds `dist/` first, and only `dist/`, this README and the
 license are published.
 

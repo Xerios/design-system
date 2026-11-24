@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "screenshot": "node scripts/screenshot.js"
   },
   "dependencies": {
     "@xerios/design-system": "workspace:*"
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@phosphor-icons/core": "^2.1.1",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "playwright-core": "^1.65.1",
     "svelte": "^5.58.0",
     "vite": "^8.3.8"
   }

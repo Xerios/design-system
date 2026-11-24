@@ -54,6 +54,7 @@
     "dev": "pnpm --filter kitchensink dev",
     "build": "svelte-package --input src --output dist && publint",
     "build:kitchensink": "pnpm --filter kitchensink build",
+    "screenshot": "pnpm --filter kitchensink screenshot",
     "icons": "node scripts/icons.js",
     "release": "node scripts/release.js",
     "prepack": "pnpm build"
