@@ -7,6 +7,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-24
+
 ### Added
 
 - `.held`, `.keyed`, `.holds`, `.keys`: the held look for the item the pointer or keyboard is on in a list or grid of
@@ -180,7 +182,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 First release: theme tokens, global CSS (`base`, `effects`, `atoms`), the components listed in the README and the
 `lib/` helpers.
 
-[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/Xerios/design-system/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/Xerios/design-system/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/Xerios/design-system/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/Xerios/design-system/compare/v0.1.2...v0.1.3

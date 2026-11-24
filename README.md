@@ -5,7 +5,7 @@ A note of warning: This is **designed for personal use and building local web-ap
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
 
-![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://raw.githubusercontent.com/Xerios/design-system/main/docs/screenshot.png)
+![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://raw.githubusercontent.com/Xerios/design-system/v0.1.6/docs/screenshot.png)
 
 Nothing in it knows about the apps that use it: anything domain-specific stays in the app.
 
