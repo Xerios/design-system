@@ -16,9 +16,9 @@
    * into that dialog, since everything outside a modal is inert and could not be clicked or announced.
    */
   import { untrack } from 'svelte'
+  import Button from './Button.svelte'
   import Icon from './Icon.svelte'
   import { fly } from '../lib/motion.js'
-  import { tooltip } from '../lib/tooltip.js'
 
   /**
    * @typedef {{ id: string | number, message: string, action?: { label: string, run: () => void, icon?: string } }} ToastData
@@ -162,9 +162,7 @@
               {toast.action.label}
             </button>
           {/if}
-          <button type="button" class="close" aria-label="Dismiss notification" {@attach tooltip('Dismiss')} onclick={() => dismiss(toast.id, depth)}
-            ><Icon name="x" size="sm" /></button
-          >
+          <Button iconOnly icon="x" label="Dismiss" class="close" aria-label="Dismiss notification" onclick={() => dismiss(toast.id, depth)} />
         </div>
       </li>
     {/each}
@@ -242,8 +240,7 @@
     padding-block: var(--space-2);
     overflow-wrap: anywhere;
   }
-  .action,
-  .close {
+  .action {
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
@@ -258,16 +255,11 @@
     /* Centred on the message's first line (its padding and one line), not on the whole block. */
     margin-top: calc((var(--space-2) * 2 + 1lh - 32px) / 2);
   }
-  .close {
-    color: var(--muted);
-    min-width: 32px;
-    justify-content: center;
-  }
-  .action:hover,
-  .close:hover {
+  .action:hover {
     background: var(--control-3);
   }
-  .close:hover {
-    color: var(--fg);
+  /* The ✕ (Button), centred on the first line the same way. */
+  .toast :global(.close) {
+    margin-top: calc((var(--space-2) * 2 + 1lh - 28px) / 2);
   }
 </style>

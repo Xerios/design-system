@@ -16,9 +16,8 @@
    * Keyboard: Esc with text clears it (and goes no further); with none, Esc is left to the list around it.
    * Other attributes and attachments go to the <input>.
    */
-  import Icon from '../Icon.svelte'
+  import Button from '../Button.svelte'
   import { composing } from '../../lib/dom.js'
-  import { tooltip } from '../../lib/tooltip.js'
 
   /**
    * @typedef {object} Props
@@ -73,20 +72,21 @@
   />
   <!-- Pointer only: mousedown would take the focus out of the field. Esc clears from the keyboard. Kept in place while
        there is nothing to clear (hidden), so a list sized to its content doesn't widen as the first letter is typed. -->
-  <button
-    type="button"
-    class="clear"
-    class:hidden={!value}
+  <Button
+    iconOnly
+    small
+    icon="x"
+    label="Clear"
+    class={['clear', !value && 'hidden']}
     disabled={!value}
-    tabindex="-1"
+    tabindex={-1}
     aria-label="Clear {label} filter"
-    {@attach tooltip('Clear')}
     onmousedown={(e) => e.preventDefault()}
     onclick={() => {
       oninput('')
       input?.focus({ preventScroll: true })
-    }}><Icon name="x" size="sm" /></button
-  >
+    }}
+  />
 </div>
 
 <style>
@@ -119,24 +119,7 @@
   .list-search-input:focus {
     outline: none;
   }
-  .clear {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .clear.hidden {
+  .list-search :global(.clear.hidden) {
     visibility: hidden;
-  }
-  .clear:hover {
-    color: var(--fg);
-    background: var(--control-3);
   }
 </style>

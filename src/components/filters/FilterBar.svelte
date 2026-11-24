@@ -41,8 +41,8 @@
   import OptionList from './OptionList.svelte'
   import DateFilter from './DateFilter.svelte'
   import TagInput from '../inputs/TagInput.svelte'
-  import Panel from './Panel.svelte'
-  import { tooltip } from '../../lib/tooltip.js'
+  import AnchoredPanel from '../AnchoredPanel.svelte'
+  import Button from '../Button.svelte'
   import { composing } from '../../lib/dom.js'
   import { datePresets, formatDay, relativeDay } from '../../lib/dates.js'
 
@@ -73,7 +73,6 @@
   } = $props()
 
   const uid = $props.id()
-  const anchor = `--filter-add-${uid}`
   /** @type {HTMLButtonElement | undefined} */
   let addButton = $state()
   /** @type {Record<string, { focus: () => void }>} */
@@ -298,24 +297,23 @@
       </FilterChip>
     {/if}
   {/each}
-  <button
-    bind:this={addButton}
-    type="button"
-    class="icon-btn add"
-    style:anchor-name={anchor}
-    aria-label={addLabel}
+  <Button
+    iconOnly
+    icon="funnel"
+    label={addLabel}
+    class="add"
     aria-haspopup="dialog"
     aria-expanded={!!adding}
-    {@attach tooltip(addLabel)}
-    onclick={() => (adding ? closeAdding(true) : (adding = { key: null }))}
-  >
-    <Icon name="funnel" />
-  </button>
+    onclick={() => void (adding ? closeAdding(true) : (adding = { key: null }))}
+    {@attach (node) => {
+      addButton = node
+    }}
+  />
 </div>
 
 {#if adding && addButton}
   {@const field = adding.key ? byKey.get(adding.key) : null}
-  <Panel anchor={addButton} name={anchor} label={field ? field.label : addLabel} onclose={closeAdding}>
+  <AnchoredPanel anchor={addButton} label={field ? field.label : addLabel} onclose={closeAdding}>
     {#if field}
       {#key field.key}
         <div
@@ -332,7 +330,7 @@
     {:else}
       <OptionList options={fieldOptions} multiple={false} label={addLabel} placeholder="Filter by…" onpick={pickField} />
     {/if}
-  </Panel>
+  </AnchoredPanel>
 {/if}
 
 <style>

@@ -18,11 +18,11 @@
    *   <ActionCard inline copy={command}><code>{command}</code></ActionCard>
    *
    * actions: a snippet of `ActionCard.Action`s (an icon and a label; see `labels`), each a `Button`, which brings the
-   * spinner and error bubble of an async action (an onclick returning a promise). Any other button works too (a
+   * spinner of an async action (an onclick returning a promise; a rejection goes to its `onerror`). Any other button works too (a
    * `<Button iconOnly>`, a `MenuButton` for more), drawn as it is. Keep them few, ordered from the most used, and about
    * this card's content only.
    * copy: adds a Copy action after the others, copying this text (or what this function returns, which may be a
-   * promise) to the clipboard. It turns to a tick, says "Copied" and announces it; a failure shows in a bubble under it.
+   * promise) to the clipboard. It turns to a tick, says "Copied" and announces it; a failure is thrown on (see Button).
    * copyLabel, copiedLabel: its label before and after (default 'Copy', 'Copied').
    * placement: top (default, the top-right corner) | bottom (a row under the content).
    * align: start (default) | end; where the row sits at the bottom.

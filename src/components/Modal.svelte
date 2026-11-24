@@ -7,8 +7,8 @@
    *     <form id="new-site" class="dialog-body" novalidate onsubmit={submit}>…</form>
    *     <footer class="dialog-foot">
    *       <span class="spacer"></span>
-   *       <button type="button" class="btn" onclick={() => modal.requestClose()}>Cancel</button>
-   *       <button type="submit" form="new-site" class="btn btn-primary">Create</button>
+   *       <Button onclick={() => modal.requestClose()}>Cancel</Button>
+   *       <Button type="submit" form="new-site" variant="primary">Create</Button>
    *     </footer>
    *   </Modal>
    *
@@ -29,9 +29,8 @@
    * Keyboard: Esc requests closing, through canClose however fast it is repeated (see closeRequests in lib/dom.js). The
    * focus starts on the first [autofocus] control, else the first focusable one, and goes back where it was on close.
    */
-  import Icon from './Icon.svelte'
+  import Button from './Button.svelte'
   import { backdropClose, closeRequests } from '../lib/dom.js'
-  import { tooltip } from '../lib/tooltip.js'
 
   /**
    * @typedef {object} Props
@@ -84,7 +83,8 @@
   <header class="dialog-head">
     <h2 id="{uid}-title">{title}</h2>
     {#if closeButton}
-      <button type="button" class="icon-btn" aria-label="Close" {@attach tooltip('Close')} onclick={requestClose} disabled={locked}><Icon name="x" /></button>
+      <!-- Returns nothing: Button would show requestClose's promise (canClose asking) as busy. -->
+      <Button iconOnly icon="x" label="Close" onclick={() => void requestClose()} disabled={locked} />
     {/if}
   </header>
   {@render children?.()}

@@ -33,7 +33,7 @@
   import FieldLabel from './FieldLabel.svelte'
   import RangeShortcuts from './RangeShortcuts.svelte'
   import { invalid } from '../../lib/invalid.js'
-  import { topLayer } from '../../lib/dom.js'
+  import { topLayer, pressedOutside } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
   import { reveal } from '../../lib/reveal.js'
   import DashOutline from '../DashOutline.svelte'
@@ -197,10 +197,7 @@
     }
   }
   /** A press outside the button and the panel closes it. The label counts as the button. @param {PointerEvent} e */
-  function outside(e) {
-    const target = /** @type {Element} */ (e.target)
-    if (open && !button?.contains(target) && !sheet?.contains(target) && !target.closest?.(`label[for="${id}"]`)) close(false)
-  }
+  const outside = (e) => open && pressedOutside(e, [button, sheet], id) && close(false)
 </script>
 
 <svelte:document onpointerdowncapture={outside} />

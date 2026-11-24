@@ -61,7 +61,7 @@ export { default as MenuButton } from './components/menu/MenuButton.svelte'
 
 export { menu, openMenu, openMenuFrom, closeMenu, contextMenu } from './lib/menu.svelte.js'
 export { alertDialog, confirmDialog, promptDialog } from './lib/dialogs.svelte.js'
-export { portal, portalNear, topLayer, backdropClose, closeRequests, composing } from './lib/dom.js'
+export { portal, portalNear, topLayer, backdropClose, closeRequests, composing, pressedOutside } from './lib/dom.js'
 export { radioKeys } from './lib/roving.js'
 export { invalid, FIRST_INVALID } from './lib/invalid.js'
 export * as dates from './lib/dates.js'

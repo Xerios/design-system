@@ -23,7 +23,7 @@
    * Other attributes (class…) and attachments go to the group.
    */
   import Icon from '../Icon.svelte'
-  import Panel from './Panel.svelte'
+  import AnchoredPanel from '../AnchoredPanel.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { menu, openMenuFrom, closeMenu } from '../../lib/menu.svelte.js'
 
@@ -57,7 +57,6 @@
   } = $props()
 
   const uid = $props.id()
-  const anchor = `--filter-${uid}`
   /** @type {HTMLButtonElement | undefined} */
   let valueButton = $state()
   /** @type {HTMLButtonElement | undefined} */
@@ -122,7 +121,6 @@
     type="button"
     class="seg value"
     id="{uid}-value"
-    style:anchor-name={anchor}
     aria-haspopup={panel ? 'dialog' : undefined}
     aria-expanded={panel ? open : undefined}
     disabled={!panel}
@@ -135,9 +133,9 @@
 </div>
 
 {#if open && panel && valueButton}
-  <Panel anchor={valueButton} name={anchor} label={field.label} onclose={close}>
+  <AnchoredPanel anchor={valueButton} label={field.label} onclose={close}>
     {@render panel({ close: () => close(true) })}
-  </Panel>
+  </AnchoredPanel>
 {/if}
 
 <style>

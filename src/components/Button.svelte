@@ -1,6 +1,6 @@
 <script>
   /**
-   * The .btn pill (or an .icon-btn), with an optional icon, that runs an async action and shows how it went.
+   * The .btn pill (or an .icon-btn), with an optional icon, that runs an async action and shows while it runs.
    *
    *   <Button icon="refresh" onclick={() => refreshAll()}>Try again</Button>
    *   <Button variant="danger" icon="trash" pendingLabel="Removing…" onclick={remove}>Remove subdomain</Button>
@@ -13,20 +13,21 @@
    * (Shimmer), `pendingLabel` (if given) in its place; an
    * icon-only button shows a spinner instead of its icon. It is aria-busy, and further presses are ignored (a flag, not
    * only the look), so the action can't run twice; the focus stays on it. Under reduced motion the sweep and the spinner
-   * hold still, so give a `pendingLabel` where you can: it says what is happening in words. If the promise rejects, the
-   * error's message shows in a bubble under
-   * the button (read out as an alert, dismissible) until the next press; pass `onerror` to handle it yourself instead.
+   * hold still, so give a `pendingLabel` where you can: it says what is happening in words. The button shows no error
+   * of its own: if the promise rejects, `onerror` gets the error (say what went wrong where it belongs: a toast, an
+   * Empty.Error, a field's `error`); without one the rejection is thrown on, for the app's own error handling.
    * pending: busy from outside, e.g. a form submit button while its form's request runs.
    *
-   * variant: secondary (default) | primary | danger. small: the 24px size. icon: an Icon name, before the label.
+   * variant: secondary (default) | primary | danger. small: the 24px size (.btn-small, or .icon-btn-small with a small
+   * icon). icon: an Icon name, before the label.
    * iconOnly: the round .icon-btn showing just the icon; `label` is then required, and becomes its accessible name and
-   * its tooltip. href: a link drawn as a button (navigation, never an action). disabled: as on any button.
+   * its tooltip. An aria-label passed as well names it instead (say "Remove report.pdf" under the tooltip "Remove").
+   * detail: a second line in an icon-only button's tooltip, what it applies to (a file name; see lib/tooltip.js).
+   * iconSize: the icon's size (sm, md, lg) where the default doesn't suit the glyph: md on an icon-only button, else sm. href: a link drawn as a button (navigation, never an action). disabled: as on any button.
    * Other attributes (class, form, autofocus…) and attachments go to the <button> (or <a>).
    */
   import Icon from './Icon.svelte'
-  import ErrorMessage from './ErrorMessage.svelte'
   import Shimmer from './Shimmer.svelte'
-  import { topLayer } from '../lib/dom.js'
   import { tooltip } from '../lib/tooltip.js'
 
   /**
@@ -34,8 +35,10 @@
    * @property {'secondary' | 'primary' | 'danger'} [variant]
    * @property {boolean} [small]
    * @property {string} [icon]
+   * @property {'sm' | 'md' | 'lg'} [iconSize]
    * @property {boolean} [iconOnly]
    * @property {string} [label] the accessible name and tooltip of an iconOnly button
+   * @property {string} [detail] a second line in an iconOnly button's tooltip
    * @property {string} [href]
    * @property {'button' | 'submit' | 'reset'} [type]
    * @property {(event: MouseEvent) => unknown} [onclick]
@@ -50,8 +53,10 @@
     variant = 'secondary',
     small = false,
     icon,
+    iconSize,
     iconOnly = false,
     label,
+    detail,
     href,
     type = 'button',
     onclick,
@@ -64,12 +69,7 @@
     ...rest
   } = $props()
 
-  const uid = $props.id()
-  const anchor = `--button-${uid}`
-  /** @type {HTMLButtonElement | undefined} */
-  let button = $state()
   let running = $state(false)
-  let error = $state('')
   const busy = $derived(pending || running)
 
   const classes = $derived([
@@ -77,6 +77,7 @@
     !iconOnly && variant === 'primary' && 'btn-primary',
     !iconOnly && variant === 'danger' && 'btn-danger',
     !iconOnly && small && 'btn-small',
+    iconOnly && small && 'icon-btn-small',
     busy && 'shimmer',
     className,
   ])
@@ -88,15 +89,14 @@
       event.preventDefault()
       return
     }
-    error = ''
     const result = onclick?.(event)
     if (!(result instanceof Promise)) return
     running = true
     try {
       await result
     } catch (failure) {
-      if (onerror) onerror(failure)
-      else error = failure instanceof Error && failure.message ? failure.message : 'That didn’t work. Try again.'
+      if (!onerror) throw failure
+      onerror(failure)
     } finally {
       running = false
     }
@@ -104,7 +104,7 @@
 </script>
 
 {#snippet content()}
-  {#if busy && iconOnly}<span class="spin"><Icon name="spinner" /></span>{:else if icon}<Icon name={icon} size={iconOnly ? 'md' : 'sm'} />{/if}
+  {#if busy && iconOnly}<span class="spin"><Icon name="spinner" size={small ? 'sm' : 'md'} /></span>{:else if icon}<Icon name={icon} size={iconSize ?? (iconOnly && !small ? 'md' : 'sm')} />{/if}
   {#if !iconOnly}
     <span class="btn-label"
       >{#if busy}<Shimmer>{#if pendingLabel}{pendingLabel}{:else}{@render children?.()}{/if}</Shimmer
@@ -114,28 +114,19 @@
 {/snippet}
 
 {#if href}
-  <a {href} class={classes} aria-label={iconOnly ? label : undefined} {@attach tooltip(iconOnly ? label : '')} {...rest}>{@render content()}</a>
+  <a {href} class={classes} aria-label={iconOnly ? label : undefined} {@attach tooltip(iconOnly ? label : '', { detail })} {...rest}>{@render content()}</a>
 {:else}
   <button
-    bind:this={button}
     {type}
     class={classes}
-    style:anchor-name={anchor}
     {disabled}
     aria-label={iconOnly ? label : undefined}
     aria-busy={busy || undefined}
     aria-disabled={busy || undefined}
-    aria-describedby={error ? `${uid}-error` : undefined}
-    {@attach tooltip(iconOnly ? label : '')}
+    {@attach tooltip(iconOnly ? label : '', { detail })}
     {...rest}
     onclick={run}>{@render content()}</button
   >
-  {#if error}
-    <!-- Hung under the button in the top layer, so it needs no wrapper around the button and nothing clips it. -->
-    <span class="error-host" style:position-anchor={anchor} data-floating {@attach topLayer(button)}>
-      <ErrorMessage floating id="{uid}-error" role="alert" message={error} ondismiss={() => ((error = ''), button?.focus())} />
-    </span>
-  {/if}
 {/if}
 
 <style>
@@ -162,18 +153,5 @@
     to {
       rotate: 1turn;
     }
-  }
-  /* A box just under the button, as wide as the bubble may grow; the bubble (absolutely placed) hangs from it. */
-  .error-host {
-    position: fixed;
-    position-area: block-end span-inline-end;
-    position-try-fallbacks: flip-inline;
-    width: min(320px, calc(100dvw - 32px));
-    height: 0;
-    overflow: visible;
-    pointer-events: none;
-  }
-  .error-host > :global(*) {
-    pointer-events: auto;
   }
 </style>

@@ -32,6 +32,27 @@ export const portalNear = (from) => (node) => {
   return () => node.remove()
 }
 
+/**
+ * Whether a press (pointerdown, caught on the document) landed outside an open floating thing: not inside any of
+ * `inside` (the layer and the control that opened it), nor in another floating layer opened from it (anything
+ * [data-floating]: a list, a tip, a nested panel; a menu; a tooltip), nor on the label of the control `labelFor`, whose
+ * click toggles it itself. A press in the floating layer the control itself sits in (a Select in a Popover's panel)
+ * does count as outside.
+ *
+ *   <svelte:document onpointerdowncapture={(e) => open && pressedOutside(e, [button, list], id) && close(false)} />
+ *
+ * @param {Event} e
+ * @param {(Element | null | undefined)[]} inside
+ * @param {string} [labelFor]
+ */
+export function pressedOutside(e, inside, labelFor) {
+  const target = /** @type {Element} */ (e.target)
+  if (inside.some((node) => node?.contains(target))) return false
+  const layer = target.closest?.('[data-floating], .ctx-menu, .tooltip')
+  if (layer && !inside.some((node) => node && layer.contains(node))) return false
+  return !(labelFor && target.closest?.(`label[for="${CSS.escape(labelFor)}"]`))
+}
+
 /** @param {MouseEvent} e */
 const onBackdrop = (e) => {
   if (e.target !== e.currentTarget) return false

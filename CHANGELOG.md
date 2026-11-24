@@ -9,16 +9,31 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Changed
 
+- **Breaking** `Button` (and `ActionCard.Action`) no longer shows an error bubble when its `onclick` promise rejects:
+  the error goes to `onerror`, or without one is thrown on, for the app's error handling. Pass `onerror` and say what
+  went wrong where it belongs (a toast, an `ErrorMessage`, a field's `error`). `ActionCard`'s Copy no longer shows a
+  failure either.
 - **Breaking** `Popover` no longer draws its button: pass a `button` snippet and spread its props on a `Button` of your
   own, `{#snippet button(props)}<Button icon="funnel" {...props}>Filters</Button>{/snippet}`. The `trigger`, `badge`,
   `dot` and `hideLabel` props are gone (put the icon, a `.badge` or a `.new-dot` in your button), and other attributes
   (class…) now go to the panel, not the button.
 - `Popover`: Tab past the panel's last control (or Shift+Tab before its first) closes it and goes on from its button.
+- `Popover`: the panel is drawn and placed as the filter bar's panels and Select's list are: in the top layer (above
+  modal dialogs), with the same gradient edge, growing out of its button. Under 860px it spans the window, as before.
+- `FilterBar`, `FilterChip`: under 860px their panels span the window between the gutters; Shift+Tab before a panel's
+  first control stops on its button.
+- `Upload` (file and image buttons, the file card, the thumbnail's ✕): at rest on the control tint (`--control-2`), as
+  `.btn` is, instead of the fainter `--control-1`.
+- `TextField` (search), `DateField`, `ListSearch`, `TagInput`, `FileCard`, `Toast`, `Modal`, `ErrorMessage`, Select's group actions:
+  their ✕ and small icon buttons are `Button`s, so they look and behave alike (24px `.icon-btn-small` for the small ones,
+  the 28px round `.icon-btn` for the toast's and dialog's ✕).
 
 ### Fixed
 
 - `Popover` with `scrim`: the panel shows above the dimmed page instead of under it, wherever the popover sits.
 - `portalNear`: inside a modal dialog the node goes into the dialog, so it isn't inert.
+- `Select`, `DateField`, `DateRangeSelect`: a press inside the floating panel they sit in (a Popover's, a filter's)
+  closes their open list; a press in a tooltip or a layer opened from them doesn't.
 
 ### Added
 
@@ -28,6 +43,11 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - `Select`: `separator: true` on an option draws a hairline across the list above it, dividing the list without a
   group heading.
 - `.badge`: a small brand pill counting what's on inside what a button opens (it was Popover's own).
+- `.icon-btn-small`: the 24px `.icon-btn`, for clear, remove and dismiss buttons inside fields, chips and bubbles.
+- `Button`: `small` with `iconOnly` draws the 24px `.icon-btn-small` with a small icon; `detail` adds a second line to
+  an icon-only button's tooltip; `iconSize` sets the icon's size where the default doesn't suit the glyph.
+- `pressedOutside(event, inside, labelFor?)` (lib/dom.js): whether a press landed outside an open floating thing, for
+  a picker or panel of your own.
 - `.btn`: open (`aria-expanded="true"`, a Popover's button) it keeps the pressed fill.
 
 ### Fixed

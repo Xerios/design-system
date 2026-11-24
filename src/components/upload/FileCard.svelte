@@ -1,5 +1,6 @@
 <script>
   import Icon from '../Icon.svelte'
+  import Button from '../Button.svelte'
   import Shimmer from '../Shimmer.svelte'
   import { invalid } from '../../lib/invalid.js'
   import { tooltip } from '../../lib/tooltip.js'
@@ -110,15 +111,7 @@
     <div class="main">{@render content()}</div>
   {/if}
   {#if item && onclear && !busy}
-    <button
-      type="button"
-      class="clear"
-      aria-label="Remove {item.name}"
-      {disabled}
-      {@attach tooltip('Remove', { detail: item.name })}
-      onclick={clear}
-      in:fade={{ duration: durations.short4 }}><Icon name="x" size="sm" /></button
-    >
+    <Button iconOnly small icon="x" label="Remove" detail={item.name} class="clear" aria-label="Remove {item.name}" {disabled} onclick={clear} />
   {/if}
 </div>
 
@@ -131,7 +124,7 @@
     min-width: 0;
     max-width: 100%;
     border: 1px solid var(--line-strong);
-    background: var(--control-1);
+    background: var(--control-2);
     color: var(--fg);
     transition:
       border-radius var(--dur) var(--ease-out),
@@ -253,29 +246,8 @@
     font-variant-numeric: tabular-nums;
     text-overflow: ellipsis;
   }
-  .clear {
-    display: inline-grid;
-    flex: none;
-    place-items: center;
-    width: 24px;
-    height: 24px;
+  .card :global(.clear) {
     margin-inline-end: var(--space-2);
-    padding: 0;
-    border: 0;
-    border-radius: var(--r-pill);
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-    transition:
-      background-color var(--dur) var(--ease-out),
-      color var(--dur) var(--ease-out);
-  }
-  .clear:hover:not(:disabled) {
-    background: var(--control-4);
-    color: var(--fg);
-  }
-  .clear:disabled {
-    cursor: default;
   }
   .dragging {
     border-color: var(--accent);
@@ -292,7 +264,7 @@
     .empty {
       min-height: 44px;
     }
-    .clear {
+    .card :global(.clear) {
       width: 44px;
       height: 44px;
       margin-inline-end: 0;

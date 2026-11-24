@@ -1,8 +1,8 @@
 <script>
   import ErrorMessage from '../ErrorMessage.svelte'
+  import Button from '../Button.svelte'
   import Icon from '../Icon.svelte'
   import FieldLabel from './FieldLabel.svelte'
-  import { tooltip } from '../../lib/tooltip.js'
   import { validity } from '../../lib/validity.js'
   import { composing } from '../../lib/dom.js'
   import { invalid } from '../../lib/invalid.js'
@@ -94,16 +94,17 @@
       )}
     />
     {#if value && type === 'search'}
-      <button
-        type="button"
-        class="clear"
+      <Button
+        iconOnly
+        small
+        icon="x"
+        label="Clear"
         aria-label="Clear {label}"
-        {@attach tooltip('Clear')}
         onclick={() => {
           value = ''
           input.focus()
-        }}><Icon name="x" size="sm" /></button
-      >
+        }}
+      />
     {:else if shortcut}
       <kbd aria-hidden="true">{shortcut}</kbd>
     {/if}
@@ -153,21 +154,5 @@
     kbd {
       display: none;
     }
-  }
-  .clear {
-    display: inline-grid;
-    place-items: center;
-    border: 0;
-    background: none;
-    color: var(--muted);
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    padding: 0;
-    flex: none;
-  }
-  .clear:hover {
-    color: var(--fg);
-    background: var(--control-3);
   }
 </style>

@@ -12,6 +12,7 @@
   import { tick } from 'svelte'
 
   import TextField from './inputs/TextField.svelte'
+  import Button from './Button.svelte'
   import { backdropClose } from '../lib/dom.js'
   import { answer, dialogs } from '../lib/dialogs.svelte.js'
 
@@ -95,16 +96,11 @@
       <footer class="dialog-foot">
         <span class="spacer"></span>
         {#if view.kind === 'alert'}
-          <!-- svelte-ignore a11y_autofocus -->
-          <button type="submit" class="btn btn-primary" autofocus><span class="btn-label">{view.okLabel ?? 'OK'}</span></button>
+          <Button type="submit" variant="primary" autofocus>{view.okLabel ?? 'OK'}</Button>
         {:else}
-          <!-- svelte-ignore a11y_autofocus -->
-          <button type="button" class="btn" autofocus={view.kind === 'confirm' && view.danger} onclick={() => dialog?.close()}
-            ><span class="btn-label">{view.cancelLabel ?? 'Cancel'}</span></button
-          >
-          <!-- svelte-ignore a11y_autofocus -->
-          <button type="submit" class="btn {view.danger ? 'btn-danger' : 'btn-primary'}" autofocus={view.kind === 'confirm' && !view.danger}
-            ><span class="btn-label">{view.confirmLabel ?? 'OK'}</span></button
+          <Button autofocus={view.kind === 'confirm' && view.danger} onclick={() => dialog?.close()}>{view.cancelLabel ?? 'Cancel'}</Button>
+          <Button type="submit" variant={view.danger ? 'danger' : 'primary'} autofocus={view.kind === 'confirm' && !view.danger}
+            >{view.confirmLabel ?? 'OK'}</Button
           >
         {/if}
       </footer>

@@ -2,7 +2,7 @@
   /**
    * One action of an ActionCard: an icon and a label, drawn as the card says (see its `labels`): the icon and the label
    * side by side, or the round icon-only button with the label as its tooltip and accessible name. It is a `Button`, so
-   * an onclick that returns a promise shows a spinner while it runs and a rejection's message in a bubble under it.
+   * an onclick that returns a promise shows a spinner while it runs, and a rejection goes to `onerror`.
    *
    *   <ActionCard.Action icon="pencil" label="Edit" onclick={edit} />
    *   <ActionCard.Action icon="sparkle" label="Polish" pendingLabel="Polishing…" onclick={polish} />

@@ -1,5 +1,6 @@
 <script>
   import Icon from '../Icon.svelte'
+  import Button from '../Button.svelte'
   import { fileSize, preview } from '../../lib/files.js'
   import { invalid } from '../../lib/invalid.js'
   import { tooltip } from '../../lib/tooltip.js'
@@ -91,15 +92,7 @@
       <div class="main">{@render content()}</div>
     {/if}
     {#if file && onclear}
-      <button
-        type="button"
-        class="clear"
-        aria-label="Remove {file.name}"
-        {disabled}
-        {@attach tooltip('Remove', { detail: file.name })}
-        onclick={clear}
-        in:fade={{ duration: durations.short4 }}><Icon name="x" size="sm" /></button
-      >
+      <Button iconOnly small icon="x" label="Remove" detail={file.name} class="clear" aria-label="Remove {file.name}" {disabled} onclick={clear} />
     {/if}
   </div>
   {#if file}
@@ -125,7 +118,7 @@
     display: flex;
     min-width: 0;
     border: 1px solid var(--line-strong);
-    background: var(--control-1);
+    background: var(--control-2);
     color: var(--fg);
     transition:
       border-radius var(--dur) var(--ease-out),
@@ -210,31 +203,19 @@
   .filled:has(> button.main:hover:not(:disabled)) img {
     opacity: 0.85;
   }
-  /* On a solid disc with a hairline, so it reads over any picture. */
-  .clear {
+  /* The small ✕ (Button) on a solid disc with a hairline, so it reads over any picture: the control tint over the
+     surface. */
+  .tile :global(.clear) {
     position: absolute;
     top: var(--space-1);
     right: var(--space-1);
-    display: inline-grid;
-    place-items: center;
-    width: 24px;
-    height: 24px;
-    padding: 0;
     border: 1px solid var(--line-strong);
-    border-radius: var(--r-pill);
-    background: var(--surface);
+    background: linear-gradient(var(--control-2), var(--control-2)), var(--surface);
     color: var(--fg-2);
-    cursor: pointer;
-    transition:
-      background-color var(--dur) var(--ease-out),
-      color var(--dur) var(--ease-out);
   }
-  .clear:hover:not(:disabled) {
+  .tile :global(.clear:hover:not(:disabled)) {
     background: linear-gradient(var(--control-4), var(--control-4)), var(--surface);
     color: var(--fg);
-  }
-  .clear:disabled {
-    cursor: default;
   }
   .caption {
     display: grid;

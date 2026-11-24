@@ -10,9 +10,8 @@
    * lib/menu.svelte.js). label: what the actions are for ("More actions for {label}"). Pressing it again closes the
    * menu. Other attributes (class…) and attachments go to the button.
    */
-  import Icon from '../Icon.svelte'
+  import Button from '../Button.svelte'
   import { menu, openMenuFrom, closeMenu } from '../../lib/menu.svelte.js'
-  import { tooltip } from '../../lib/tooltip.js'
 
   /**
    * @typedef {object} Props
@@ -21,9 +20,11 @@
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let { items, label, class: className, ...rest } = $props()
+  /** @type {HTMLElement | undefined} */
   let button = $state()
-  const expanded = $derived(menu.open && menu.trigger === button)
+  const expanded = $derived(menu.open && !!button && menu.trigger === button)
 
+  /** @param {MouseEvent} e */
   function toggle(e) {
     e.stopPropagation()
     if (expanded) closeMenu()
@@ -31,16 +32,19 @@
   }
 </script>
 
-<button
-  bind:this={button}
-  type="button"
-  class={['icon-btn more', className]}
+<!-- The tooltip says what it is; the name says what for. -->
+<Button
+  iconOnly
+  icon="more"
+  iconSize="lg"
+  label="More actions"
+  class={['more', className]}
   {...rest}
   aria-label="More actions for {label}"
   aria-haspopup="menu"
   aria-expanded={expanded}
-  {@attach tooltip('More actions')}
   onclick={toggle}
->
-  <Icon name="more" size="lg" />
-</button>
+  {@attach (node) => {
+    button = node
+  }}
+/>

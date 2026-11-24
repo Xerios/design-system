@@ -18,11 +18,10 @@
    * Other attributes and attachments go to the <input>.
    */
   import { tick } from 'svelte'
+  import Button from '../Button.svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
-  import Icon from '../Icon.svelte'
   import FieldLabel from './FieldLabel.svelte'
   import { flip, scale, durations } from '../../lib/motion.js'
-  import { tooltip } from '../../lib/tooltip.js'
   import { composing } from '../../lib/dom.js'
   import { announce } from '../../lib/announce.js'
   import { invalid } from '../../lib/invalid.js'
@@ -181,9 +180,7 @@
           transition:scale={{ start: 0.85, duration: durations.short3 }}
         >
           <span class="text">{tag}</span>
-          <button type="button" class="remove" tabindex="-1" aria-label="Remove {tag}" {@attach tooltip('Remove')} onclick={() => remove(i, -1)}
-            ><Icon name="x" size="sm" /></button
-          >
+          <Button iconOnly small icon="x" label="Remove" class="remove" tabindex={-1} aria-label="Remove {tag}" onclick={() => remove(i, -1)} />
         </li>
       {/each}
     </ul>
@@ -263,23 +260,9 @@
     white-space: nowrap;
   }
   /* A 24px target with an 18px circle drawn inside it (the padding keeps the fill off the edge). */
-  .remove {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 24px;
-    height: 24px;
+  .tag :global(.remove) {
     padding: 3px;
-    border: 0;
-    border-radius: 50%;
-    background: none;
     background-clip: content-box;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .remove:hover {
-    color: var(--fg);
-    background-color: var(--control-4);
   }
   input {
     all: unset;

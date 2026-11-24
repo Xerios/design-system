@@ -1,6 +1,6 @@
 <script>
   import Icon from './Icon.svelte'
-  import { tooltip } from '../lib/tooltip.js'
+  import Button from './Button.svelte'
   import { fly, durations } from '../lib/motion.js'
   /**
    * One line of error text with a warning icon. Draws nothing while `message` is empty, so it can stay in the
@@ -51,16 +51,17 @@
     <Icon name="warning" size="sm" />
     <span class="text">{message}</span>
     {#if floating}
-      <button
-        type="button"
+      <Button
+        iconOnly
+        small
+        icon="x"
+        label="Dismiss"
         class="dismiss"
-        aria-label="Dismiss"
-        {@attach tooltip('Dismiss')}
         onclick={() => {
           dismissed = true
           ondismiss?.()
-        }}><Icon name="x" size="sm" /></button
-      >
+        }}
+      />
     {/if}
   </p>
 {/if}
@@ -121,20 +122,12 @@
   .floating .text {
     margin-block: calc((24px - 1lh) / 2);
   }
-  .dismiss {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--r-pill);
-    background: none;
+  /* The small ✕ (Button) in the bubble's tone. */
+  .floating :global(.dismiss) {
     color: var(--tone);
-    cursor: pointer;
   }
-  .dismiss:hover {
+  .floating :global(.dismiss:hover) {
     background: var(--tone-soft);
+    color: var(--tone);
   }
 </style>

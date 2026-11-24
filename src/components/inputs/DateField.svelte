@@ -22,11 +22,12 @@
    * tabbing out of the panel closes it.
    */
   import { tick } from 'svelte'
+  import Button from '../Button.svelte'
   import Icon from '../Icon.svelte'
   import ErrorMessage from '../ErrorMessage.svelte'
   import FieldLabel from './FieldLabel.svelte'
   import { invalid } from '../../lib/invalid.js'
-  import { topLayer } from '../../lib/dom.js'
+  import { topLayer, pressedOutside } from '../../lib/dom.js'
   import { pop } from '../../lib/motion.js'
   import { tooltip } from '../../lib/tooltip.js'
 
@@ -134,10 +135,7 @@
   }
   /** A press outside the field and its panel closes it. The label counts as the button, and a layer opened from the
    *  panel (a Select's list, a tip) as the panel. @param {PointerEvent} e */
-  const outside = (e) => {
-    const target = /** @type {Element} */ (e.target)
-    if (open && !sheet?.contains(target) && !button?.contains(target) && !target.closest?.(`label[for="${id}"], [data-floating], .tooltip`)) close(false)
-  }
+  const outside = (e) => open && pressedOutside(e, [sheet, button], id) && close(false)
 </script>
 
 <svelte:document onpointerdowncapture={outside} />
@@ -189,15 +187,16 @@
         <!-- Kept in place while there is nothing to clear (hidden and disabled), so the box doesn't change width as a
              value comes and goes. -->
         {#if onclear}
-          <button
-            type="button"
-            class="clear"
-            class:hidden={!hasValue}
+          <Button
+            iconOnly
+            small
+            icon="x"
+            label="Clear"
+            class={['clear', !hasValue && 'hidden']}
             disabled={!hasValue}
             aria-label="Clear {label}"
-            {@attach tooltip('Clear')}
-            onclick={() => (onclear(), entry?.querySelector('input')?.focus())}><Icon name="x" size="sm" /></button
-          >
+            onclick={() => void (onclear(), entry?.querySelector('input')?.focus())}
+          />
         {/if}
       </div>
       {@render panel(() => close())}
@@ -318,24 +317,8 @@
     margin-block-end: var(--space-2);
     padding-inline-end: 4px;
   }
-  .clear {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: none;
-    color: var(--muted);
-  }
-  .clear.hidden {
+  .entry :global(.clear.hidden) {
     visibility: hidden;
-  }
-  .clear:hover:not(:disabled) {
-    background: var(--control-3);
-    color: var(--fg-2);
   }
   /* Anchored under the field, flipping above or to its other side when there's no room. */
   /* No user-select here: the panel holds the typed inputs, and Safari won't type in a field under it (Calendar and the

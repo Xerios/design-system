@@ -1,5 +1,6 @@
 <script>
   import Icon from '../Icon.svelte'
+  import Button from '../Button.svelte'
   /**
    * Single-choice dropdown with a listbox popover. Keyboard: arrows, Home/End, type-ahead, Enter, Escape; with a search
    * field the focus stays in it, arrows and Enter work the list, and Home/End, Space and letters are the field's.
@@ -47,7 +48,7 @@
   import { tooltip } from '../../lib/tooltip.js'
   import { invalid } from '../../lib/invalid.js'
   import { observeSize } from '../../lib/observe.js'
-  import { topLayer } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
+  import { topLayer, pressedOutside } from '../../lib/dom.js' // the list lives in the top layer: no scrolling parent clips it, no modal dialog covers it
   import { pop } from '../../lib/motion.js'
   import ListSearch from './ListSearch.svelte'
   import { matches, wantsSearch } from '../../lib/list-search.js'
@@ -234,7 +235,7 @@
 
   // While open, a press outside closes the list. The label counts as the button (its click toggles the list), so pressing
   // it isn't an outside press.
-  const outside = (e) => open && !button.contains(e.target) && !list?.contains(e.target) && !e.target.closest?.(`label[for="${id}"]`) && hide(false)
+  const outside = (e) => open && pressedOutside(e, [button, list], id) && hide(false)
 </script>
 
 <svelte:document onpointerdowncapture={outside} />
@@ -335,15 +336,15 @@
                 <span id="{id}-group-{si}">{sec.group}</span>
                 {#if action}
                   <!-- Pointer only (keeps focus on the listbox, which owns the keyboard). -->
-                  <button
-                    type="button"
-                    class="group-action"
-                    tabindex="-1"
-                    aria-label={action.label}
-                    {@attach tooltip(action.label)}
+                  <Button
+                    iconOnly
+                    small
+                    icon={action.icon}
+                    label={action.label}
+                    tabindex={-1}
                     onmousedown={(e) => e.preventDefault()}
-                    onclick={() => runGroupAction(action)}><Icon name={action.icon} size="sm" /></button
-                  >
+                    onclick={() => void runGroupAction(action)}
+                  />
                 {/if}
               </div>
               <ul role="none">
@@ -627,23 +628,6 @@
     box-shadow: 0 -4px 0 var(--elevated);
     font: var(--w-medium) 12px var(--font-body);
     color: var(--muted);
-  }
-  .group-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--r-sm);
-    background: none;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .group-action:hover {
-    background: var(--control-3);
-    color: var(--fg);
   }
   .hint {
     color: var(--faint);

@@ -4,6 +4,7 @@
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
   import Button from '@xerios/design-system/components/Button.svelte'
+  import ErrorMessage from '@xerios/design-system/components/ErrorMessage.svelte'
   import MenuButton from '@xerios/design-system/components/menu/MenuButton.svelte'
   import Tile from '@xerios/design-system/components/tiles/Tile.svelte'
   import ScrollToTop from '@xerios/design-system/components/scroll/ScrollToTop.svelte'
@@ -18,6 +19,7 @@
     })
 
   let picked = $state('nothing yet')
+  let deployError = $state('')
   let pending = $state(false)
   let pressed = $state('nothing yet')
   let compact = $state(false)
@@ -49,9 +51,9 @@
 <Section
   id="actions"
   title="Actions"
-  intro="Button runs async work itself: a spinner while the promise runs, presses ignored meanwhile, a rejection shown under it."
+  intro="Button runs async work itself: a spinner while the promise runs, presses ignored meanwhile, a rejection handed to onerror."
 >
-  <Demo label="Button" description="Variants, icons, and async work with its pending and error states.">
+  <Demo label="Button" description="Variants, icons, and async work with its pending state.">
     <Case label="Variants">
       <Button>Secondary</Button>
       <Button variant="primary" icon="plus">Primary</Button>
@@ -62,8 +64,15 @@
       <Button icon="refresh" pendingLabel="Refreshing…" onclick={() => wait(1500)}>Refresh</Button>
       <Button iconOnly icon="refresh" label="Refresh" onclick={() => wait(1500)} />
     </Case>
-    <Case label="Async: rejects (bubble under the button)">
-      <Button variant="primary" icon="rocket" pendingLabel="Deploying…" onclick={fail}>Deploy</Button>
+    <Case label="Async: rejects, and onerror says so beside it">
+      <Button
+        variant="primary"
+        icon="rocket"
+        pendingLabel="Deploying…"
+        onclick={() => ((deployError = ''), fail())}
+        onerror={(e) => (deployError = e instanceof Error ? e.message : 'That didn’t work.')}>Deploy</Button
+      >
+      <ErrorMessage message={deployError} />
     </Case>
     <Case label="Pending from outside, disabled">
       <Button variant="primary" {pending} pendingLabel="Saving…">Save</Button>
