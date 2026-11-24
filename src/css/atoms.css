@@ -32,6 +32,13 @@
     filter var(--dur) var(--ease-out);
 }
 
+/* A .btn's label, wrapped in .btn-label (Button does it), sits half a pixel low: the browser rounds the 12px label's
+   baseline up, which leaves its capitals above the box's middle and above an icon beside it. Padding can't move text by
+   half a pixel (baselines snap to whole pixels), a transform can. */
+.btn-label {
+  translate: 0 0.5px;
+}
+
 .btn :where(.icon) {
   color: var(--muted);
   transition: color var(--dur) var(--ease-out);
@@ -49,6 +56,11 @@
 .btn:active:where(:not(:disabled, [aria-disabled='true'])) {
   background: var(--control-4);
   scale: 0.98;
+}
+
+/* Open: a button whose panel or list is showing (Popover's) keeps the pressed fill. */
+.btn:where(:not(.btn-primary, .btn-danger))[aria-expanded='true'] {
+  background: var(--control-4);
 }
 
 .btn-primary {
@@ -363,6 +375,18 @@
   padding: 0 7px;
 }
 
+/* How many things are on inside what a button opens (filters in a Popover): a small brand pill, louder than .count. */
+.badge {
+  font: var(--w-medium) 11px/1 var(--font-data);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  background: var(--brand);
+  border-radius: var(--r-pill);
+  padding: 2px 5px;
+  min-width: 16px;
+  text-align: center;
+}
+
 /* Tones: set data-tone on any element to get --tone / --tone-soft for it. Apps add their own names the same way. */
 [data-tone='success'] {
   --tone: var(--success);
@@ -588,10 +612,10 @@
   min-width: 0;
 }
 
-/* Fields share what the buttons leave, down to 160px each; only then does the row wrap. */
+/* Fields share what the buttons leave, down to 160px each; only then does the row wrap. Set as the basis, not a
+   min-width: the field components' own min-width: 0 is unlayered, so it would win over one set here. */
 .field-row > :where(*) {
-  flex: 1 1 0%;
-  min-width: min(160px, 100%);
+  flex: 1 1 160px;
 }
 
 .field-row > :where(.btn, .icon-btn, .chip-btn, .label-chip) {

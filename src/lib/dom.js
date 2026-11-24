@@ -24,10 +24,11 @@ export const topLayer = (from) => (node) => {
 /**
  * Attachment: like portal, but moves the node into the nearest [data-layer-root] ancestor of `from` (else <body>).
  * Use it for layers that must stack against siblings inside an isolated container (the app shell isolates its header
- * and view card, so a scrim on <body> would cover the header and the panel it opened).
+ * and view card, so a scrim on <body> would cover the header and the panel it opened). Inside a modal <dialog> it goes
+ * into the dialog instead (outside it everything is inert).
  */
 export const portalNear = (from) => (node) => {
-  ;(from?.closest('[data-layer-root]') ?? document.body).appendChild(node)
+  ;(from?.closest('dialog, [data-layer-root]') ?? document.body).appendChild(node)
   return () => node.remove()
 }
 

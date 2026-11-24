@@ -3,8 +3,9 @@
   /**
    * Single-choice dropdown with a listbox popover. Keyboard: arrows, Home/End, type-ahead, Enter, Escape; with a search
    * field the focus stays in it, arrows and Enter work the list, and Home/End, Space and letters are the field's.
-   * Options: { value, label, text?, hint?, group?, detail? }. `label` shows on the button, `text` (if set) in the list.
-   * Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
+   * Options: { value, label, text?, hint?, group?, separator?, detail? }. `label` shows on the button, `text` (if set) in
+   * the list. Consecutive options with the same `group` sit under its heading; a value may appear in more than one group.
+   * separator: true draws a hairline across the list above that option, dividing the list (or a group) without a heading.
    * groupActions: { [group]: { icon, label, run } } puts a small button on that group's heading (e.g. Clear).
    * loading (true or a label like "Checking models…"): the button shows a shimmer on its edge and label and doesn't open.
    * ghost: a flat button with no raised edges (for toolbars and dense rows); the default is raised.
@@ -23,10 +24,16 @@
    * avatar or icon, a second line, a badge. The button still shows `label`, and type-ahead and the search still go by
    * `text ?? label`, so keep those the words the row says. On the chosen row (solid brand) --fg, --fg-2, --muted and
    * --faint turn to the brand's ink, so text drawn in them stays readable; `selected` is there for anything else.
+   * display: snippet (option) drawing the chosen option on the button in place of its `label`: an avatar or icon before
+   * the name. It sits on one line, centred; cut long text off yourself (min-width: 0 and an ellipsis on the text), and the
+   * button's tooltip still shows `label` whole when it is cut off.
    * Other attributes (class…) and attachments go to the button.
    *
    *   <Select bind:value={owner} options={PEOPLE} id="owner" label="Owner">
    *     {#snippet item(o)}<img class="avatar" src={o.avatar} alt="" /><span>{o.label}<small>{o.email}</small></span>{/snippet}
+   *   </Select>
+   *   <Select bind:value={owner} options={PEOPLE} id="owner" label="Owner">
+   *     {#snippet display(o)}<img class="avatar" src={o.avatar} alt="" /><span class="name">{o.label}</span>{/snippet}
    *   </Select>
    *   <Select bind:value={region} options={REGIONS} id="region" label="Region" info="Where the files are served from." />
    *   <Select bind:value={plan} options={PLANS} id="plan" label="Plan">
@@ -48,7 +55,7 @@
   import SideTip from '../SideTip.svelte'
 
   /**
-   * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string, detail?: any }} Option
+   * @typedef {{ value: any, label: string, text?: string, hint?: string, group?: string, separator?: boolean, detail?: any }} Option
    * @typedef {object} Props
    * @property {any} [value] bindable
    * @property {Option[]} options
@@ -66,6 +73,7 @@
    * @property {string} [searchPlaceholder]
    * @property {import('svelte').Snippet<[Option]>} [detail] draws an option's detail card
    * @property {import('svelte').Snippet<[Option, { selected: boolean, active: boolean }]>} [item] draws an option's row in the list
+   * @property {import('svelte').Snippet<[Option]>} [display] draws the chosen option on the button
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLButtonAttributes, keyof Props>} */
   let {
@@ -85,6 +93,7 @@
     searchPlaceholder = 'Filter…',
     detail,
     item,
+    display,
     class: className,
     ...rest
   } = $props()
@@ -106,12 +115,15 @@
   // The options the search leaves, each with its index into `options` (what keyboard and ids use).
   const shown = $derived(options.map((o, i) => ({ o, i })).filter(({ o }) => matches(text(o), query)))
   const visible = $derived(shown.map(({ i }) => i))
-  // Runs of shown options with the same group.
+  // Runs of shown options with the same group. `sep`: a separator option's hairline, drawn above it unless it opens the
+  // list or a group (whose heading has its own).
   const sections = $derived(
     shown.reduce((acc, { o, i }) => {
+      const group = o.group ?? null
       const last = acc.at(-1)
-      if (last && last.group === (o.group ?? null)) last.items.push({ o, i })
-      else acc.push({ group: o.group ?? null, items: [{ o, i }] })
+      const sep = !!o.separator && !!last
+      if (last && last.group === group) last.items.push({ o, i, sep })
+      else acc.push({ group, items: [{ o, i, sep: sep && !group }] })
       return acc
     }, []),
   )
@@ -280,7 +292,9 @@
       {#if loading}
         <Shimmer class="value">{typeof loading === 'string' ? loading : 'Loading…'}</Shimmer>
       {:else}
-        <span class="value" {@attach watchCut(current?.label)}>{current?.label ?? ''}</span>
+        <span class="value" class:custom={!!display && !!current} {@attach watchCut(current?.label)}
+          >{#if display && current}{@render display(current)}{:else}{current?.label ?? ''}{/if}</span
+        >
       {/if}
       <span class="caret" class:flip={open}><Icon name="caretDown" size="sm" /></span>
     </button>
@@ -333,11 +347,11 @@
                 {/if}
               </div>
               <ul role="none">
-                {#each sec.items as { o, i } (i)}{@render option(o, i)}{/each}
+                {#each sec.items as { o, i, sep } (i)}{#if sep}<li class="sep" role="none"></li>{/if}{@render option(o, i)}{/each}
               </ul>
             </li>
           {:else}
-            {#each sec.items as { o, i } (i)}{@render option(o, i)}{/each}
+            {#each sec.items as { o, i, sep } (i)}{#if sep}<li class="sep" role="none"></li>{/if}{@render option(o, i)}{/each}
           {/if}
         {/each}
         {#if !shown.length}<li class="empty" role="none">No matches</li>{/if}
@@ -451,6 +465,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* The display snippet's content: in a row, centred on the button's line. */
+  .value.custom {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
   .caret {
     flex: none;
     display: inline-flex;
@@ -558,6 +578,16 @@
     gap: var(--space-2);
     padding-block: var(--space-1);
     white-space: normal;
+  }
+  /* A separator option's hairline: across the whole list, over its 4px padding (a group's runs as wide). */
+  li.sep {
+    display: block;
+    min-height: 0;
+    margin: 4px -4px;
+    padding: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    cursor: default;
   }
   li[aria-selected='true'] .hint {
     color: inherit;

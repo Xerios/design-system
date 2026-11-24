@@ -106,9 +106,10 @@
 {#snippet content()}
   {#if busy && iconOnly}<span class="spin"><Icon name="spinner" /></span>{:else if icon}<Icon name={icon} size={iconOnly ? 'md' : 'sm'} />{/if}
   {#if !iconOnly}
-    {#if busy}<Shimmer
-        >{#if pendingLabel}{pendingLabel}{:else}{@render children?.()}{/if}</Shimmer
-      >{:else}{@render children?.()}{/if}
+    <span class="btn-label"
+      >{#if busy}<Shimmer>{#if pendingLabel}{pendingLabel}{:else}{@render children?.()}{/if}</Shimmer
+        >{:else}{@render children?.()}{/if}</span
+    >
   {/if}
 {/snippet}
 

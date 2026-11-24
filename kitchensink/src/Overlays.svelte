@@ -92,16 +92,31 @@
       {/if}
     </Case>
   </Demo>
-  <Demo label="Popover" description="A panel opened from its button.">
-    <Popover id="ks-popover" label="Filters" badge={onlyMine ? 1 : null}>
-      {#snippet trigger()}<Icon name="funnel" />{/snippet}
-      {#snippet children({ close })}
-        <div class="panel">
-          <Switch bind:checked={onlyMine} id="ks-mine" label="Only mine" />
-          <Button small onclick={close}>Done</Button>
-        </div>
-      {/snippet}
-    </Popover>
+  <Demo label="Popover" description="A panel opened from a button of your own.">
+    <Case label="A Button with a count of what's on inside">
+      <Popover id="ks-popover" label="Filters">
+        {#snippet button(props)}
+          <Button icon="funnel" {...props}>Filters{#if onlyMine}<span class="badge">1</span>{/if}</Button>
+        {/snippet}
+        {#snippet children({ close })}
+          <div class="panel">
+            <Switch bind:checked={onlyMine} id="ks-mine" label="Only mine" />
+            <Button small onclick={close}>Done</Button>
+          </div>
+        {/snippet}
+      </Popover>
+    </Case>
+    <Case label="An icon-only Button, dimming the page behind the panel (scrim)">
+      <Popover id="ks-popover-own" label="View options" align="start" scrim>
+        {#snippet button(props)}<Button iconOnly icon="gear" label="View options" {...props} />{/snippet}
+        {#snippet children({ close })}
+          <div class="panel">
+            <Switch bind:checked={onlyMine} id="ks-mine-2" label="Only mine" />
+            <Button small onclick={close}>Done</Button>
+          </div>
+        {/snippet}
+      </Popover>
+    </Case>
   </Demo>
   <Demo label="Modal" description="Asks before throwing away what's typed.">
     <Button onclick={() => modal?.show()}>Open the modal</Button>

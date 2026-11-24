@@ -155,6 +155,16 @@
     { value: 'sam', label: 'Sam Okafor', email: 'sam.okafor@example.com', role: 'Viewer' },
   ]
   let assignee = $state('kofi')
+  let reviewer = $state('li')
+  // Separators: hairlines dividing the list without headings.
+  const SORTS = [
+    { value: 'new', label: 'Newest first' },
+    { value: 'old', label: 'Oldest first' },
+    { value: 'az', label: 'Name, A to Z', separator: true },
+    { value: 'za', label: 'Name, Z to A' },
+    { value: 'manual', label: 'Manual order', separator: true },
+  ]
+  let sort = $state('new')
   const initials = (/** @type {string} */ name) => name.split(' ').map((w) => w[0]).join('')
   const LEVEL_DETAILS = LEVELS.map((o, i) => ({ ...o, detail: { title: o.label, text: `About ${2 + i * 3} years in, give or take.` } }))
   let pickedLevelDetail = $state('mid-level')
@@ -212,7 +222,7 @@
   <Demo label="Text area" description="Grows with its text.">
     <TextArea bind:value={notes} id="ks-notes" label="Notes" placeholder="Anything worth writing down" />
   </Demo>
-  <Demo label="Select" description="One of a list: groups, search, detail beside it, rows of your own.">
+  <Demo label="Select" description="One of a list: groups, separators, search, detail beside it, rows of your own.">
     <Case label="Grouped">
       <Select bind:value={region} options={REGIONS} id="ks-region" label="Region" info="Where the files are served from." />
     </Case>
@@ -249,6 +259,17 @@
           <span class="person-role">{o.role}</span>
         {/snippet}
       </Select>
+    </Case>
+    <Case label="The chosen option drawn by the display snippet">
+      <Select bind:value={reviewer} options={PEOPLE} id="ks-reviewer" label="Reviewer">
+        {#snippet display(o)}
+          <span class="person-initials" aria-hidden="true">{initials(o.label)}</span>
+          <span class="person-name">{o.label}</span>
+        {/snippet}
+      </Select>
+    </Case>
+    <Case label="Separators between options, without headings">
+      <Select bind:value={sort} options={SORTS} id="ks-sort" label="Sort" />
     </Case>
     <Case label="Loading">
       <Select value="eu" options={REGIONS} id="ks-region-2" label="Region" loading="Checking regions…" />
@@ -609,6 +630,11 @@
     overflow: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .person-name {
+    min-width: 0;
+    overflow: clip;
+    text-overflow: ellipsis;
   }
   .person-role {
     flex: none;

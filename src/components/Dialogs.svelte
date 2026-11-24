@@ -96,15 +96,15 @@
         <span class="spacer"></span>
         {#if view.kind === 'alert'}
           <!-- svelte-ignore a11y_autofocus -->
-          <button type="submit" class="btn btn-primary" autofocus>{view.okLabel ?? 'OK'}</button>
+          <button type="submit" class="btn btn-primary" autofocus><span class="btn-label">{view.okLabel ?? 'OK'}</span></button>
         {:else}
           <!-- svelte-ignore a11y_autofocus -->
           <button type="button" class="btn" autofocus={view.kind === 'confirm' && view.danger} onclick={() => dialog?.close()}
-            >{view.cancelLabel ?? 'Cancel'}</button
+            ><span class="btn-label">{view.cancelLabel ?? 'Cancel'}</span></button
           >
           <!-- svelte-ignore a11y_autofocus -->
           <button type="submit" class="btn {view.danger ? 'btn-danger' : 'btn-primary'}" autofocus={view.kind === 'confirm' && !view.danger}
-            >{view.confirmLabel ?? 'OK'}</button
+            ><span class="btn-label">{view.confirmLabel ?? 'OK'}</span></button
           >
         {/if}
       </footer>

@@ -20,22 +20,22 @@
 
 <Section id="atoms" title="Atoms" intro="Classes for plain elements, for the small things that don't need a component.">
   <Demo label="Field row" description=".field-row: buttons line up with the field's control, not its label.">
-    <Case label="A Select with a button (as tall as the field) and a ghost icon button (centred on it)">
-      <div class="field-row">
+    <Case wide label="A Select with a button (as tall as the field) and a ghost icon button (centred on it)">
+      <div class="field-row form-width">
         <Select bind:value={branch} options={BRANCHES} id="ks-row-branch" label="Branch" />
         <Button icon="refresh">Sync</Button>
         <button type="button" class="icon-btn" aria-label="Branch settings" {@attach tooltip('Branch settings')}><Icon name="gear" /></button>
       </div>
     </Case>
-    <Case label="A text field with a primary button and a small one (centred)">
-      <div class="field-row">
+    <Case wide label="A text field with a primary button and a small one (centred)">
+      <div class="field-row form-width">
         <TextField bind:value={invite} type="email" id="ks-row-invite" label="Invite by email" placeholder="name@example.com" />
         <Button variant="primary" icon="plus">Invite</Button>
         <button type="button" class="btn btn-small">Paste list</button>
       </div>
     </Case>
-    <Case label="Compact: --control-h: 28px on the row">
-      <div class="field-row" style:--control-h="28px">
+    <Case wide label="Compact: --control-h: 28px on the row">
+      <div class="field-row form-width" style:--control-h="28px">
         <TextField bind:value={rowSearch} compact hideLabel id="ks-row-search" label="Search" placeholder="Search…" />
         <Button>Apply</Button>
         <button type="button" class="icon-btn" aria-label="Clear filters" {@attach tooltip('Clear filters')}><Icon name="x" /></button>
@@ -122,6 +122,10 @@
   .full {
     width: 100%;
     min-width: 0;
+  }
+  /* A field row as wide as a form's column: inside the stage's flex row it would only be as wide as its content. */
+  .form-width {
+    width: min(100%, 440px);
   }
   /* A card to light: its own stacking context, so the shine stays under the page's sticky parts and the glow behind
      the label. It shrinks to 120px so a pair fits side by side in one column of the Section. */

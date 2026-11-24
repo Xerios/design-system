@@ -7,6 +7,36 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking** `Popover` no longer draws its button: pass a `button` snippet and spread its props on a `Button` of your
+  own, `{#snippet button(props)}<Button icon="funnel" {...props}>Filters</Button>{/snippet}`. The `trigger`, `badge`,
+  `dot` and `hideLabel` props are gone (put the icon, a `.badge` or a `.new-dot` in your button), and other attributes
+  (class…) now go to the panel, not the button.
+- `Popover`: Tab past the panel's last control (or Shift+Tab before its first) closes it and goes on from its button.
+
+### Fixed
+
+- `Popover` with `scrim`: the panel shows above the dimmed page instead of under it, wherever the popover sits.
+- `portalNear`: inside a modal dialog the node goes into the dialog, so it isn't inert.
+
+### Added
+
+- `.btn-label`: wrap a `.btn`'s label in it to set the label half a pixel lower, as `Button` does.
+- `Select`: a `display` snippet draws the chosen option on the button (an avatar or icon before the name) in place of
+  its `label`.
+- `Select`: `separator: true` on an option draws a hairline across the list above it, dividing the list without a
+  group heading.
+- `.badge`: a small brand pill counting what's on inside what a button opens (it was Popover's own).
+- `.btn`: open (`aria-expanded="true"`, a Popover's button) it keeps the pressed fill.
+
+### Fixed
+
+- `Button` (and the confirm and alert dialogs): the label sits half a pixel lower, so its capitals line up with the icon
+  beside it instead of sitting above it.
+- `.field-row`: a `Select`, `TextField`, `DateField` or `DateRangeSelect` in it keeps its 160px floor and the row wraps,
+  instead of the field being squashed under the buttons beside it in a narrow row.
+
 ## [0.1.6] - 2026-11-24
 
 ### Added
