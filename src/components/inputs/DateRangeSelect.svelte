@@ -106,8 +106,13 @@
   )
   const empty = $derived(!newest.length)
 
-  async function show() {
+  // Whether the keyboard is moving through the list (its row then shows the keyed ring, css/atoms.css); the pointer
+  // moving over the list turns it off.
+  let keyboard = $state(false)
+
+  async function show(byKeyboard = false) {
     if (disabled || empty) return
+    keyboard = byKeyboard
     first = null
     pointed = null
     active = Math.max(0, newest.indexOf(value[1]))
@@ -167,7 +172,7 @@
   function onButtonKey(e) {
     if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
       e.preventDefault()
-      void show()
+      void show(true)
     }
   }
   /** @param {KeyboardEvent} e */
@@ -177,6 +182,7 @@
     else if (e.key === 'Enter' || e.key === ' ') pick(newest[active])
     else return
     e.preventDefault()
+    keyboard = true
   }
   /** Esc closes; tabbing past either end of the panel closes it from the button, so the focus moves on from there.
    *  @param {KeyboardEvent} e */
@@ -211,6 +217,8 @@
     role="option"
     aria-selected={inSpan}
     class:active={i === active}
+    class:held={edge && i === active}
+    class:keyed={keyboard && !edge && i === active}
     class:edge
     class:between={inSpan && !edge}
     class:span-top={!!span && day === span[1]}
@@ -270,6 +278,8 @@
         aria-describedby="{id}-hint"
         aria-activedescendant="{id}-opt-{active}"
         onkeydown={onListKey}
+        onpointermove={() => (keyboard = false)}
+        onfocus={() => list?.matches(':focus-visible') && (keyboard = true)}
       >
         <!-- The span's band, behind its rows from end to end (see .band). -->
         <li class="band" class:pending={!!first} class:down={!!first && !!span && first === span[1]} role="none" {@attach band(span, first)}>{#if first}<DashOutline />{/if}</li>
@@ -465,7 +475,8 @@
   .list:focus {
     outline: none;
   }
-  /* Rows as Select's: 32px, the pointer's or keyboard's row filled (.active, which the pointer moves too). */
+  /* Rows as Select's: 32px, the pointer's or keyboard's row filled (.active, which the pointer moves too); a solid end
+     under it is .held, and any other row the keyboard is on .keyed (css/atoms.css). */
   [role='option'] {
     display: flex;
     align-items: center;

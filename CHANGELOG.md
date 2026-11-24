@@ -7,8 +7,18 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Added
+
+- `.held`, `.keyed`, `.holds`, `.keys`: the held look for the item the pointer or keyboard is on in a list or grid of
+  your own (an edge, a gap of the surface, the fill), with `--held-gap` for the surface it sits on.
+
 ### Changed
 
+- `Select`, `OptionList`, `DatePicker`, `DateRangePicker` (`Calendar`), `DateRangeSelect`: the item under the pointer
+  or keyboard shows an `--accent` edge (the focus ring's colour) with a gap of the list's surface just inside it: a
+  chosen option, day or end on its brand fill (it used to show a lighter brand line, or nothing on hover), and any
+  other row or day the keyboard is on over its hover fill. `Select` and `DateRangeSelect` now mark the keyboard's row
+  this way too (they showed only the fill); it shows while the keyboard is in use and clears when the pointer moves.
 - `Collapsible`, `Table` (groups): an open section's header title is dimmed to `--muted`; a closed one stays `--fg`.
 
 ## [0.1.5] - 2026-11-24

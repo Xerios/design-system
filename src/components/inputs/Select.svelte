@@ -131,8 +131,13 @@
     return stop
   }
 
-  async function show() {
+  // Whether the keyboard is moving through the list (its row then shows the keyed ring, css/atoms.css); the pointer
+  // moving over the list turns it off again.
+  let keyboard = $state(false)
+
+  async function show(byKeyboard = false) {
     if (disabled || loading || !options.length) return
+    keyboard = byKeyboard
     query = ''
     active = Math.max(0, options.indexOf(current))
     open = true
@@ -146,6 +151,7 @@
   /** @param {string} q */
   function narrow(q) {
     query = q
+    keyboard = true
     // The keyboard goes to the first match (back on the current option when the text is cleared).
     active = q ? (visible[0] ?? -1) : Math.max(0, options.indexOf(current))
     tick().then(() => reveal(listbox, listbox?.querySelector(`[data-i="${active}"]`)))
@@ -167,7 +173,7 @@
   function onButtonKey(e) {
     if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
       e.preventDefault()
-      show()
+      show(true)
     }
   }
   function onListKey(e) {
@@ -210,6 +216,7 @@
     }
     e.preventDefault()
     e.stopPropagation()
+    keyboard = true
     reveal(listbox, listbox?.querySelector(`[data-i="${active}"]`))
   }
 
@@ -230,6 +237,8 @@
     aria-selected={o.value === value}
     aria-describedby={described && i === active ? `${id}-detail` : undefined}
     class:active={i === active}
+    class:held={o.value === value && i === active}
+    class:keyed={keyboard && i === active && o.value !== value}
     class:custom={!!item}
     onpointerenter={() => (active = i)}
     onclick={() => choose(i)}
@@ -301,6 +310,7 @@
           aria-activedescendant={searchable ? undefined : activeId}
           onkeydown={searchable ? undefined : onListKey}
           onmousedown={searchable ? (e) => e.preventDefault() : undefined}
+          onpointermove={() => (keyboard = false)}
         >
         {#each sections as sec, si (si)}
           {#if sec.group}
@@ -530,8 +540,9 @@
   li.active {
     background: var(--control-3);
   }
-  /* The chosen option is solid brand, as Calendar's chosen day, whether or not the keyboard is on it. With the keyboard
-     on it, a lighter brand line inside the edge keeps that visible. */
+  /* The chosen option is solid brand, as Calendar's chosen day, whether or not the keyboard is on it. Under the pointer
+     or the keyboard it is .held, and any other row the keyboard is on .keyed (css/atoms.css): a gap of the list's
+     surface just inside the edge. */
   /* The text tokens turn to the brand's ink too, so a custom row's quieter text (item snippet) stays readable on it. */
   li[aria-selected='true'] {
     background: var(--brand);
@@ -547,9 +558,6 @@
     gap: var(--space-2);
     padding-block: var(--space-1);
     white-space: normal;
-  }
-  li[aria-selected='true'].active {
-    box-shadow: inset 0 0 0 2px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
   }
   li[aria-selected='true'] .hint {
     color: inherit;

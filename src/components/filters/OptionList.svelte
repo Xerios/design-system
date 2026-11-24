@@ -26,6 +26,8 @@
    * Keyboard: ArrowUp / ArrowDown move, Home / End (without a search field) jump to the ends, Space (without a search
    * field) or Enter ticks or picks; without a search field a letter jumps to the next option starting with it. Esc clears
    * the search, else is left to the panel around it, as Tab is. With a search field the focus stays in it (combobox); otherwise on the list.
+   * --held-gap: the surface the list sits on (default --elevated, a floating panel's); the ring on the row under the
+   * pointer or keyboard opens a gap of it (.held / .keyed, css/atoms.css). Set it when the list sits on another surface.
    * Other attributes (class…) and attachments go to the wrapper.
    */
   import { tick, untrack } from 'svelte'
@@ -153,6 +155,7 @@
       }
     }
     e.preventDefault()
+    keyboard = true
   }
 
   /** Attachment: takes the focus once the list is in place (the panel around it may still be moving into the top layer). */
@@ -167,6 +170,10 @@
   let root = $state()
   let hovered = $state(false)
   let focused = $state(false)
+  // Whether the keyboard is moving through the list (its row then shows the keyed ring); the pointer moving over the
+  // list turns it off, and tabbing onto the list turns it on.
+  let keyboard = $state(false)
+  const inUse = $derived(hovered || focused)
   const beside = $derived(root ? (/** @type {HTMLElement | null} */ (root.closest('[data-floating], [data-top-layer]')) ?? root) : null)
   const described = $derived((hovered || focused) && shown[active]?.detail != null ? shown[active] : null)
   /** Plain detail (no snippet): a string is the text, an object its title and text. */
@@ -182,6 +189,8 @@
     data-i={i}
     class="option"
     class:active={i === active}
+    class:held={inUse && !multiple && i === active && isOn(o.value)}
+    class:keyed={inUse && keyboard && i === active && (multiple || !isOn(o.value))}
     role="option"
     aria-selected={isOn(o.value)}
     aria-describedby={described && i === active ? `${uid}-detail` : undefined}
@@ -207,7 +216,11 @@
   {...rest}
   onpointerenter={() => (hovered = true)}
   onpointerleave={() => (hovered = false)}
-  onfocusin={() => (focused = true)}
+  onfocusin={(e) => {
+    focused = true
+    if (e.target === list && list.matches(':focus-visible')) keyboard = true
+  }}
+  onpointermove={() => (keyboard = false)}
   onfocusout={(e) => (focused = !!root?.contains(/** @type {Node | null} */ (e.relatedTarget)))}
 >
   {#if searchable}
@@ -286,11 +299,9 @@
   .option-list:is(:focus-within, :hover) .option.active {
     background: var(--control-3);
   }
-  .list:focus-visible .option.active {
-    box-shadow: inset 0 0 0 2px var(--accent);
-  }
-  /* Picking one, the picked row is solid brand (as Calendar's chosen day), its icon and hint in the same ink; with the
-     keyboard on it, a lighter brand line inside the edge keeps that visible. */
+  /* Picking one, the picked row is solid brand (as Calendar's chosen day), its icon and hint in the same ink. Under the
+     pointer or the keyboard it is .held, and any other row the keyboard is on .keyed (css/atoms.css): a gap of the
+     surface around the list just inside the edge (--held-gap). */
   .single [aria-selected='true'],
   .option-list.single:is(:focus-within, :hover) [aria-selected='true'].active {
     background: var(--brand);
@@ -301,14 +312,6 @@
   }
   .single [aria-selected='true'] .hint {
     opacity: 0.75;
-  }
-  .option-list.single:is(:focus-within, :hover) [aria-selected='true'].active {
-    box-shadow: inset 0 0 0 2px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
-  }
-  .list.single:focus-visible [aria-selected='true'].active {
-    box-shadow:
-      inset 0 0 0 2px var(--accent),
-      inset 0 0 0 3px color-mix(in lch, var(--brand), var(--accent-ink) 45%);
   }
   /* The check box (Tile's): hidden on rows that are neither ticked nor under the pointer or keyboard, so the column of
      empty boxes doesn't crowd the list; brand-filled with a tick once ticked. */

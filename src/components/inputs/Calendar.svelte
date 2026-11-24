@@ -26,6 +26,8 @@
    * and the years from min to max (without them, 3 years back to 1 ahead, and the year shown when it is further), with
    * a search field when there are more than 8. Picking a year whose
    * month has nothing to pick moves to its nearest month that does. Keyboard in them: as Select's.
+   * The day under the pointer or the keyboard shows the held ring (css/atoms.css): set --held-gap to the surface the
+   * calendar sits on when that isn't a floating panel's (--elevated).
    */
   import { tick, untrack } from 'svelte'
   import Button from '../Button.svelte'
@@ -426,6 +428,8 @@
                 class="day"
                 class:outside={!inMonth}
                 class:chosen={chosen || edge}
+                class:holds={chosen || edge}
+                class:keys={!(chosen || edge)}
                 class:between
                 class:bar-start={inRange && (day === span?.[0] || col === 0)}
                 class:bar-end={inRange && (day === span?.[1] || col === week.length - 1)}
@@ -532,7 +536,8 @@
   .outside {
     color: var(--faint);
   }
-  [aria-current='date'] {
+  /* Today's hairline gives way to the held ring (.holds / .keys, css/atoms.css) while that is on it. */
+  [aria-current='date']:not(.holds:hover, :focus-visible) {
     box-shadow: inset 0 0 0 1px var(--accent-line);
   }
   /* A range: one bar per week, rounded only where it starts or ends (the range's ends, the week's ends). Between its
@@ -546,6 +551,15 @@
     color: var(--fg);
   }
   .between:hover:not([aria-disabled='true']) {
+    background:
+      linear-gradient(var(--control-3), var(--control-3)),
+      var(--tint);
+  }
+  /* The keyboard's day takes the hover fill under its ring, as a list's keyboard row does, so the ring's gap shows. */
+  .day.keys:focus-visible {
+    background: var(--control-3);
+  }
+  .between.keys:focus-visible {
     background:
       linear-gradient(var(--control-3), var(--control-3)),
       var(--tint);
@@ -577,10 +591,6 @@
     color: var(--faint);
     text-decoration: line-through;
     cursor: default;
-  }
-  .day:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
   }
   @media (forced-colors: active) {
     .chosen {

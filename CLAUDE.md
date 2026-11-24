@@ -38,6 +38,10 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
 - A description of a list's option (what it means, before it is chosen) is its `detail`, shown in a `SideTip` beside
   the list while the option is under the pointer or the keyboard (`Select`, `OptionList`), not a second line in the row
   or a `title`. Rich content goes through the `detail` snippet. A list of your own uses `SideTip` the same way.
+- The item the pointer or keyboard is on in a list or grid (an option, a day, a row) is held, never outlined brighter:
+  a gap of the surface opens just inside its edge (edge, gap, fill). `.held` on a chosen, solid item; `.keyed` on any
+  other item the keyboard is on, shown only while the keyboard is in use; `.holds` / `.keys` where real `:hover` and
+  `:focus-visible` drive it (css/atoms.css). Set `--held-gap` when the list doesn't sit on `--elevated`.
 - Controls (anything you press, type into or drag) take the tinted control fills (`--control-1` … `--control-4`) at
   rest and for hover, pressed and active; non-interactive things use the neutral `--fill-*`. Both are translucent, never
   an opaque colour. Resting surfaces are flat; only floating layers take `--shadow`.

@@ -42,6 +42,23 @@
       </div>
     </Case>
   </Demo>
+  <Demo label="Held (.held, .keyed, .holds, .keys): the item the pointer or keyboard is on">
+    <Case label="In a list: a chosen row held, another the keyboard is on">
+      <ul class="held-list">
+        <li>Draft</li>
+        <li class="chosen held">In review</li>
+        <li class="hovered keyed">Approved</li>
+        <li>Shipped</li>
+      </ul>
+    </Case>
+    <Case label="Driven by hover and focus: hover or tab through them">
+      <div class="held-row">
+        {#each ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as d (d)}
+          <button type="button" class={['held-day', d === 'Wed' ? 'chosen holds' : 'keys']}>{d}</button>
+        {/each}
+      </div>
+    </Case>
+  </Demo>
   <Demo label="Chip buttons">
     <Case label="Borderless: hover for the fill">
       <button type="button" class="chip-btn"><Icon name="circleDashed" />Planned</button>
@@ -131,5 +148,54 @@
       var(--grain) 0 0 / 256px 256px,
       linear-gradient(var(--scrim), var(--scrim)),
       var(--view-bg);
+  }
+  /* The held demo's list and days sit on the card, not a floating layer: --held-gap says so. */
+  .held-list,
+  .held-row {
+    --held-gap: var(--surface);
+    user-select: none;
+  }
+  .held-list {
+    display: grid;
+    gap: 2px;
+    width: 200px;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+  .held-list li {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: var(--r-sm);
+    font-size: 13px;
+  }
+  .held-list .hovered {
+    background: var(--control-3);
+  }
+  .held-row {
+    display: flex;
+    gap: 2px;
+  }
+  .held-day {
+    min-width: 44px;
+    min-height: 30px;
+    border: 0;
+    border-radius: var(--r);
+    background: none;
+    color: var(--fg);
+    font: var(--w-medium) 12px var(--font-data);
+    cursor: pointer;
+  }
+  .held-day:hover {
+    background: var(--control-3);
+  }
+  .chosen,
+  .held-day.chosen:hover {
+    background: var(--brand);
+    color: var(--accent-ink);
   }
 </style>

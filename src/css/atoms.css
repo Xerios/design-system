@@ -246,6 +246,42 @@
   border-bottom-right-radius: 2px;
 }
 
+/* ---------- held: the item the pointer or keyboard is on ---------- */
+/* In a list or grid (options, days, rows), the item the pointer or keyboard is on never gets a brighter outline: a gap
+   of the surface opens just inside its edge instead (an --accent edge, the colour of the focus ring, then the gap, then
+   the fill), so it reads as held. A chosen, solid item takes .held; any other item the keyboard is on .keyed, on top
+   of its hover fill.
+   Lists that track their keyboard row in script (aria-activedescendant: Select, OptionList) toggle .held and .keyed;
+   items with real hover and focus (Calendar's days) take .holds (chosen ones: .held on :hover and :focus-visible) or
+   .keys (others: .keyed on :focus-visible). Show .keyed only while the keyboard is in use, not under the pointer.
+   --held-gap: the surface the item sits on (default --elevated, a floating layer's); set it on the list or grid when
+   it sits on another, or the gap shows as a ring of the wrong colour. */
+.held,
+.holds:is(:hover, :focus-visible),
+.keyed,
+.keys:focus-visible {
+  box-shadow:
+    inset 0 0 0 1.5px var(--accent),
+    inset 0 0 0 2.5px var(--held-gap, var(--elevated));
+}
+
+/* The ring is the focus indicator here, in place of the browser's outline. */
+.holds:focus-visible,
+.keys:focus-visible {
+  outline: none;
+}
+
+/* Forced colours drop box shadows: an outline marks the held item instead. */
+@media (forced-colors: active) {
+  .held,
+  .holds:is(:hover, :focus-visible),
+  .keyed,
+  .keys:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 /* ---------- data tables ---------- */
 /* Linear's table card: a rounded hairline card, 40px rows split by full-width hairlines, value columns divided by vertical
    hairlines, a header row in small tertiary text, and a full-bleed fill on hover. Wrap a <table> in .data-table;
