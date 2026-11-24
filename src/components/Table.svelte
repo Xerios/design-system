@@ -391,6 +391,11 @@
     font-size: 13px;
     color: var(--fg);
     cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  /* An open group's label steps back to --muted, so its rows lead; closed, it reads as --fg. */
+  .group-head > button[aria-expanded='true'] {
+    color: var(--muted);
   }
   .group-head > button::after {
     content: '';

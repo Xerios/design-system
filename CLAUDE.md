@@ -46,8 +46,9 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   pressed, open, chosen and keyboard-highlighted states change the fill, border or raise, never the text colour: a
   brightness step on text the fill already marks is barely seen, but it redraws the glyphs, which reads as a shift.
   Icons may brighten (no text to redraw). A colour change is the indicator only where nothing else changes (a link, a
-  sort header). Muted text is for things you don't press, with one exception: the options of a one-of-many choice
-  (`Segmented`, `ButtonGroup`, `RadioGroup`) are `--muted` until hovered, and the chosen one is `--fg`.
+  sort header). Muted text is for things you don't press, with two exceptions: the options of a one-of-many choice
+  (`Segmented`, `ButtonGroup`, `RadioGroup`) are `--muted` until hovered, and the chosen one is `--fg`; and an open
+  section's header title (`Collapsible`, a `Table` group) steps back to `--muted` so the content under it leads.
 - Suggestions are dashed. Anything proposed but not applied yet (a suggested label, assignee, reply or next step) is a
   `.label-chip`, `.chip-btn` or `.btn` (`<Button class="suggested">`) with `.suggested`: a dashed outline and no fill in
   its resting state, turning solid as a button is hovered or pressed (a suggested button's text is as clear as any

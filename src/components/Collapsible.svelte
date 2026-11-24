@@ -116,8 +116,13 @@
   .open .chev {
     rotate: 90deg;
   }
+  /* An open section's title steps back to --muted, so the content under it leads; closed, it reads as --fg. */
   .title {
     color: var(--fg);
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .open .title {
+    color: var(--muted);
   }
   .count {
     font: var(--w-medium) 11px var(--font-data);

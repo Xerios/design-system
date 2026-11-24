@@ -7,6 +7,10 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Changed
+
+- `Collapsible`, `Table` (groups): an open section's header title is dimmed to `--muted`; a closed one stays `--fg`.
+
 ## [0.1.5] - 2026-11-24
 
 ### Added
