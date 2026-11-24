@@ -1,11 +1,13 @@
 # @xerios/design-system
 
+[![npm](https://img.shields.io/npm/v/@xerios/design-system)](https://www.npmjs.com/package/@xerios/design-system)
+
 A note of warning: This is **designed for personal use and building local web-apps**, so no cross-browser tests have been performed.
 
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
 
-![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://raw.githubusercontent.com/Xerios/design-system/v0.1.6/docs/screenshot.png)
+![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://raw.githubusercontent.com/Xerios/design-system/main/docs/screenshot.png)
 
 Nothing in it knows about the apps that use it: anything domain-specific stays in the app.
 
@@ -418,9 +420,8 @@ To release, run `pnpm release` (or `pnpm release patch|minor|major|x.y.z`; `--dr
 commit and tag, `--no-shot` to keep the screenshot). It bumps `version` in `package.json` (from the changelog when no level is given: a **Breaking** entry
 bumps the minor while on 0.x, anything else the patch), turns `[Unreleased]` in `CHANGELOG.md` into the dated release
 under a fresh `[Unreleased]`, updates the compare links, checks both builds, retakes the screenshot (`pnpm screenshot`)
-and points this README's image at the new tag, then commits and tags `vx.y.z`. The image is addressed in full
-(raw.githubusercontent.com), since npm shows the README of each version but not the image file, which is not published;
-it appears once the tag is pushed. Push with
+and commits and tags `vx.y.z`. The image is addressed in full, on `main` (raw.githubusercontent.com), since npm shows
+the README but doesn't publish the image file; it updates once the release commit is pushed. Push with
 `git push --follow-tags`, then `pnpm publish`. `prepack` rebuilds `dist/` first, and only `dist/`, this README and the
 license are published.
 
