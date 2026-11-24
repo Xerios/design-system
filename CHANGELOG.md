@@ -7,6 +7,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-24
+
 ### Changed
 
 - **Breaking** `Button` (and `ActionCard.Action`) no longer shows an error bubble when its `onclick` promise rejects:
@@ -234,7 +236,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 First release: theme tokens, global CSS (`base`, `effects`, `atoms`), the components listed in the README and the
 `lib/` helpers.
 
-[Unreleased]: https://github.com/Xerios/design-system/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/Xerios/design-system/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Xerios/design-system/compare/v0.1.6...v0.2.0
 [0.1.6]: https://github.com/Xerios/design-system/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/Xerios/design-system/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/Xerios/design-system/compare/v0.1.3...v0.1.4
