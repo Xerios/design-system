@@ -50,6 +50,8 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - `FilterChip` (and `FilterBar`'s chips) short of room: only the value gives way, cut off with an ellipsis, instead of
   every part squeezing and the value's text running up to the ✕ unfinished.
 - `FilterBar`: Backspace in the keywords step removes the last word again instead of going back to the field list.
+- `DatePicker`, `DateRangePicker` (and `DateField`): pressing the button while the panel is open closes it, instead of
+  closing and opening it again.
 
 ## [0.2.0] - 2026-11-24
 
