@@ -48,14 +48,15 @@
   }
   .intro {
     max-width: 75ch;
-    font-size: 17px;
+    font-size: 16px;
     color: var(--muted);
   }
   /* Its Demos, one under the other, each with its rule above. A container, so a Demo can tell whether there is room for
-     its heading beside its examples. */
+     its heading beside its examples. The heading sits as far above the first rule as below the area's own rule: the
+     section's top padding, less the gap the grid already puts before this. */
   .demos {
     container: area / inline-size;
     display: grid;
-    margin-top: var(--space-2);
+    margin-top: calc(var(--space-8) - var(--space-1));
   }
 </style>
