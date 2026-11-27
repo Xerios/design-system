@@ -25,6 +25,7 @@
   import FilterBar from '@xerios/design-system/components/filters/FilterBar.svelte'
   import FilterChip from '@xerios/design-system/components/filters/FilterChip.svelte'
   import OptionList from '@xerios/design-system/components/filters/OptionList.svelte'
+  import { filterHistory } from '@xerios/design-system/lib/filter-history.svelte.js'
   import Icon from '@xerios/design-system/components/Icon.svelte'
   import { fieldErrors } from '@xerios/design-system/lib/field-errors.svelte.js'
   import { FIRST_INVALID } from '@xerios/design-system/lib/invalid.js'
@@ -98,7 +99,9 @@
     { key: 'company', label: 'Company', icon: 'buildings', options: COMPANIES, plural: 'companies' },
     { key: 'posted', label: 'Posted', icon: 'clock', kind: 'date' },
     { key: 'words', label: 'Keywords', icon: 'search', kind: 'text', operators: ['contain', "don't contain"] },
-    { key: 'salary', label: 'Salary', icon: 'currencyEur', kind: 'custom', operators: ['at least', 'at most'] },
+    { key: 'salary', label: 'Salary', icon: 'currencyEur', kind: 'custom', operators: ['at least', 'at most'], format: (k) => euros(k) },
+    { key: 'easy', label: 'Easy apply', icon: 'cursorClick', kind: 'boolean' },
+    { key: 'visa', label: 'Visa sponsorship', icon: 'briefcase', kind: 'boolean' },
   ]
   let filters = $state([
     { field: 'posted', op: 'after', value: '-3d' },
@@ -110,6 +113,18 @@
     { field: 'salary', op: 'at least', value: 70 },
   ])
   let noFilters = $state([])
+  let recentFilters = $state([{ field: 'mode', op: 'is any of', value: ['remote'] }])
+  // A history filled in advance, so the recent list shows at once.
+  const seeded = filterHistory('ks-seeded')
+  for (const [filter, times] of /** @type {const} */ ([
+    [{ field: 'mode', op: 'is any of', value: ['remote'] }, 6],
+    [{ field: 'stage', op: 'is', value: ['interview', 'offer'] }, 4],
+    [{ field: 'posted', op: 'after', value: '-1w' }, 3],
+    [{ field: 'level', op: 'is', value: ['senior'] }, 2],
+    [{ field: 'words', op: 'contain', value: ['svelte'] }, 1],
+    [{ field: 'salary', op: 'at least', value: 80 }, 1],
+  ]))
+    for (let i = 0; i < times; i++) seeded.record(filter)
   let chipOp = $state('is')
   let chipStages = $state(['applied'])
   let chipGone = $state(false)
@@ -288,7 +303,10 @@
   </Demo>
   <Demo label="Filter bar" description="The applied filters as chips, and a button to add one." wide>
     <Case label="Applied filters: a relative date and a list of values">
-      <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
+      <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history="ks-jobs" />
+    </Case>
+    <Case label="Recent filters lead the add list (the most used first), and a boolean field flips in place">
+      <FilterBar bind:filters={recentFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history={seeded} />
     </Case>
     <Case label="Several values, typed keywords and a custom field (salary, with a slider)">
       <FilterBar bind:filters={manyFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
@@ -297,7 +315,7 @@
       <FilterBar bind:filters={noFilters} fields={FIELDS} label="Job filters" />
     </Case>
   </Demo>
-  <Demo label="Filter chip" description="One filter: a field, a condition and its values.">
+  <Demo label="Filter chip" description="One filter: a field, a condition and its values." wide>
     <Case label="A condition menu and a list of values">
       {#if chipGone}
         <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>

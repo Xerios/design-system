@@ -19,12 +19,22 @@
    * onchange(value): after every tick. onpick(value): a pick in a single list (the host closes on it).
    * onback(): Backspace with the search empty (FilterBar goes back to the field list with it).
    * lead: snippet (option) drawing the left of a row in place of the icon, for something an icon name can't say.
+   * More on an option: `top` keeps it above the rule with the ticked ones (FilterBar's recent filters); `muted` draws it
+   * dimmed, still pickable (a field already filtered by); `switch` (true or false) ends the row with a switch showing it,
+   * as a context menu's toggle does: picking the row calls onpick but doesn't make it the picked value, so the host
+   * flips it and the list stays as it is; `action` is such a row without the switch (a "Show more" row); `removable`
+   * puts a ✕ on the row under the pointer or keyboard, which calls onremove(option) (removeLabel names it, default
+   * "Remove"), its room kept on every removable row so the list doesn't widen as it shows.
+   * text: snippet (option) drawing a row's label in place of its plain text (part of it muted, say); `label` is still
+   * what the search matches.
+   * head: snippet drawn above the rows, scrolling with them (a heading for the top rows, with actions on them).
    * detail: an option's `detail` (any value) puts a card beside the panel (SideTip) while that row is under the pointer,
    * or the keyboard's while the list has the focus, read with the row: a string is its text, { title, text } a heading
    * and text. The `detail` snippet (option) draws it instead, for anything richer, from whatever `detail` holds.
    * autofocus: takes the focus as it appears (default true).
    * Keyboard: ArrowUp / ArrowDown move, Home / End (without a search field) jump to the ends, Space (without a search
-   * field) or Enter ticks or picks; without a search field a letter jumps to the next option starting with it. Esc clears
+   * field) or Enter ticks or picks; without a search field a letter jumps to the next option starting with it.
+   * Shift+Delete (or Delete with nothing typed) removes a removable row. Esc clears
    * the search, else is left to the panel around it, as Tab is. With a search field the focus stays in it (combobox); otherwise on the list.
    * --held-gap: the surface the list sits on (default --elevated, a floating panel's); the ring on the row under the
    * pointer or keyboard opens a gap of it (.held / .keyed, css/atoms.css). Set it when the list sits on another surface.
@@ -36,9 +46,10 @@
   import { matches, wantsSearch } from '../../lib/list-search.js'
   import { reveal } from '../../lib/reveal.js'
   import SideTip from '../SideTip.svelte'
+  import { tooltip } from '../../lib/tooltip.js'
 
   /**
-   * @typedef {{ value: any, label: string, icon?: string, tone?: string, hint?: string, detail?: any }} Option
+   * @typedef {{ value: any, label: string, icon?: string, tone?: string, hint?: string, detail?: any, top?: boolean, muted?: boolean, switch?: boolean, action?: boolean, removable?: boolean }} Option
    * @typedef {object} Props
    * @property {any} [value] bindable: an array, or one value when not `multiple`
    * @property {Option[]} options
@@ -50,7 +61,11 @@
    * @property {(value: any) => void} [onchange]
    * @property {(value: any) => void} [onpick]
    * @property {() => void} [onback]
+   * @property {(option: Option) => void} [onremove] a removable row's ✕
+   * @property {string} [removeLabel]
+   * @property {import('svelte').Snippet} [head] above the rows, scrolling with them
    * @property {import('svelte').Snippet<[Option]>} [lead]
+   * @property {import('svelte').Snippet<[Option]>} [text] draws a row's label
    * @property {import('svelte').Snippet<[Option]>} [detail] draws an option's detail card
    * @property {boolean} [autofocus]
    */
@@ -66,7 +81,11 @@
     onchange,
     onpick,
     onback,
+    onremove,
+    removeLabel = 'Remove',
+    head,
     lead,
+    text,
     detail,
     autofocus = true,
     class: className,
@@ -76,6 +95,8 @@
   const uid = $props.id()
   /** @type {HTMLUListElement | undefined} */
   let list = $state()
+  /** @type {HTMLDivElement | undefined} */
+  let scroller = $state()
   let query = $state('')
 
   /** @param {any} v */
@@ -84,8 +105,10 @@
   const pinned = untrack(() => new Set(multiple && Array.isArray(value) ? value : []))
   const searchable = $derived(wantsSearch(search, options.length))
   const found = $derived(options.filter((o) => matches(o.label, query)))
-  const top = $derived(found.filter((o) => pinned.has(o.value)))
-  const others = $derived(found.filter((o) => !pinned.has(o.value)))
+  /** @param {Option} o */
+  const leads = (o) => !!o.top || pinned.has(o.value)
+  const top = $derived(found.filter(leads))
+  const others = $derived(found.filter((o) => !leads(o)))
   const shown = $derived([...top, ...others])
   const hasLead = $derived(!!lead || options.some((o) => o.icon))
   // The row holding the keyboard: back to the top whenever the search changes; on the picked one as a single list opens.
@@ -96,6 +119,10 @@
 
   /** @param {Option} o */
   function choose(o) {
+    if (o.switch != null || o.action) {
+      onpick?.(o.value)
+      return
+    }
     if (!multiple) {
       value = o.value
       onchange?.(value)
@@ -116,7 +143,7 @@
   /** @param {number} i */
   function moveTo(i) {
     active = i
-    reveal(list, list?.querySelector(`[data-i="${i}"]`))
+    reveal(scroller, list?.querySelector(`[data-i="${i}"]`))
   }
 
   /** @param {KeyboardEvent} e */
@@ -144,6 +171,10 @@
       case 'Backspace':
         if (query || !onback) return
         onback()
+        break
+      case 'Delete':
+        if ((query && !e.shiftKey) || !onremove || !shown[active]?.removable) return
+        onremove(shown[active])
         break
       default: {
         if (searchable || e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return
@@ -188,11 +219,13 @@
     id="{uid}-o-{i}"
     data-i={i}
     class="option"
+    class:muted={o.muted}
     class:active={i === active}
     class:held={inUse && !multiple && i === active && isOn(o.value)}
     class:keyed={inUse && keyboard && i === active && (multiple || !isOn(o.value))}
     role="option"
-    aria-selected={isOn(o.value)}
+    aria-selected={o.switch == null && isOn(o.value)}
+    aria-checked={o.switch ?? undefined}
     aria-describedby={described && i === active ? `${uid}-detail` : undefined}
     onpointerenter={() => (active = i)}
     onclick={() => choose(o)}
@@ -205,8 +238,23 @@
         {#if lead}{@render lead(o)}{:else if o.icon}<Icon name={o.icon} />{/if}
       </span>
     {/if}
-    <span class="label">{o.label}</span>
+    <span class="label">{#if text}{@render text(o)}{:else}{o.label}{/if}</span>
     {#if o.hint}<span class="hint">{o.hint}</span>{/if}
+    {#if o.removable && onremove}
+      <!-- Pointer only: from the keyboard, Delete removes the row. -->
+      <button
+        type="button"
+        class="remove"
+        tabindex="-1"
+        aria-label="{removeLabel} {o.label}"
+        {@attach tooltip(removeLabel)}
+        onclick={(e) => {
+          e.stopPropagation()
+          onremove(o)
+        }}><Icon name="x" size="sm" /></button
+      >
+    {/if}
+    {#if o.switch != null}<span class="knob" aria-hidden="true"></span>{/if}
   </li>
 {/snippet}
 
@@ -237,6 +285,13 @@
   {/if}
   {#if shown.length}
     <!-- With a search field the focus stays in it: a press on the list mustn't take it (mousedown is what moves it). -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="scroll" bind:this={scroller} onmousedown={searchable ? (e) => e.preventDefault() : undefined}>
+    {#if head}
+      <!-- A press on its buttons leaves the focus where it is (the search field, or the list), so the keys still move through the rows. -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="head" onmousedown={(e) => e.preventDefault()}>{@render head()}</div>
+    {/if}
     <ul
       id="{uid}-list"
       bind:this={list}
@@ -247,13 +302,13 @@
       tabindex={searchable ? -1 : 0}
       aria-activedescendant={searchable ? undefined : activeId}
       onkeydown={searchable ? undefined : onkeydown}
-      onmousedown={searchable ? (e) => e.preventDefault() : undefined}
       {@attach searchable ? null : focusIn}
     >
       {#each top as o, i (o.value)}{@render row(o, i)}{/each}
       {#if top.length && others.length}<li class="sep" role="none"></li>{/if}
       {#each others as o, j (o.value)}{@render row(o, top.length + j)}{/each}
     </ul>
+    </div>
   {:else}
     <p class="empty" id="{uid}-list" role="status">{empty}</p>
   {/if}
@@ -269,15 +324,19 @@
     min-width: 0;
     min-height: 0;
   }
-  /* On the list, not the wrapper: an ancestor of the search field set to none stops Safari typing in it. */
-  .list {
+  /* The rows (and the head over them) scroll under the search field. On the scroller, not the wrapper: an ancestor of
+     the search field set to none stops Safari typing in it. */
+  .scroll {
     user-select: none;
-    margin: 0;
     padding: 4px;
-    list-style: none;
     max-height: 296px;
     overflow-y: auto;
     overscroll-behavior: contain;
+  }
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
   .list:focus {
     outline: none;
@@ -361,6 +420,10 @@
   .lead[data-tone] {
     color: var(--tone);
   }
+  /* Still pickable, but set back: a field already in use, a filter already applied. */
+  .muted :is(.label, .lead) {
+    color: var(--muted);
+  }
   .label {
     flex: 1;
     min-width: 0;
@@ -372,6 +435,65 @@
     color: var(--muted);
     font: var(--w-normal) 12px var(--font-data);
     font-variant-numeric: tabular-nums;
+  }
+  /* A removable row's ✕: on the row under the pointer or keyboard only, so a column of them doesn't crowd the list; its
+     room is kept on the others (hidden, not gone), so the list doesn't widen as it shows. */
+  .remove {
+    flex: none;
+    display: grid;
+    visibility: hidden;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin-inline-end: -6px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .option-list:is(:focus-within, :hover) .active .remove {
+    visibility: visible;
+  }
+  .remove:hover {
+    background: var(--control-3);
+    color: var(--fg);
+  }
+  /* A switch row's switch: the track and knob of inputs/Switch, as the context menu's toggle items draw it (a control
+     can't sit inside an option). */
+  .knob {
+    flex: none;
+    position: relative;
+    width: 28px;
+    height: 16px;
+    border-radius: var(--r-pill);
+    background: var(--control-4);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      var(--sunken-shadow);
+    transition:
+      background var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out);
+  }
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--knob);
+    box-shadow: var(--knob-shadow);
+    transition: translate var(--dur) var(--ease-out);
+  }
+  [aria-checked='true'] > .knob {
+    background: var(--brand);
+    box-shadow: none;
+  }
+  [aria-checked='true'] > .knob::after {
+    translate: 12px 0;
   }
   /* Between the ticked rows and the rest: across the whole list, through its padding. */
   .sep {

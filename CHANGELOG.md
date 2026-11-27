@@ -7,6 +7,50 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Added
+
+- `FilterBar`: `history` (a storage key, or a `filterHistory(key, { storage })`) puts the filters used most, and most
+  lately, at the top of the add list as "Recent", above a rule: the first `recent` (default 3) and a "Show more" row,
+  their condition muted, a ✕ on each (or Shift+Delete) to forget one. Those already applied are left out. The "Recent"
+  heading folds the list away, and it stays folded. Picking one applies it.
+- `filterHistory`, `FilterHistory`, `memoryStore` (lib/filter-history.svelte.js): the filters used, scored by how often
+  and how lately they were used, kept in memory for the page's life (a `storage` with `get` and `set` can replace it); `clear()`
+  forgets them all, `setCollapsed()` folds the recent list.
+- `pinToAnchor(anchor)` (lib/pin.js): an attachment that holds a layer placed by CSS anchor positioning where it opened
+  while its button grows or moves, as AnchoredPanel's panels (Popover, FilterBar, FilterChip) do.
+- `FilterBar`: `kind: 'boolean'` fields, flipped by a switch on their row of the add list, which stays open; on, the
+  chip is the field and a ✕ (conditions include and exclude by default). Custom fields take `format(value)` for their recent-list text.
+- `FilterBar`: a field's value step in the add panel has a header, a ‹ with the field's icon and name, that goes back
+  to the field list when pressed (anywhere on it).
+- `OptionList`: options take `top` (above the rule), `muted`, `switch` (a switch on the right; picking the row calls
+  `onpick` without choosing it), `action` (the same without the switch) and `removable` (a ✕ calling `onremove`, its
+  room kept so the list doesn't widen); a `head` snippet scrolls above the rows, a `text` snippet draws a row's label.
+- `FilterChip`: `operator` and `value` are optional; without them the chip leaves those parts out. `compact` makes the
+  field the button that opens the conditions (no condition part), `negated` shows the condition (between the field and the value, or first without a value).
+
+### Changed
+
+- `FilterBar`: a chip leaves its plain condition (the first of `operators`: is, after, contains, include) unsaid,
+  "Posted 3 days ago"; any other shows between the field and the value, "Posted | before | 3 days ago" (a boolean
+  chip, with no value, starts with it: "Exclude | Easy apply"). The condition menu opens from the
+  chip's field, as there is no condition part in the middle any more.
+- `FilterBar`: a chip with a few short values (up to three, 24 characters together) shows them in full with their
+  icons, "Remote, Hybrid", instead of their icons and "2 modes"; longer lists keep the count.
+- `FilterBar`: fields already filtered by are dimmed in the add list (boolean ones show their switch instead).
+- `FilterBar`: a filter being added whose last value is unticked leaves the row at once, instead of showing a chip with
+  no values until the panel closes.
+
+### Fixed
+
+- `FilterBar`, `FilterChip`, `Popover` panels stay where they opened, to the pixel, when their button moves or grows (a
+  value written into a chip, a chip added before the add button, the row wrapping), instead of jumping or flipping with
+  it. Once open, a panel keeps its side of the button unless a change of its own size would take it out of the window.
+- `FilterBar`, `FilterChip`, `Popover`: icons and text in a panel no longer move a pixel as its opening animation ends
+  or its closing one starts (seen at fractional zoom, such as 125% or 150%, below a hairline in the panel).
+- `FilterChip` (and `FilterBar`'s chips) short of room: only the value gives way, cut off with an ellipsis, instead of
+  every part squeezing and the value's text running up to the ✕ unfinished.
+- `FilterBar`: Backspace in the keywords step removes the last word again instead of going back to the field list.
+
 ## [0.2.0] - 2026-11-24
 
 ### Changed

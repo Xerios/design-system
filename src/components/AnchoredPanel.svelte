@@ -4,21 +4,23 @@
    * sits in the top layer (above modal dialogs and a Popover's scrim), anchored to its button with CSS anchor positioning
    * (it names the button's anchor itself), flipping above or to the other side where there is no room; under 860px it
    * spans the window between the gutters instead. It grows out of the button and fades as it closes, and once open it
-   * stays put even if the button changes size (a count appearing in it). Render it while open.
+   * stays put while the page around it changes: the button growing (a value written into it), moving along its row or
+   * onto the next line (a chip added before it; pinToAnchor in lib/pin.js). Scrolling still carries it along with the
+   * button. Render it while open.
    *
    *   <AnchoredPanel anchor={button} label="Filters" onclose={(refocus) => …}>…</AnchoredPanel>
    *
    * anchor: the button it belongs to. label: the panel's accessible name. align: which edge of the button it lines up
    * with ('start', the default, or 'end'). placement: 'below' (default) or 'above'. width: a fixed width in px; without
-   * it the panel fits its content (240px to 480px, at least as wide as the button).
+   * it the panel fits its content (240px to 480px, at least as wide as the button was as it opened).
    * onclose(refocus): asked to close: Esc (refocus true), a press outside it and its button (false, see pressedOutside),
    * Tab or Shift+Tab past its last or first control (true, so the Tab carries on from the button).
    * As it opens, the focus goes to its [data-autofocus] control, else its first, unless the content took it (OptionList
    * does). Other attributes (id, class…) and attachments go to the panel.
    */
   import { topLayer, pressedOutside } from '../lib/dom.js'
-  import { observeSize } from '../lib/observe.js'
   import { pop } from '../lib/motion.js'
+  import { pinToAnchor } from '../lib/pin.js'
 
   /**
    * @typedef {object} Props
@@ -61,28 +63,6 @@
     return () => cancelAnimationFrame(frame)
   }
 
-  /**
-   * Attachment: holds the panel where it opened. If the button changes size while it is open, the edge the panel lines
-   * up with may move, and the panel would jump sideways with it; each move of that edge on a resize is taken back with a
-   * shift (--pin, used above 860px only).
-   * @param {HTMLElement} node
-   */
-  const pin = (node) => {
-    const el = anchor
-    const edge = () => {
-      const r = el.getBoundingClientRect()
-      return align === 'end' ? r.right : r.left
-    }
-    let last = edge(),
-      shift = 0
-    return observeSize(el, () => {
-      const now = edge()
-      shift -= now - last
-      last = now
-      node.style.setProperty('--pin', `${shift}px`)
-    })
-  }
-
   /** @param {KeyboardEvent} e */
   function onkeydown(e) {
     if (e.key === 'Escape') {
@@ -122,7 +102,7 @@
   {@attach named}
   {@attach topLayer(anchor)}
   {@attach settle}
-  {@attach pin}
+  {@attach pinToAnchor(anchor)}
   transition:pop={{ from: anchor }}
   {onkeydown}
 >
@@ -130,7 +110,11 @@
 </div>
 
 <style>
+  /* On a layer of its own for good (will-change), not only while it grows in or fades out: drawn on one, content at a
+     fraction of a device pixel (below a 1px rule at 150% zoom, say) is drawn there, but drawn with the page it is
+     rounded to a whole one, so it moved a pixel as the animation started or ended. */
   .anchored-panel {
+    will-change: scale, translate;
     position: fixed;
     z-index: calc(var(--z-overlay) + 1);
     position-area: block-end span-inline-end;
@@ -143,11 +127,10 @@
        to end at the button's right edge: a flip swaps the inline margins too). */
     margin-inline-start: calc(var(--space-1) * -1);
     margin-block: 4px;
-    translate: var(--pin, 0) 0;
     display: flex;
     flex-direction: column;
     width: max-content;
-    min-width: max(calc(anchor-size(width) + var(--space-1) * 2), 240px);
+    min-width: max(calc(var(--anchor-w, anchor-size(width)) + var(--space-1) * 2), 240px);
     max-width: min(480px, calc(100dvw - 16px));
     max-height: min(480px, calc(100dvh - 16px));
     overflow: auto;
@@ -186,7 +169,6 @@
       position-area: none;
       position-try-fallbacks: none;
       margin: 0;
-      translate: none;
       left: var(--gutter-l);
       right: var(--gutter-r);
       width: auto;
