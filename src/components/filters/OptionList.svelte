@@ -325,13 +325,14 @@
     min-height: 0;
   }
   /* The rows (and the head over them) scroll under the search field. On the scroller, not the wrapper: an ancestor of
-     the search field set to none stops Safari typing in it. */
+     the search field set to none stops Safari typing in it. No overscroll-behavior: contain here; browsers apply it
+     even when the rows fit, so the wheel over a list on a page would never scroll the page. A floating panel holding
+     the list (AnchoredPanel) contains the scroll itself. */
   .scroll {
     user-select: none;
     padding: 4px;
     max-height: 296px;
     overflow-y: auto;
-    overscroll-behavior: contain;
   }
   .list {
     margin: 0;

@@ -99,7 +99,7 @@
     { key: 'company', label: 'Company', icon: 'buildings', options: COMPANIES, plural: 'companies' },
     { key: 'posted', label: 'Posted', icon: 'clock', kind: 'date' },
     { key: 'words', label: 'Keywords', icon: 'search', kind: 'text', operators: ['contain', "don't contain"] },
-    { key: 'salary', label: 'Salary', icon: 'currencyEur', kind: 'custom', operators: ['at least', 'at most'], format: (k) => euros(k) },
+    { key: 'salary', label: 'Salary', icon: 'currencyEur', kind: 'custom', operators: ['is above', 'less than'], format: (k) => euros(k) },
     { key: 'easy', label: 'Easy apply', icon: 'cursorClick', kind: 'boolean' },
     { key: 'visa', label: 'Visa sponsorship', icon: 'briefcase', kind: 'boolean' },
   ]
@@ -110,7 +110,8 @@
   let manyFilters = $state([
     { field: 'stage', op: 'is not', value: ['applied', 'interview', 'rejected'] },
     { field: 'words', op: 'contain', value: ['svelte', 'typescript'] },
-    { field: 'salary', op: 'at least', value: 70 },
+    { field: 'salary', op: 'is above', value: 70 },
+    { field: 'easy', op: 'only', value: true },
   ])
   let noFilters = $state([])
   let recentFilters = $state([{ field: 'mode', op: 'is any of', value: ['remote'] }])
@@ -122,7 +123,7 @@
     [{ field: 'posted', op: 'after', value: '-1w' }, 3],
     [{ field: 'level', op: 'is', value: ['senior'] }, 2],
     [{ field: 'words', op: 'contain', value: ['svelte'] }, 1],
-    [{ field: 'salary', op: 'at least', value: 80 }, 1],
+    [{ field: 'salary', op: 'is above', value: 80 }, 1],
   ]))
     for (let i = 0; i < times; i++) seeded.record(filter)
   let chipOp = $state('is')
@@ -316,7 +317,7 @@
     </Case>
   </Demo>
   <Demo label="Filter chip" description="One filter: a field, a condition and its values." wide>
-    <Case label="A condition menu and a list of values">
+    <Case label="A condition to choose (its list opens over it) and a list of values">
       {#if chipGone}
         <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>
       {:else}

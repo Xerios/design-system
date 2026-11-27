@@ -5,106 +5,95 @@
  *   <button class="icon-btn" aria-label="Refresh" {@attach tooltip('Refresh')}>…</button>
  *   <button class="icon-btn" aria-label="Search" {@attach tooltip('Search', { shortcut: '/' })}>…</button>
  *   <button … {@attach tooltip('Replace', { detail: file.name })}>…</button>
+ *   <button … {@attach tooltip(tip, { press: 'pin' })}>…</button>   (tip: a snippet)
  *
- * text: what the control does, sentence case. No text, no tooltip. shortcut: shown as a key cap after it.
+ * content: what the control does, sentence case; or a snippet, for richer content (its children are stacked, and a
+ * <strong> first reads as the heading, as with `detail`). No content, no tooltip. shortcut: shown as a key cap after it.
  * detail: a second line under the text, which then turns bold: what the action applies to, in full where the control
  * cuts it short (a long file name). It wraps anywhere, so a name with no spaces still fits.
- * The tooltip is not the accessible name: keep the aria-label. When the text says more than the name, it is
- * also announced as the control's description.
+ * press: what pressing the control does to its tip, for a control whose only job is the tip (InfoTip's ⓘ): 'open' opens
+ * it (so a tap on a touch screen shows it), 'pin' pins it open over a dimmed page so its text can be selected, until a
+ * press outside it, Escape, scrolling, or pressing the control again (the control gets aria-expanded).
+ * placement: 'below' (the default) or 'above' the control; either flips to the other side where there is no room.
+ * The tooltip is not the accessible name: keep the aria-label. When the text says more than the name (a snippet always
+ * does), it is also announced as the control's description.
  *
- * It opens in the top layer (Popover API), so it shows above modal dialogs, under the control or above it when
- * there is no room, with an arrow pointing at the control. Escape, a press, scrolling or leaving the control closes it. Touch input never opens it.
- * It fades in and out (css/atoms.css); a closing tip is removed once its fade has ended.
+ * Every tooltip on the page is the one TooltipLayer (components/TooltipLayer.svelte), mounted on first use and refilled
+ * and moved to each control in turn. It opens in the top layer, so it shows above modal dialogs, placed by CSS anchor
+ * positioning (css/atoms.css): under the control (or above it, with `placement`), on the other side where there is no room, with an arrow pointing at it. It
+ * fades in and goes at once. Leaving the control closes it (unless pinned), as do Escape, a press or a scroll anywhere
+ * on the page, and the control's own list opening (a select's). Hovering with touch input never opens it, nor does
+ * hovering a control while its list is open.
  */
+import { flushSync, mount } from 'svelte'
+import TooltipLayer from '../components/TooltipLayer.svelte'
+
+/** The mounted layer's exports. @type {Record<'show' | 'hide' | 'close' | 'pin', (entry?: object) => void> | null} */
+let layer = null
 let count = 0
+function theLayer() {
+  if (!layer) {
+    layer = /** @type {any} */ (mount(TooltipLayer, { target: document.body }))
+    flushSync() // mount() leaves its bindings to the next flush; the layer's elements are needed at once
+  }
+  return /** @type {NonNullable<typeof layer>} */ (layer)
+}
 
-export function tooltip(text, { shortcut = null, detail = null } = {}) {
+/** Whether the control's own popup is open (a select's list, which may cover the control): its tip would only sit
+    under it, so none shows. False where the browser doesn't know :open. @param {HTMLElement} node */
+function popupOpen(node) {
+  try {
+    return node.matches(':open')
+  } catch {
+    return false
+  }
+}
+
+/**
+ * @param {string | import('svelte').Snippet | null | undefined} content
+ * @param {{ shortcut?: string | null, detail?: string | null, press?: 'pin' | 'open' | null, placement?: 'below' | 'above' }} [options]
+ * @returns {import('svelte/attachments').Attachment<HTMLElement>}
+ */
+export function tooltip(content, { shortcut = null, detail = null, press = null, placement = 'below' } = {}) {
   return (node) => {
-    if (!text) return
-    const id = `tooltip-${++count}`
-    const said = detail ? `${text} ${detail}` : text
-    const describes = said !== node.getAttribute('aria-label') && said !== node.textContent?.trim()
-    let tip = null
-    let leaving = null // the tip fading out, if any
-
-    function show() {
-      if (tip) return
-      // Coming straight back: the old tip goes at once, so there is never two with this id.
-      leaving?.remove()
-      leaving = null
-      tip = document.createElement('div')
-      tip.id = id
-      tip.className = 'tooltip'
-      tip.setAttribute('role', 'tooltip')
-      tip.setAttribute('popover', 'manual')
-      if (detail) {
-        // Two lines. The space between them isn't drawn (they are grid items) but keeps the words apart when the tip
-        // is read out as the control's description.
-        const lines = document.createElement('span')
-        lines.className = 'tooltip-lines'
-        const head = document.createElement('strong')
-        head.textContent = text
-        const rest = document.createElement('span')
-        rest.textContent = detail
-        lines.append(head, ' ', rest)
-        tip.append(lines)
-      } else tip.textContent = text
-      if (shortcut) {
-        const key = document.createElement('kbd')
-        key.textContent = shortcut
-        tip.append(key)
-      }
-      // Inside a modal dialog everything outside it is inert, so the tooltip joins the dialog.
-      ;(node.closest('dialog') ?? document.body).append(tip)
-      tip.showPopover?.()
-      const r = node.getBoundingClientRect()
-      const w = tip.offsetWidth
-      const h = tip.offsetHeight
-      const above = r.bottom + h + 16 > innerHeight && r.top > h + 16
-      const left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8))
-      tip.style.left = `${left}px`
-      tip.style.top = `${above ? r.top - h - 8 : r.bottom + 8}px`
-      // The arrow points back at the control's centre, even when the tip is pushed in from the window's edge.
-      tip.dataset.arrow = above ? 'down' : 'up'
-      tip.style.setProperty('--arrow-x', `${r.left + r.width / 2 - left}px`)
-      if (describes) node.setAttribute('aria-describedby', id)
-      addEventListener('scroll', hide, true)
-    }
-    function hide() {
-      if (!tip) return
-      // Closed first, so it fades out (css/atoms.css), then removed when that has ended;
-      // at once with no fade (reduced motion, or no popover support).
-      const old = (leaving = tip)
-      tip = null
-      if (old.hidePopover && old.matches(':popover-open')) old.hidePopover()
-      Promise.all(old.getAnimations().map((a) => a.finished))
-        .catch(() => {})
-        .finally(() => {
-          old.remove()
-          if (leaving === old) leaving = null
-        })
-      if (describes) node.removeAttribute('aria-describedby')
-      removeEventListener('scroll', hide, true)
+    if (!content) return
+    const said = typeof content === 'string' ? (detail ? `${content} ${detail}` : content) : null
+    const entry = {
+      node,
+      content,
+      shortcut,
+      detail,
+      press,
+      placement,
+      // Its own anchor name, not one shared by all, so a name left behind on a control (a component restoring the
+      // anchor names it found) can never draw the tip to it.
+      name: `--tooltip-${++count}`,
+      describes: said === null || (said !== node.getAttribute('aria-label') && said !== node.textContent?.trim()),
     }
 
-    const enter = (event) => event.pointerType !== 'touch' && show()
-    const focus = () => node.matches(':focus-visible') && show()
-    const key = (event) => event.key === 'Escape' && hide()
+    const enter = (/** @type {PointerEvent} */ event) => event.pointerType !== 'touch' && !popupOpen(node) && theLayer().show(entry)
+    const focus = () => node.matches(':focus-visible') && !popupOpen(node) && theLayer().show(entry)
+    const leave = () => layer?.hide(entry)
+    // A key that opens the control's own list (a select's) puts the tip away, once the list is open.
+    const keyed = () => requestAnimationFrame(() => popupOpen(node) && layer?.close(entry))
+    const pressed = () => (press === 'pin' ? theLayer().pin(entry) : theLayer().show(entry))
 
+    if (press === 'pin') node.setAttribute('aria-expanded', 'false')
     node.addEventListener('pointerenter', enter)
-    node.addEventListener('pointerleave', hide)
-    node.addEventListener('pointerdown', hide)
+    node.addEventListener('pointerleave', leave)
     node.addEventListener('focus', focus)
-    node.addEventListener('blur', hide)
-    node.addEventListener('keydown', key)
+    node.addEventListener('blur', leave)
+    node.addEventListener('keydown', keyed)
+    if (press) node.addEventListener('click', pressed)
     return () => {
-      hide()
+      layer?.close(entry)
       node.removeEventListener('pointerenter', enter)
-      node.removeEventListener('pointerleave', hide)
-      node.removeEventListener('pointerdown', hide)
+      node.removeEventListener('pointerleave', leave)
       node.removeEventListener('focus', focus)
-      node.removeEventListener('blur', hide)
-      node.removeEventListener('keydown', key)
+      node.removeEventListener('blur', leave)
+      node.removeEventListener('keydown', keyed)
+      node.removeEventListener('click', pressed)
+      if (press === 'pin') node.removeAttribute('aria-expanded')
     }
   }
 }

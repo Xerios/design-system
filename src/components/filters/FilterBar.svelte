@@ -28,14 +28,13 @@
    *     word is added. The chip shows them as small label chips (three, then "+2"). Conditions default to
    *     ['contains', 'does not contain'].
    *   'boolean': on or off, with a switch on its row of the add list that flips it in place (the list stays open, as a
-   *     context menu's toggle does). On, it is { field, op, value: true } and its chip is the field and a ✕.
-   *     Conditions default to ['include', 'exclude'].
+   *     context menu's toggle does). On, it is { field, op, value: true } and its chip is the field, the condition and
+   *     a ✕ ("Easy apply | only"). Conditions default to ['only', 'excluded'].
    *   'custom': the `panel` snippet edits the value and `summary` draws it on the chip; `format(value)` puts it in words
    *     for the recent list (default String(value)). Conditions default to ['is'].
    *     Without a `panel` snippet a custom field can't be edited, so the add button leaves it out.
-   * operators: the conditions to choose from, the first being where a new filter starts. The first is the plain one (is,
-   *   after, contains, include): the chip leaves it unsaid ("Posted 3 days ago"); any other shows between the field and
-   *   the value ("Application | is not | 2 stages"), or first on a boolean chip ("Exclude | Easy apply"). The chip's field opens the conditions as a menu.
+   * operators: the conditions to choose from, the first being where a new filter starts. The chip shows the condition
+   *   between the field and the value ("Posted | after | 3 days ago"), a select of the others.
    * filters (bindable): [{ field, op, value }], field a key of `fields`. The app applies them; this only edits them.
    * onchange(filters): after every edit. label: the row's accessible name ("Filters"). addLabel: the button's ("Add filter").
    * history: where the filters used are counted: a key (kept in memory, for the page's life) or a FilterHistory from
@@ -123,7 +122,7 @@
   /** @param {Field} f */
   const operatorsOf = (f) =>
     f.operators ??
-    { options: ['is', 'is not'], date: ['after', 'before'], text: ['contains', 'does not contain'], boolean: ['include', 'exclude'], custom: ['is'] }[kindOf(f)]
+    { options: ['is', 'is not'], date: ['after', 'before'], text: ['contains', 'does not contain'], boolean: ['only', 'excluded'], custom: ['is'] }[kindOf(f)]
 
   /** Marks a recent filter's value in the field list apart from the fields' keys. */
   const RECENT = '\u0000recent:'
@@ -444,8 +443,6 @@
         bind:this={chips[filter.field]}
         field={{ label: field.label, icon: field.icon }}
         operator={filter.op}
-        compact
-        negated={filter.op !== operatorsOf(field)[0]}
         operators={operatorsOf(field)}
         onoperator={(op) => {
           update(field.key, { op })

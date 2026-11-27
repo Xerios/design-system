@@ -1,7 +1,7 @@
 <script>
   /**
    * One applied filter as a joined pill (Linear's filter chips): the field it looks at, the condition, the value and a ✕,
-   * split by hairlines. The condition opens a menu of the others; the value opens a panel under it with whatever edits
+   * split by hairlines. The condition is a select of the others; the value opens a panel under it with whatever edits
    * it (an OptionList, a calendar…); the ✕ removes the filter. FilterBar draws these from data; use one directly for a
    * filter row of your own.
    *
@@ -11,25 +11,24 @@
    *     {#snippet panel({ close })}<OptionList bind:value={f.value} options={STATUSES} label="Status" />{/snippet}
    *   </FilterChip>
    *
-   * field: { label, icon? } (an Icon name). operator: the condition shown ("is", "after"). operators: the conditions it
-   * can switch to; with more than one the condition is a button opening them as a menu (the context menu layer, so mount
-   * <ContextMenu />), else plain text. onoperator(op). onremove(): the ✕ (removeLabel names it, default "Remove filter").
+   * field: { label, icon? } (an Icon name). operator: the condition shown ("is", "after", "is above"). operators: the
+   * conditions it can switch to; with more than one the condition is a select whose list opens over the chip, the
+   * chosen condition on top of its own text (where the browser supports appearance: base-select; elsewhere the native
+   * list), else plain text. onoperator(op). onremove(): the ✕ (removeLabel names it, default "Remove filter").
    * open (bindable): whether the value's panel is open. onclose(): after the panel closes, however it closed.
    * value: snippet drawing the value on its button. panel: snippet ({ close }) drawing the editor in the panel; close()
-   * closes it and puts the focus back on the value. Without an operator or a value the chip leaves that part out.
-   * compact: the condition isn't a part of its own; the field is the button that opens the conditions menu (a filter
-   * that is on or off, FilterBar's boolean fields: include or exclude). negated: the condition shows as a part between the
-   * field and the value ("Application | is not | 2 stages"); a chip without a value starts with it, capitalised
-   * ("Exclude | Easy apply"). A press on it opens the conditions too.
-   * focus(): puts the focus on the value button.
-   * Keyboard: each part is a button in the tab order (compact: the field, the value, the ✕). On the value, Enter, Space or ArrowDown opens the panel; Esc in it
-   * closes it, and Tab past its last control closes it and moves on. The group is named by its parts ("Status is Done").
+   * closes it and puts the focus back on the value. Without an operator or a value the chip leaves that part out
+   * (a filter that is on or off: "Easy apply | only | ✕").
+   * focus(): puts the focus on the value button (else the condition, else the ✕).
+   * Keyboard: the condition, the value and the ✕ are in the tab order. On the condition, Enter, Space or the arrows
+   * open its list, as on any select. On the value, Enter, Space or ArrowDown opens the panel; Esc in it closes it, and
+   * Tab past its last control closes it and moves on. The group is named by its parts ("Status is Done").
    * Other attributes (class…) and attachments go to the group.
    */
   import Icon from '../Icon.svelte'
   import AnchoredPanel from '../AnchoredPanel.svelte'
   import { tooltip } from '../../lib/tooltip.js'
-  import { menu, openMenuFrom, closeMenu } from '../../lib/menu.svelte.js'
+  import ConditionSelect from './ConditionSelect.svelte'
 
   /**
    * @typedef {object} Props
@@ -43,8 +42,6 @@
    * @property {() => void} [onclose]
    * @property {import('svelte').Snippet} [value]
    * @property {import('svelte').Snippet<[{ close: () => void }]>} [panel]
-   * @property {boolean} [compact] the field opens the conditions menu, no condition part
-   * @property {boolean} [negated] the condition as a part of its own (compact)
    */
   /** @type {Props & Omit<import('svelte/elements').HTMLAttributes<HTMLDivElement>, keyof Props>} */
   let {
@@ -58,8 +55,6 @@
     onclose,
     value,
     panel,
-    compact = false,
-    negated = false,
     class: className,
     ...rest
   } = $props()
@@ -67,19 +62,14 @@
   const uid = $props.id()
   /** @type {HTMLButtonElement | undefined} */
   let valueButton = $state()
-  /** @type {HTMLButtonElement | undefined} */
-  let opButton = $state()
-  const choosable = $derived(operators.length > 1)
-  /** A compact chip's condition, shown: ahead of the field when there is no value to put it before. */
-  const leads = $derived(!!negated && !!operator && !value)
-  const between = $derived(!!negated && !!operator && !!value)
-  const opOpen = $derived(menu.open && !!opButton && menu.trigger === opButton)
-
+  /** @type {ConditionSelect | undefined} */
+  let opSelect = $state()
   /** @type {HTMLButtonElement | undefined} */
   let removeButton = $state()
+  const choosable = $derived(operators.length > 1)
 
   export function focus() {
-    ;(valueButton ?? removeButton)?.focus()
+    ;(valueButton ?? opSelect ?? removeButton)?.focus()
   }
 
   /** @param {boolean} refocus */
@@ -88,18 +78,6 @@
     open = false
     if (refocus) valueButton?.focus()
     onclose?.()
-  }
-
-  /** @param {MouseEvent} e */
-  function toggleOperators(e) {
-    e.stopPropagation()
-    if (opOpen) return closeMenu()
-    if (!opButton) return
-    openMenuFrom(
-      opButton,
-      operators.map((op) => ({ label: op, checked: op === operator, action: () => onoperator?.(op) })),
-      `${field.label} condition`,
-    )
   }
 
   /** @param {KeyboardEvent} e */
@@ -114,55 +92,23 @@
 <div
   class={['filter-chip', className]}
   role="group"
-  aria-labelledby={(leads ? [`${uid}-op`, `${uid}-name`] : [`${uid}-name`, operator && `${uid}-op`])
-    .concat(value ? `${uid}-value` : [])
-    .filter(Boolean)
-    .join(' ')}
+  aria-labelledby={[`${uid}-name`, operator && `${uid}-op`, value && `${uid}-value`].filter(Boolean).join(' ')}
   {...rest}
 >
-  {#snippet condition(/** @type {string} */ text)}
-    <!-- Pointer only, a larger target for the field's button, which has the keyboard. -->
-    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-    <span class="seg op shown" id="{uid}-op" onclick={(e) => (compact && choosable ? toggleOperators(e) : undefined)}>{text}</span>
-  {/snippet}
-  {#if leads && operator}{@render condition(operator.charAt(0).toUpperCase() + operator.slice(1))}{/if}
-  {#if compact && choosable}
-    <button
-      bind:this={opButton}
-      type="button"
-      class="seg field"
-      id="{uid}-field"
-      aria-haspopup="menu"
-      aria-expanded={opOpen}
-      {@attach tooltip('Change condition')}
-      onclick={toggleOperators}
-    >
-      {#if field.icon}<Icon name={field.icon} size="sm" />{/if}
-      <span class="name" id="{uid}-name">{field.label}</span>
-      {#if !negated}<span class="sr-only" id="{uid}-op">{operator}</span>{/if}
-    </button>
-  {:else}
-    <span class="seg field" id="{uid}-field">
-      {#if field.icon}<Icon name={field.icon} size="sm" />{/if}
-      <span class="name" id="{uid}-name">{field.label}</span>
-    </span>
-  {/if}
-  {#if between && operator}
-    {@render condition(operator)}
-  {:else if !operator || compact}
-    <!-- Nothing between the field and the value. -->
-  {:else if choosable}
-    <button
-      bind:this={opButton}
-      type="button"
-      class="seg op"
+  <span class="seg field" id="{uid}-field">
+    {#if field.icon}<Icon name={field.icon} size="sm" />{/if}
+    <span class="name" id="{uid}-name">{field.label}</span>
+  </span>
+  {#if operator && choosable}
+    <ConditionSelect
+      bind:this={opSelect}
       id="{uid}-op"
-      aria-haspopup="menu"
-      aria-expanded={opOpen}
-      {@attach tooltip('Change condition')}
-      onclick={toggleOperators}>{operator}</button
-    >
-  {:else}
+      label="{field.label} condition"
+      value={operator}
+      options={operators}
+      onchange={(op) => onoperator?.(op)}
+    />
+  {:else if operator}
     <span class="seg op" id="{uid}-op">{operator}</span>
   {/if}
   {#if value}
@@ -221,7 +167,10 @@
       background-color var(--dur) var(--ease-out),
       color var(--dur) var(--ease-out);
   }
-  .seg + .seg {
+  /* The condition (ConditionSelect) is a segment of its own, drawn there. */
+  .seg + .seg,
+  .seg + :global(.condition-select),
+  :global(.condition-select) + .seg {
     border-inline-start: 1px solid var(--line);
   }
   .seg:first-child {
@@ -234,13 +183,6 @@
   }
   .field :global(.icon) {
     color: var(--muted);
-  }
-  /* A compact chip's condition, shown: a press on it opens the conditions, as one on the field does. */
-  .shown {
-    cursor: pointer;
-  }
-  .shown:hover {
-    background: var(--control-3);
   }
   /* As readable as the field name beside it (it is a button too); hovering changes only the fill. */
   .op {
@@ -289,12 +231,15 @@
   button.seg:focus-visible {
     outline-offset: -2px;
   }
+
   @media (forced-colors: active) {
     .filter-chip {
       outline: 1px solid CanvasText;
       outline-offset: -1px;
     }
-    .seg + .seg {
+    .seg + .seg,
+    .seg + :global(.condition-select),
+    :global(.condition-select) + .seg {
       border-color: CanvasText;
     }
   }

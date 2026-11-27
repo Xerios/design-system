@@ -9,7 +9,6 @@
   import Modal from '@xerios/design-system/components/Modal.svelte'
   import Drawer from '@xerios/design-system/components/Drawer.svelte'
   import Popover from '@xerios/design-system/components/Popover.svelte'
-  import Tooltip from '@xerios/design-system/components/Tooltip.svelte'
   import SideTip from '@xerios/design-system/components/SideTip.svelte'
   import Switch from '@xerios/design-system/components/inputs/Switch.svelte'
   import TextField from '@xerios/design-system/components/inputs/TextField.svelte'
@@ -47,27 +46,36 @@
       <button type="button" class="icon-btn" aria-label="Copy" {@attach tooltip('Copy')}><Icon name="external" /></button>
       <button type="button" class="btn" {@attach tooltip('Search everything', { shortcut: '/' })}>With a shortcut</button>
     </Case>
-    <Case label="Around content">
-      <Tooltip>
-        {#snippet tip()}<strong>Build 1,024</strong><span>Finished 2 minutes ago</span>{/snippet}
-        <span class="label-chip" data-tone="success"><span class="label-dot"></span>Live</span>
-      </Tooltip>
+    <Case label="Rich content (a snippet)">
+      {#snippet build()}<strong>Build 1,024</strong><span>Finished 2 minutes ago</span>{/snippet}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <span class="label-chip" data-tone="success" tabindex="0" {@attach tooltip(build)}><span class="label-dot"></span>Live</span>
     </Case>
   </Demo>
   <Demo label="Info tip" description="ⓘ beside a label, open on hover; a pinnable one stays open on a click.">
-    <span class="field-head"
-      ><span class="field-label">Retention</span><InfoTip lines={[{ text: 'How long logs are kept before they are deleted.' }]} label="About retention" /></span
-    >
-    <span class="field-head"
-      ><span class="field-label">Pinnable</span><InfoTip
-        pinnable
-        label="About limits"
-        lines={[
-          { label: 'Requests', text: '1,000 a minute' },
-          { label: 'Storage', text: '10 GB' },
-        ]}
-      /></span
-    >
+    <Case label="Beside a label">
+      <span class="field-head"
+        ><span class="field-label">Retention</span><InfoTip text="How long logs are kept before they are deleted." label="About retention" /></span
+      >
+    </Case>
+    <Case label="Pinnable (a click pins it open, its text selectable)">
+      <span class="field-head"
+        ><span class="field-label">Pinnable</span><InfoTip pinnable label="About limits" text="1,000 requests a minute and 10 GB of storage." /></span
+      >
+    </Case>
+    <Case label="Your own content">
+      <span class="field-head"
+        ><span class="field-label">Deploys</span><InfoTip label="About deploys"
+          ><strong>Build 1,024</strong><span>Finished 2 minutes ago</span></InfoTip
+        ></span
+      >
+    </Case>
+    <Case label="Decorative, inside a control (hover only)">
+      <button type="button" class="btn" aria-describedby="infotip-demo-compact"
+        >Compact<InfoTip decorative text="Smaller rows, more on screen." /></button
+      >
+      <span id="infotip-demo-compact" class="sr-only">Smaller rows, more on screen.</span>
+    </Case>
   </Demo>
   <Demo label="Side tip" description="Detail beside a list, level with its row.">
     <Case label="Beside a list of your own, level with the row under the pointer or the focus">

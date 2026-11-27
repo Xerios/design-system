@@ -37,7 +37,7 @@
 {/snippet}
 
 {#if info}
-  <div class="field-head">{@render text()}<InfoTip lines={[{ text: info }]} label="About {label}" /></div>
+  <div class="field-head">{@render text()}<InfoTip text={info} label="About {label}" /></div>
 {:else}
   {@render text()}
 {/if}

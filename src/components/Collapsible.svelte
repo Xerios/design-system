@@ -49,7 +49,7 @@
     ></button>
     <span class="chev" aria-hidden="true"><Icon name="caretRight" size="sm" /></span>
     <span class="title" id="{id}-title" aria-hidden="true">{title}</span>
-    {#if info}<InfoTip lines={[{ text: info }]} label="About {title}" />{/if}
+    {#if info}<InfoTip text={info} label="About {title}" />{/if}
     {#if count != null}<span class="count" id="{id}-count" aria-hidden="true">{count}</span>{/if}
     {#if meta}<span class="meta" id="{id}-meta" aria-hidden="true">{@render meta()}</span>{/if}
   </h3>

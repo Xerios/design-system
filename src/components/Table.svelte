@@ -21,7 +21,7 @@
    *     `title`: a longer name for the sort tooltip.
    * - `rows`: the rows, for a table without groups. Or
    * - `groups`: [{ key, label, rows, sub?, tone?, info? }], each a collapsible section with a header row showing its row
-   *     count. `tone` puts a coloured dot before the label (any `data-tone`); `info` is InfoTip lines about the group.
+   *     count. `tone` puts a coloured dot before the label (any `data-tone`); `info` is InfoTip text about the group.
    * - `key(row)`: a unique id per row. It also lands on the row as `data-row`, so an app can find it again.
    * - `cell`: snippet (row, column) drawing a cell's content. Without it a cell shows `column.value(row)`.
    * - `sort` (bindable): { key, dir } with dir 1 ascending or -1 descending; null keeps the given order. Equal values
@@ -64,7 +64,7 @@
    * @property {any[]} rows
    * @property {string} [sub]
    * @property {string} [tone]
-   * @property {{ label?: string, text: string }[]} [info]
+   * @property {string} [info]
    *
    * @typedef {object} Props
    * @property {Column[]} columns
@@ -181,7 +181,7 @@
                     <span class="group-label">{group.label}</span>
                     {#if group.sub}<span class="group-sub">{group.sub}</span>{/if}
                   </button>
-                  {#if group.info?.length}<InfoTip pinnable label="About {group.label}" lines={group.info} />{/if}
+                  {#if group.info}<InfoTip pinnable label="About {group.label}" text={group.info} />{/if}
                   <span class="group-count">{group.rows.length}</span>
                 </div>
               </th>

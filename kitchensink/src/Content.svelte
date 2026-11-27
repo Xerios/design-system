@@ -37,7 +37,7 @@
     key: team,
     label: team,
     rows: PEOPLE.filter((p) => p.team === team),
-    info: [{ text: `Everyone on the ${team} team.` }],
+    info: `Everyone on the ${team} team.`,
   }))
   let sort = $state(/** @type {{ key: string, dir: number } | null} */ ({ key: 'commits', dir: -1 }))
   let open = $state(true)

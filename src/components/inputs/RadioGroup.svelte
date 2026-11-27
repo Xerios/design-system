@@ -1,8 +1,8 @@
 <script>
   import Icon from '../Icon.svelte'
+  import InfoTip from '../InfoTip.svelte'
   import { tooltip } from '../../lib/tooltip.js'
   import { radioKeys } from '../../lib/roving.js'
-  import Tooltip from '../Tooltip.svelte'
   import { motion, durations, easings } from '../../lib/motion.js'
   /**
    * Single choice shown as a joined switch: one track, the chosen segment raised on it (radio group with roving
@@ -58,8 +58,7 @@
       aria-describedby={o.info ? `${uid}-info-${i}` : undefined}
       >{#if o.value === value}<span class="thumb" aria-hidden="true" in:slide></span>{/if}{#if o.icon}<Icon name={o.icon} size="sm" />{/if}{#if !iconOnly}<span
           class="text">{o.label}</span
-        >{/if}{#if o.info}<Tooltip focusable={false}>{#snippet tip()}{o.info}{/snippet}<span class="info"><Icon name="infoCircle" size="sm" /></span></Tooltip
-        >{/if}</button
+        >{/if}{#if o.info}<InfoTip decorative text={o.info} />{/if}</button
     >
   {/each}
   <!-- The ⓘ's text, as each option's description: the tooltip only opens on hover. -->
@@ -140,10 +139,6 @@
   }
   button :global(.icon) {
     flex: none;
-  }
-  .info {
-    display: inline-flex;
-    color: var(--muted);
   }
   .text {
     min-width: 0;

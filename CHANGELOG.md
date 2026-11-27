@@ -9,6 +9,13 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Added
 
+- `InfoTip`: `text` for its description, and children to draw the tip's content yourself instead.
+- `tooltip`: `placement: 'above'` opens the tip over the control (under it where there is no room).
+- `InfoTip`: `decorative` draws the ⓘ as a plain icon for use inside another control (a radio option, a tab): hidden
+  from screen readers and out of the Tab order, its tip opening on hover; the control describes itself with the text.
+- `tooltip`: the content may be a snippet (its children stacked, a `<strong>` first reading as the heading); `press: 'open'` makes a press
+  on the control open its tip, `press: 'pin'` pin it open over a dimmed page with its text selectable (what
+  `InfoTip` and its `pinnable` use).
 - `FilterBar`: `history` (a storage key, or a `filterHistory(key, { storage })`) puts the filters used most, and most
   lately, at the top of the add list as "Recent", above a rule: the first `recent` (default 3) and a "Show more" row,
   their condition muted, a ✕ on each (or Shift+Delete) to forget one. Those already applied are left out. The "Recent"
@@ -19,29 +26,47 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 - `pinToAnchor(anchor)` (lib/pin.js): an attachment that holds a layer placed by CSS anchor positioning where it opened
   while its button grows or moves, as AnchoredPanel's panels (Popover, FilterBar, FilterChip) do.
 - `FilterBar`: `kind: 'boolean'` fields, flipped by a switch on their row of the add list, which stays open; on, the
-  chip is the field and a ✕ (conditions include and exclude by default). Custom fields take `format(value)` for their recent-list text.
+  chip is the field, its condition and a ✕, "Easy apply | only" (conditions only and excluded by default). Custom fields take `format(value)` for their recent-list text.
 - `FilterBar`: a field's value step in the add panel has a header, a ‹ with the field's icon and name, that goes back
   to the field list when pressed (anywhere on it).
 - `OptionList`: options take `top` (above the rule), `muted`, `switch` (a switch on the right; picking the row calls
   `onpick` without choosing it), `action` (the same without the switch) and `removable` (a ✕ calling `onremove`, its
   room kept so the list doesn't widen); a `head` snippet scrolls above the rows, a `text` snippet draws a row's label.
-- `FilterChip`: `operator` and `value` are optional; without them the chip leaves those parts out. `compact` makes the
-  field the button that opens the conditions (no condition part), `negated` shows the condition (between the field and the value, or first without a value).
+- `FilterChip`: `operator` and `value` are optional; without them the chip leaves those parts out.
 
 ### Changed
 
-- `FilterBar`: a chip leaves its plain condition (the first of `operators`: is, after, contains, include) unsaid,
-  "Posted 3 days ago"; any other shows between the field and the value, "Posted | before | 3 days ago" (a boolean
-  chip, with no value, starts with it: "Exclude | Easy apply"). The condition menu opens from the
-  chip's field, as there is no condition part in the middle any more.
+- `FilterChip`: a visible condition with others to switch to is a `<select>` instead of a button opening the context
+  menu. In browsers with customizable selects (`appearance: base-select`), its list opens over the chip, the chosen
+  condition on top of the segment's text, on the menu's surface in the chip's type; elsewhere the native list opens.
+  The list fades in and out; its chosen condition is solid brand, held (a gap inside its edge) under the pointer or
+  keyboard, as in `Select`. A chip no longer needs `<ContextMenu />` mounted.
+- `tooltip`, `InfoTip`: one tooltip for both. The page holds a single tip, moved and refilled for each control (so two
+  never show at once), placed by CSS anchor positioning instead of from script: centred under the control, above it
+  where there is no room, with an arrow pointing at it. `InfoTip` now looks and moves like the attachment's tip (280px
+  wide at most, a fade in with no slide), and opens above the ⓘ. A tip no longer fades out: it goes as soon as it closes. Escape closes a tip wherever focus is, and keeps
+  going past it (to close a dialog) unless the tip is pinned or its control has focus. A control carries an extra
+  `anchor-name` while its tip shows. The tip is now `.tooltip` inside a `.tooltip-layer` popover.
 - `FilterBar`: a chip with a few short values (up to three, 24 characters together) shows them in full with their
   icons, "Remote, Hybrid", instead of their icons and "2 modes"; longer lists keep the count.
 - `FilterBar`: fields already filtered by are dimmed in the add list (boolean ones show their switch instead).
 - `FilterBar`: a filter being added whose last value is unticked leaves the row at once, instead of showing a chip with
   no values until the panel closes.
 
+### Removed
+
+- **Breaking** `InfoTip`: `lines` removed. Pass `text` for a description (`lines={[{ text }]}` becomes `text={…}`), or
+  children for anything richer, such as label/value rows.
+- **Breaking** `Table`: a group's `info` is a string (the InfoTip's text) instead of `[{ label?, text }]`.
+- **Breaking** `Tooltip`: removed. Attach `tooltip` to the element instead, with the old `tip` snippet as its content:
+  `<span tabindex="0" {@attach tooltip(tip)}>…</span>` (leave out `tabindex` where `focusable={false}` was set).
+
 ### Fixed
 
+- `tooltip`: a control's tip no longer shows while its own list is open (a select's), where it sat half hidden under
+  the list; a list opened from the keyboard puts away the tip its focus showed.
+- `OptionList`: the mouse wheel over a list placed on a page scrolls the page again, both when the list's rows fit and once
+  the list has scrolled to its end (it swallowed the wheel). In a floating panel the page still stays put.
 - `FilterBar`, `FilterChip`, `Popover` panels stay where they opened, to the pixel, when their button moves or grows (a
   value written into a chip, a chip added before the add button, the row wrapping), instead of jumping or flipping with
   it. Once open, a panel keeps its side of the button unless a change of its own size would take it out of the window.

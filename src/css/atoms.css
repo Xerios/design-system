@@ -178,13 +178,40 @@
   cursor: default;
 }
 
-/* The tooltip drawn by the `tooltip` attachment (lib/tooltip.js): a popover in the top layer, placed from script.
-   It fades in on the enter curve and out on the quicker exit one, as the modals do (css/effects.css); the attachment
-   removes it once the fade out has ended. Reduced motion drops the fade (css/base.css), so it simply appears and goes. */
+/* The tooltip (components/TooltipLayer.svelte, through the `tooltip` attachment and InfoTip): a layer over the
+   window in the top layer, letting the pointer through, holding the tip. Pinned, the layer dims the page and catches the
+   pointer, and the tip's text can be selected. */
+.tooltip-layer {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+  transition: background-color var(--dur-enter) var(--ease-enter);
+}
+.tooltip-layer.pinned {
+  pointer-events: auto;
+  background: var(--scrim);
+}
+/* The tip, placed by CSS anchor positioning on the control named in --tooltip-anchor (the layer gives the control that
+   anchor name while the tip is its own). It sits centred under the control, above it where there is no room below, and
+   8px in from the window's edges. It fades in on the enter curve, as the modals do (css/effects.css), each time the layer
+   opens, and goes at once when it closes. Reduced motion drops the fade (css/base.css), so it simply appears. */
 .tooltip {
   position: fixed;
-  inset: auto;
-  margin: 0;
+  position-anchor: var(--tooltip-anchor);
+  position-area: block-end span-all;
+  position-try-fallbacks: flip-block;
+  justify-self: anchor-center;
+  inset: auto var(--space-2);
+  margin: var(--space-2) 0 0;
   width: max-content;
   max-width: 280px;
   pointer-events: none;
@@ -201,13 +228,27 @@
   white-space: normal;
   text-align: left;
   overflow: visible;
-  transition:
-    opacity var(--dur-enter) var(--ease-enter),
-    overlay var(--dur-enter) allow-discrete,
-    display var(--dur-enter) allow-discrete;
+  transition: opacity var(--dur-enter) var(--ease-enter);
 }
-/* A tip with a detail line (tooltip(text, { detail })): the text in bold over the detail, which breaks anywhere so a long
-   name without spaces still wraps inside the tip. */
+@starting-style {
+  .tooltip {
+    opacity: 0;
+  }
+}
+/* Over the control instead (tooltip(…, { placement: 'above' }); InfoTip's), flipping under it where there is no room. */
+.tooltip.above {
+  position-area: block-start span-all;
+  margin: 0 0 var(--space-2);
+}
+.pinned > .tooltip {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+/* Stacked content: a detail line (tooltip(text, { detail })), the text in bold over the detail, which breaks anywhere so
+   a long name without spaces still wraps inside the tip; or a snippet's children, a <strong> first reading as the
+   heading. */
 .tooltip-lines {
   display: grid;
   min-width: 0;
@@ -219,17 +260,21 @@
 .tooltip-lines > span {
   overflow-wrap: anywhere;
 }
-/* Closed, it carries the exit timing (a transition takes the timing of the state it moves to). Only a browser that knows
-   :popover-open hides it here, so one that doesn't still shows the tip. */
-.tooltip:not(:popover-open) {
-  opacity: 0;
-  transition-duration: var(--dur-exit);
-  transition-timing-function: var(--ease-exit), linear, linear;
+/* Its arrow (the [data-arrow] atom below) is anchored to the control too, so it points at the control's centre even where
+   the tip is held in from the window's edge, kept 12px clear of the tip's corners. The layer sets data-arrow to the side
+   the tip took ("down" when it flipped above). */
+.tooltip[data-arrow]::before {
+  position: fixed;
+  position-anchor: var(--tooltip-anchor);
+  position-area: block-end span-all;
+  justify-self: anchor-center;
+  inset: auto var(--space-4);
+  margin: 3px 0 0;
+  translate: none;
 }
-@starting-style {
-  .tooltip:popover-open {
-    opacity: 0;
-  }
+.tooltip[data-arrow='down']::before {
+  position-area: block-start span-all;
+  margin: 0 0 3px;
 }
 
 /* Arrow on a tip, pointing at the element it belongs to: data-arrow="up" when the tip sits below it, "down" when above.
@@ -738,8 +783,9 @@
   display: grid;
   gap: var(--space-4);
   padding: var(--space-5);
+  /* No overscroll-behavior here: the modal <dialog> around it (a scroll container, overflow: auto from the browser)
+     contains the scroll (effects.css). */
   overflow-y: auto;
-  overscroll-behavior: contain;
 }
 
 .dialog-foot {
