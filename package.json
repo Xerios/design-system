@@ -65,13 +65,13 @@
     "any-date-parser": "^2.2.4"
   },
   "peerDependencies": {
-    "svelte": "^5.29.0"
+    "svelte": "^5.59.2"
   },
   "devDependencies": {
     "@phosphor-icons/core": "^2.1.1",
     "@sveltejs/package": "^3.0.3",
     "publint": "^0.3.25",
-    "svelte": "^5.58.0",
+    "svelte": "^5.59.2",
     "typescript": "^6.0.3"
   }
 }
