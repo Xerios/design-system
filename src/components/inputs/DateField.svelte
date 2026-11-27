@@ -127,11 +127,12 @@
     e.stopPropagation()
     close()
   }
-  /** Tabbing out of the panel closes it; the focus moving into a layer opened from it (a Select's list) doesn't.
+  /** Tabbing out of the panel closes it; the focus moving into a layer opened from it (a Select's list) doesn't, nor
+   *  onto the button (pressing it, whose click then closes the panel: closing here would have it open again).
    *  @param {FocusEvent} e */
   function onfocusout(e) {
     const to = /** @type {Element | null} */ (e.relatedTarget)
-    if (to && !sheet?.contains(to) && !to.closest?.('[data-floating]')) close(false)
+    if (to && to !== button && !sheet?.contains(to) && !to.closest?.('[data-floating]')) close(false)
   }
   /** A press outside the field and its panel closes it. The label counts as the button, and a layer opened from the
    *  panel (a Select's list, a tip) as the panel. @param {PointerEvent} e */
