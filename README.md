@@ -3,15 +3,17 @@
 [![npm](https://img.shields.io/npm/v/@xerios/design-system?logo=npm&label=npm)](https://www.npmjs.com/package/@xerios/design-system)
 [![GitHub](https://img.shields.io/github/stars/Xerios/design-system?logo=github&label=GitHub)](https://github.com/Xerios/design-system)
 
-**[Kitchen sink](https://xerios.github.io/design-system/)** |
-**[Demo page](https://xerios.github.io/design-system/demo.html)** |
-[Changelog](CHANGELOG.md)
-
-The kitchen sink shows every component in its states; the demo page is one screen built only from the design system.
+**[Website / Kitchensink](https://xerios.github.io/design-system/)** |
+**[Sample demo](https://xerios.github.io/design-system/demo.html)** |
+[CHANGELOG](CHANGELOG.md)
 
 > [!WARNING]
 > This is **designed for personal use and building local web-apps**, so no cross-browser tests have been performed.
-> Also due to modern API usage and focus on chromium webviews, we are on purposefully ignoring Safari compatibility.
+> Also due to modern API usage and focus on chromium webviews, we are purposefully ignoring Safari compatibility.
+
+Rest of the text below this line is.. well, written by non-humans.
+
+---
 
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
