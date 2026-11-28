@@ -145,6 +145,9 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   Phosphor icons (dev only, for `pnpm icons`).
   Do not add others without asking. Only `dist/` and `CHANGELOG.md` are published (`files` in `package.json`).
 
+- Browsers: Chromium and Firefox. Safari is not a target: a platform feature it lacks (interest invokers,
+  `closedby` on dialogs, `popover="hint"`) may be used, with no fallback needed for Safari alone.
+
 ## Checking a change
 
 There are no tests. Run `pnpm build` (svelte-package, then publint) and `pnpm build:kitchensink`, and look for new

@@ -36,6 +36,9 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ### Changed
 
+- `tooltip`: on a `<button>` or `<a>` the browser now opens and closes the tip (interest invokers): the control carries
+  an `interestfor` attribute pointing at the tooltip layer instead of its own pointer and focus listeners, and a long
+  press on a touch screen shows its tip. Other elements, and browsers without interest invokers, work as before.
 - `FilterChip`: a visible condition with others to switch to is a `<select>` instead of a button opening the context
   menu. In browsers with customizable selects (`appearance: base-select`), its list opens over the chip, the chosen
   condition on top of the segment's text, on the menu's surface in the chip's type; elsewhere the native list opens.

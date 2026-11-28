@@ -22,32 +22,31 @@
  * and moved to each control in turn. It opens in the top layer, so it shows above modal dialogs, placed by CSS anchor
  * positioning (css/atoms.css): under the control (or above it, with `placement`), on the other side where there is no room, with an arrow pointing at it. It
  * fades in and goes at once. Leaving the control closes it (unless pinned), as do Escape, a press or a scroll anywhere
- * on the page, and the control's own list opening (a select's). Hovering with touch input never opens it, nor does
- * hovering a control while its list is open.
+ * on the page, and the control's own list opening (a select's). Hovering a control while its list is open never opens it.
+ *
+ * On a <button> or <a> the browser does the watching: the control gets `interestfor` pointing at the layer, and the
+ * layer opens on the browser's interest events (hover, keyboard focus, a long press on a touch screen), so the control
+ * carries no listeners of its own. Other elements (a focusable <span>), and browsers without interest invokers, are
+ * watched with pointer and focus listeners, where touch never opens it.
  */
-import { flushSync, mount } from 'svelte'
+import { mount } from 'svelte'
 import TooltipLayer from '../components/TooltipLayer.svelte'
 
-/** The mounted layer's exports. @type {Record<'show' | 'hide' | 'close' | 'pin', (entry?: object) => void> | null} */
+/**
+ * The mounted layer's exports (see TooltipLayer).
+ * @typedef {{ show(entry: object): boolean, hide(entry: object): void, close(entry?: object): void, pin(entry: object): void, track(entry: object): () => void }} Layer
+ */
+/** @type {Layer | null} */
 let layer = null
 let count = 0
+/** Mounted on the first tooltip attached, not shown: a control pointing at it with `interestfor` needs it in place. */
 function theLayer() {
-  if (!layer) {
-    layer = /** @type {any} */ (mount(TooltipLayer, { target: document.body }))
-    flushSync() // mount() leaves its bindings to the next flush; the layer's elements are needed at once
-  }
+  layer ??= /** @type {any} */ (mount(TooltipLayer, { target: document.body }))
   return /** @type {NonNullable<typeof layer>} */ (layer)
 }
 
-/** Whether the control's own popup is open (a select's list, which may cover the control): its tip would only sit
-    under it, so none shows. False where the browser doesn't know :open. @param {HTMLElement} node */
-function popupOpen(node) {
-  try {
-    return node.matches(':open')
-  } catch {
-    return false
-  }
-}
+/** Whether the browser watches this element's interest itself (interest invokers: buttons and links, in Chromium). */
+const watched = (/** @type {HTMLElement} */ node) => 'interestForElement' in node
 
 /**
  * @param {string | import('svelte').Snippet | null | undefined} content
@@ -70,28 +69,32 @@ export function tooltip(content, { shortcut = null, detail = null, press = null,
       name: `--tooltip-${++count}`,
       describes: said === null || (said !== node.getAttribute('aria-label') && said !== node.textContent?.trim()),
     }
-
-    const enter = (/** @type {PointerEvent} */ event) => event.pointerType !== 'touch' && !popupOpen(node) && theLayer().show(entry)
-    const focus = () => node.matches(':focus-visible') && !popupOpen(node) && theLayer().show(entry)
-    const leave = () => layer?.hide(entry)
-    // A key that opens the control's own list (a select's) puts the tip away, once the list is open.
-    const keyed = () => requestAnimationFrame(() => popupOpen(node) && layer?.close(entry))
-    const pressed = () => (press === 'pin' ? theLayer().pin(entry) : theLayer().show(entry))
-
+    const tips = theLayer()
+    const pressed = () => (press === 'pin' ? tips.pin(entry) : tips.show(entry))
     if (press === 'pin') node.setAttribute('aria-expanded', 'false')
-    node.addEventListener('pointerenter', enter)
-    node.addEventListener('pointerleave', leave)
-    node.addEventListener('focus', focus)
-    node.addEventListener('blur', leave)
-    node.addEventListener('keydown', keyed)
     if (press) node.addEventListener('click', pressed)
+
+    /** @type {() => void} */
+    let unwatch
+    if (watched(node)) unwatch = tips.track(entry)
+    else {
+      const enter = (/** @type {PointerEvent} */ event) => event.pointerType !== 'touch' && tips.show(entry)
+      const focus = () => node.matches(':focus-visible') && tips.show(entry)
+      const leave = () => tips.hide(entry)
+      node.addEventListener('pointerenter', enter)
+      node.addEventListener('pointerleave', leave)
+      node.addEventListener('focus', focus)
+      node.addEventListener('blur', leave)
+      unwatch = () => {
+        node.removeEventListener('pointerenter', enter)
+        node.removeEventListener('pointerleave', leave)
+        node.removeEventListener('focus', focus)
+        node.removeEventListener('blur', leave)
+      }
+    }
     return () => {
-      layer?.close(entry)
-      node.removeEventListener('pointerenter', enter)
-      node.removeEventListener('pointerleave', leave)
-      node.removeEventListener('focus', focus)
-      node.removeEventListener('blur', leave)
-      node.removeEventListener('keydown', keyed)
+      tips.close(entry)
+      unwatch()
       node.removeEventListener('click', pressed)
       if (press === 'pin') node.removeAttribute('aria-expanded')
     }

@@ -196,6 +196,10 @@
   pointer-events: none;
   transition: background-color var(--dur-enter) var(--ease-enter);
 }
+/* A control whose tip the browser opens (interestfor, see lib/tooltip.js): at once, and closed at once, as the others'. */
+[interestfor^='tooltip-layer'] {
+  interest-delay: 0s;
+}
 .tooltip-layer.pinned {
   pointer-events: auto;
   background: var(--scrim);

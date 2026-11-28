@@ -20,12 +20,22 @@
     if (rest) node.style.setProperty('anchor-name', rest)
     else node.style.removeProperty('anchor-name')
   }
+
+  /** Whether the control's own popup is open (a select's list, which may cover the control): its tip would only sit
+      under it, so none shows. False where the browser doesn't know :open. @param {HTMLElement} node */
+  function popupOpen(node) {
+    try {
+      return node.matches(':open')
+    } catch {
+      return false
+    }
+  }
 </script>
 
 <script>
   /**
-   * The page's one tooltip. The `tooltip` attachment (lib/tooltip.js) mounts it on first use and fills it for each
-   * control in turn; `InfoTip` goes through that attachment too. Not for use on its own, so it takes no props.
+   * The page's one tooltip. The `tooltip` attachment (lib/tooltip.js) mounts it when the first tooltip is attached and fills
+   * it for each control in turn; `InfoTip` goes through that attachment too. Not for use on its own, so it takes no props.
    *
    * A popover in the top layer (above modal dialogs; it joins the dialog a control sits in, as everything outside that is
    * inert) spanning the window and letting the pointer through, holding the tip. The tip is placed by CSS anchor
@@ -34,8 +44,12 @@
    * Pinned (a control with `press: 'pin'`), the layer dims the page and catches the pointer: a press on it closes the tip
    * and goes no further, and the tip takes the pointer so its text can be selected.
    *
-   * Exports, for the attachment: show(entry), hide(entry) (unless pinned), close(entry), pin(entry) (toggles).
+   * Exports, for the attachment: show(entry) (false when it didn't: the control's own list is open), hide(entry)
+   * (unless pinned), close(entry), pin(entry) (toggles), track(entry) (returns its undo).
    * entry: { node, content (text, or a snippet), shortcut?, detail?, press?, placement?, name (its anchor name), describes }.
+   * track hands a control (a <button> or <a>) to the browser: it gets `interestfor` pointing at the layer, and the
+   * layer's `interest` and `loseinterest` events, fired with the control as their source, show and hide its tip. A pinned
+   * tip holds on to the interest (the loseinterest is cancelled).
    *
    * Keyboard: Escape anywhere closes it; it is consumed (a dialog around stays open) when the tip is pinned or its control
    * has focus, and goes on when the tip only shows under the pointer. A press or a scroll anywhere closes it too.
@@ -56,6 +70,9 @@
 
   const uid = $props.id()
   const id = `tooltip-${uid}`
+  const layerId = `tooltip-layer-${uid}`
+  /** The controls the browser watches for us (track), by element. @type {WeakMap<Element, Entry>} */
+  const tracked = new WeakMap()
   /** @type {HTMLDivElement} */
   let layer
   /** @type {HTMLDivElement} */
@@ -81,7 +98,14 @@
 
   /** @param {Entry} entry */
   export function show(entry) {
-    if (current?.entry === entry) return
+    if (current?.entry === entry) return true
+    if (popupOpen(entry.node)) return false
+    // Taken from a control the browser watches: hidden first, so the browser lets go of its interest there now, rather
+    // than in a loseinterest that comes later and would hide the layer under this control's tip.
+    if (current && tracked.get(current.entry.node) === current.entry && isOpen()) {
+      release()
+      layer.hidePopover()
+    }
     release()
     current = { entry, named: addName(entry.node, entry.name) }
     const host = entry.node.closest('dialog') ?? document.body
@@ -95,6 +119,7 @@
     // Read from the edges, so the gap between the tip and the control needn't be known here.
     side = tip.getBoundingClientRect().bottom <= entry.node.getBoundingClientRect().top ? 'down' : 'up'
     if (entry.describes) entry.node.setAttribute('aria-describedby', id)
+    return true
   }
 
   /** Closes the tip if it is `entry`'s (any control's, without one). @param {Entry} [entry] */
@@ -117,6 +142,33 @@
     entry.node.setAttribute('aria-expanded', 'true')
   }
 
+  /** @param {Entry} entry */
+  export function track(entry) {
+    tracked.set(entry.node, entry)
+    entry.node.setAttribute('interestfor', layerId)
+    return () => {
+      if (tracked.get(entry.node) !== entry) return
+      tracked.delete(entry.node)
+      entry.node.removeAttribute('interestfor')
+    }
+  }
+
+  // The browser's interest in a tracked control (hovered, focused from the keyboard, long-pressed): cancelled where the
+  // tip doesn't show, so the browser doesn't open the layer itself.
+  /** @param {Event & { source?: Element }} event */
+  function interest(event) {
+    const entry = event.source && tracked.get(event.source)
+    if (!entry || !show(entry)) event.preventDefault()
+  }
+
+  /** @param {Event & { source?: Element }} event */
+  function loseInterest(event) {
+    const entry = event.source && tracked.get(event.source)
+    if (!entry) return
+    if (pinned && current?.entry === entry) event.preventDefault()
+    else close(entry)
+  }
+
   /** @param {PointerEvent} event */
   function press(event) {
     if (!current) return
@@ -128,7 +180,13 @@
 
   /** @param {KeyboardEvent} event */
   function key(event) {
-    if (!current || event.key !== 'Escape') return
+    if (!current) return
+    if (event.key !== 'Escape') {
+      // A key that opens the control's own list (a select's) puts the tip away, once the list is open.
+      const { entry } = current
+      requestAnimationFrame(() => popupOpen(entry.node) && close(entry))
+      return
+    }
     if (pinned || current.entry.node.contains(document.activeElement)) {
       event.preventDefault()
       event.stopPropagation()
@@ -146,7 +204,7 @@
 
 <svelte:document onpointerdowncapture={press} onkeydowncapture={key} onscrollcapture={scrolled} />
 
-<div bind:this={layer} class="tooltip-layer" class:pinned popover="manual">
+<div bind:this={layer} id={layerId} class="tooltip-layer" class:pinned popover="manual" oninterest={interest} onloseinterest={loseInterest}>
   <div bind:this={tip} {id} class="tooltip" class:above={current?.entry.placement === 'above'} role="tooltip" data-arrow={side} style:--tooltip-anchor={current?.entry.name}>
     {#if current}
       {@const { content, detail, shortcut } = current.entry}
