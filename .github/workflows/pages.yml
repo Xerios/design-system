@@ -1,10 +1,12 @@
-# Builds the kitchen sink (kitchensink/) and publishes it to GitHub Pages on every push to main.
-# One-time setup: the repository's Settings → Pages → Source must be "GitHub Actions".
+# Builds the kitchen sink (kitchensink/) with the README's screenshot (screenshot.png, of the demo page) and publishes
+# them to GitHub Pages when a release tag (vx.y.z, made by `pnpm release`) is pushed, or when run by hand.
+# One-time setup: the repository's Settings → Pages → Source must be "GitHub Actions", and Settings → Environments →
+# github-pages must allow the tags `v*` to deploy (by default only the default branch can).
 name: Pages
 
 on:
   push:
-    branches: [main]
+    tags: ['v*.*.*']
   workflow_dispatch:
 
 permissions:
@@ -36,6 +38,9 @@ jobs:
       - run: pnpm build:kitchensink
         env:
           VITE_PAGES_URL: ${{ steps.pages.outputs.base_url }}/
+      # The README shows it from the site. The runner's Google Chrome takes it (scripts/screenshot.js finds it on the PATH).
+      - run: pnpm screenshot --no-build
+      - run: cp docs/screenshot.png kitchensink/dist/screenshot.png
       - uses: actions/upload-pages-artifact@v5
         with:
           path: kitchensink/dist

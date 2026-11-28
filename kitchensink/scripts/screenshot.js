@@ -1,8 +1,8 @@
 // Takes the README's screenshot: `pnpm screenshot [--no-build] [--light]` (at the repo root).
 // Builds the kitchen sink, serves the build, opens its demo page (demo.html) in headless Chromium at 1440×900 and twice
-// the pixel density, in the dark theme with motion reduced, and writes docs/screenshot.png at the repo root.
-// `pnpm release` runs it, so each release's README shows the release as it looks. --no-build serves the current
-// kitchensink/dist as it is; --light takes it in the light theme instead.
+// the pixel density, in the dark theme with motion reduced, and writes docs/screenshot.png at the repo root (not
+// committed). The Pages workflow runs it on each release and publishes the image with the site, where the README shows
+// it from. --no-build serves the current kitchensink/dist as it is; --light takes it in the light theme instead.
 // The browser: one already on this machine, never downloaded. CHROME_PATH if set; else the newest Chromium in
 // Playwright's cache (~/.cache/ms-playwright, or PLAYWRIGHT_BROWSERS_PATH), whatever Playwright version put it there;
 // else Chrome, Chromium or Brave on the PATH.

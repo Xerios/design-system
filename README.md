@@ -16,7 +16,7 @@ The kitchen sink shows every component in its states; the demo page is one scree
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
 components (inputs, menus, popovers, tooltips, collapsibles, toasts). Dense, quiet, keyboard-first.
 
-![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](docs/screenshot.png)
+![A made-up issue tracker built only from the design system, in the dark theme: a side menu, a filter row, stat tiles, a grouped table and an issue's details beside it](https://xerios.github.io/design-system/screenshot.png)
 
 Nothing in it knows about the apps that use it: anything domain-specific stays in the app.
 
@@ -171,12 +171,14 @@ left out shows the missing-icon placeholder and a console error.
 Beside it, `demo.html` (`kitchensink/src/demo/`, linked from the kitchen sink's side menu) is one screen of a made-up
 issue tracker built only from the design system, to see the parts working together. The screenshot at the top of this
 README is taken of it, in the dark theme, by `pnpm screenshot` (`kitchensink/scripts/screenshot.js`: it builds the
-kitchen sink and opens the page in headless Chromium through `playwright-core`) and written to `docs/screenshot.png`.
-It downloads no browser: it uses `CHROME_PATH` if set, else the newest Chromium in Playwright's cache
+kitchen sink and opens the page in headless Chromium through `playwright-core`) and written to `docs/screenshot.png`
+(not committed). The Pages workflow takes it on each release and publishes it with the site, where the README shows
+it from. It downloads no browser: it uses `CHROME_PATH` if set, else the newest Chromium in Playwright's cache
 (`~/.cache/ms-playwright`), else Chrome, Chromium or Brave on the `PATH`.
 
-Every push to `main` builds both pages and publishes them to
-[GitHub Pages](https://xerios.github.io/design-system/) (`.github/workflows/pages.yml`).
+Each release tag builds both pages and the screenshot and publishes them to
+[GitHub Pages](https://xerios.github.io/design-system/) (`.github/workflows/pages.yml`; it can also be run by hand
+from the Actions tab).
 
 ```sh
 pnpm install
@@ -434,14 +436,12 @@ pnpm icons        # regenerate components/icons.js after editing scripts/icons.j
 ```
 
 To release, run `pnpm release` (or `pnpm release patch|minor|major|x.y.z`; `--dry` to preview, `--no-git` to skip the
-commit and tag, `--no-shot` to keep the screenshot). It bumps `version` in `package.json` (from the changelog when no level is given: a **Breaking** entry
+commit and tag). It bumps `version` in `package.json` (from the changelog when no level is given: a **Breaking** entry
 bumps the minor while on 0.x, anything else the patch), turns `[Unreleased]` in `CHANGELOG.md` into the dated release
-under a fresh `[Unreleased]`, updates the compare links, checks both builds, retakes the screenshot (`pnpm screenshot`)
-and commits and tags `vx.y.z`. The image path is relative, so GitHub shows the one of the branch or tag being read;
-npm doesn't publish the image file, but points relative paths at the repository (its default branch), so there it
-updates once the release commit is pushed. Push with
+under a fresh `[Unreleased]`, updates the compare links, checks both builds, and commits and tags `vx.y.z`. Push with
 `git push --follow-tags`: the tag starts the Publish workflow (`.github/workflows/publish.yml`), which checks the tag
-matches `package.json`, builds, and publishes to npm with provenance. Only `dist/`, this README and the license are
+matches `package.json`, builds, and publishes to npm with provenance, and the Pages workflow, which publishes the
+kitchen sink and retakes the screenshot. Only `dist/`, this README and the license are
 published.
 
 To try an unreleased build in an app, link it (`"@xerios/design-system": "link:../design-system"`) and run
