@@ -41,6 +41,49 @@
 </script>
 
 <Section id="overlays" title="Overlays" intro="Everything that floats draws in the top layer, so it shows above modal dialogs too.">
+  <Demo label="Modal" description="Asks before throwing away what's typed.">
+    <Button onclick={() => modal?.show()}>Open the modal</Button>
+  </Demo>
+  <Demo label="Alert, confirm, prompt" description="Plain questions, awaited from script.">
+    <Button onclick={async () => (await alertDialog({ title: 'Upload failed', body: 'The file is over 50 MB.' }), (answer = 'alert closed'))}>Alert</Button>
+    <Button onclick={async () => (answer = String(await confirmDialog({ title: 'Delete 3 items?', confirmLabel: 'Delete', danger: true })))}>Confirm</Button>
+    <Button
+      onclick={async () =>
+        (answer = String(await promptDialog({ title: 'Rename', label: 'Name', value: 'draft', validate: (v) => (v.trim() ? '' : 'Enter a name') })))}
+      >Prompt</Button
+    >
+    <span class="small muted">Answer: {answer}</span>
+  </Demo>
+  <Demo label="Drawer" description="Drag its edge to resize it; Esc, the backdrop or ✕ closes it.">
+    <Button onclick={() => drawer?.show()}>Open the drawer</Button>
+    <span class="small muted">Width: {drawerWidth ? `${drawerWidth}px` : 'default'}</span>
+  </Demo>
+  <Demo label="Popover" description="A panel opened from a button of your own.">
+    <Case label="A Button with a count of what's on inside">
+      <Popover id="ks-popover" label="Filters">
+        {#snippet button(props)}
+          <Button icon="funnel" {...props}>Filters{#if onlyMine}<span class="badge">1</span>{/if}</Button>
+        {/snippet}
+        {#snippet children({ close })}
+          <div class="panel">
+            <Switch bind:checked={onlyMine} id="ks-mine" label="Only mine" />
+            <Button small onclick={close}>Done</Button>
+          </div>
+        {/snippet}
+      </Popover>
+    </Case>
+    <Case label="An icon-only Button, dimming the page behind the panel (scrim)">
+      <Popover id="ks-popover-own" label="View options" align="start" scrim>
+        {#snippet button(props)}<Button iconOnly icon="gear" label="View options" {...props} />{/snippet}
+        {#snippet children({ close })}
+          <div class="panel">
+            <Switch bind:checked={onlyMine} id="ks-mine-2" label="Only mine" />
+            <Button small onclick={close}>Done</Button>
+          </div>
+        {/snippet}
+      </Popover>
+    </Case>
+  </Demo>
   <Demo label="Tooltip" description="On hover and keyboard focus.">
     <Case label="Attachment (hover or keyboard focus)">
       <button type="button" class="icon-btn" aria-label="Copy" {@attach tooltip('Copy')}><Icon name="external" /></button>
@@ -99,49 +142,6 @@
         <SideTip id="ks-target-tip" for="ks-target-{targetAt}" beside={targetList} title={TARGETS[targetAt].title} text={TARGETS[targetAt].text} />
       {/if}
     </Case>
-  </Demo>
-  <Demo label="Popover" description="A panel opened from a button of your own.">
-    <Case label="A Button with a count of what's on inside">
-      <Popover id="ks-popover" label="Filters">
-        {#snippet button(props)}
-          <Button icon="funnel" {...props}>Filters{#if onlyMine}<span class="badge">1</span>{/if}</Button>
-        {/snippet}
-        {#snippet children({ close })}
-          <div class="panel">
-            <Switch bind:checked={onlyMine} id="ks-mine" label="Only mine" />
-            <Button small onclick={close}>Done</Button>
-          </div>
-        {/snippet}
-      </Popover>
-    </Case>
-    <Case label="An icon-only Button, dimming the page behind the panel (scrim)">
-      <Popover id="ks-popover-own" label="View options" align="start" scrim>
-        {#snippet button(props)}<Button iconOnly icon="gear" label="View options" {...props} />{/snippet}
-        {#snippet children({ close })}
-          <div class="panel">
-            <Switch bind:checked={onlyMine} id="ks-mine-2" label="Only mine" />
-            <Button small onclick={close}>Done</Button>
-          </div>
-        {/snippet}
-      </Popover>
-    </Case>
-  </Demo>
-  <Demo label="Modal" description="Asks before throwing away what's typed.">
-    <Button onclick={() => modal?.show()}>Open the modal</Button>
-  </Demo>
-  <Demo label="Drawer" description="Drag its edge to resize it; Esc, the backdrop or ✕ closes it.">
-    <Button onclick={() => drawer?.show()}>Open the drawer</Button>
-    <span class="small muted">Width: {drawerWidth ? `${drawerWidth}px` : 'default'}</span>
-  </Demo>
-  <Demo label="Alert, confirm, prompt" description="Plain questions, awaited from script.">
-    <Button onclick={async () => (await alertDialog({ title: 'Upload failed', body: 'The file is over 50 MB.' }), (answer = 'alert closed'))}>Alert</Button>
-    <Button onclick={async () => (answer = String(await confirmDialog({ title: 'Delete 3 items?', confirmLabel: 'Delete', danger: true })))}>Confirm</Button>
-    <Button
-      onclick={async () =>
-        (answer = String(await promptDialog({ title: 'Rename', label: 'Name', value: 'draft', validate: (v) => (v.trim() ? '' : 'Enter a name') })))}
-      >Prompt</Button
-    >
-    <span class="small muted">Answer: {answer}</span>
   </Demo>
 </Section>
 

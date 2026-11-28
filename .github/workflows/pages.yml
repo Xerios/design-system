@@ -30,8 +30,12 @@ jobs:
           node-version: lts/*
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - id: pages
+        uses: actions/configure-pages@v6
+      # The site's address turns on what only the published kitchen sink shows: the title's link, the npm and GitHub badges.
       - run: pnpm build:kitchensink
-      - uses: actions/configure-pages@v6
+        env:
+          VITE_PAGES_URL: ${{ steps.pages.outputs.base_url }}/
       - uses: actions/upload-pages-artifact@v5
         with:
           path: kitchensink/dist

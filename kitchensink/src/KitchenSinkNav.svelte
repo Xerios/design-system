@@ -3,7 +3,8 @@
    * The kitchen sink's side menu, built on the design system's SideMenu: the areas as icon rows, each with a count of its
    * components, and under the area in view its components, one row each (as a docs site lists them). The component in
    * view is marked current (it follows the scroll), and choosing an area or a component jumps there and moves the focus
-   * to its heading. The theme switch (system, light, dark) sits in the footer.
+   * to its heading. On the published site (PAGES_URL set) the title links to it, with badges under it linking to the package
+   * on npm and its repository on GitHub. The theme switch (system, light, dark) sits in the footer.
    *
    *   <KitchenSinkNav onpick={closeDrawer} />
    *
@@ -14,7 +15,7 @@
   import ButtonGroup from '@xerios/design-system/components/inputs/ButtonGroup.svelte'
   import SideMenu from '@xerios/design-system/components/side-menu/index.js'
   import { AREAS, jump } from './areas.js'
-  import { PACKAGE } from './package.js'
+  import { NPM_BADGE, NPM_URL, PACKAGE, PAGES_URL, REPO_BADGE, REPO_URL } from './package.js'
   import { THEMES, setTheme, theme } from './theme.svelte.js'
 
   /** @type {{ onpick?: () => void } & import('svelte/elements').HTMLAttributes<HTMLElement>} */
@@ -71,7 +72,23 @@
 </script>
 
 <SideMenu label="Design system areas" {...rest} {@attach follow}>
-  {#snippet header()}<span class="brand"><Icon name="swatches" size="lg" />{PACKAGE}</span>{/snippet}
+  {#snippet header()}
+    {#if PAGES_URL}
+      <div class="masthead">
+        <a class="brand" href={PAGES_URL}><Icon name="swatches" size="lg" />{PACKAGE}</a>
+        <div class="badges">
+          <a href={NPM_URL} target="_blank" rel="noopener">
+            <img src={NPM_BADGE} alt="npm: the published version" height="20" />
+          </a>
+          <a href={REPO_URL} target="_blank" rel="noopener">
+            <img src={REPO_BADGE} alt="GitHub: the repository's stars" height="20" />
+          </a>
+        </div>
+      </div>
+    {:else}
+      <span class="brand"><Icon name="swatches" size="lg" />{PACKAGE}</span>
+    {/if}
+  {/snippet}
 
   <SideMenu.Group>
     {#each AREAS as a (a.id)}
@@ -117,5 +134,29 @@
   }
   .brand > :global(.icon) {
     color: var(--muted);
+  }
+  a.brand {
+    text-decoration: none;
+  }
+  .masthead {
+    justify-items: start;
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .badges a {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    border-radius: var(--r-sm);
+  }
+  .badges img {
+    display: block;
+    height: 20px;
   }
 </style>

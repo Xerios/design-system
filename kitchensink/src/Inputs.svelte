@@ -1,5 +1,5 @@
 <script>
-  /** Kitchen sink: every field and choice control (tiles among them), and a form with submit-first validation (fieldErrors). */
+  /** Kitchen sink: every field and choice control, tiles (in a group and on their own) beside them, and a form with submit-first validation (fieldErrors). */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
@@ -54,6 +54,7 @@
   let topics = $state(['deploys', 'mentions'])
   let backups = $state(true)
   let keep = $state('30')
+  let pressed = $state('nothing yet')
   let upFile = $state(/** @type {File | null} */ (null))
   let upFiles = $state(/** @type {File[]} */ ([]))
   let upFolder = $state(/** @type {{ name: string, files: { path: string, file: File }[] } | null} */ (null))
@@ -232,11 +233,11 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Search field" description="Esc clears it; / focuses it from anywhere.">
-    <SearchField bind:value={search} id="ks-search" label="Search" placeholder="Search" shortcut="/" />
-  </Demo>
   <Demo label="Text area" description="Grows with its text.">
     <TextArea bind:value={notes} id="ks-notes" label="Notes" placeholder="Anything worth writing down" />
+  </Demo>
+  <Demo label="Search field" description="Esc clears it; / focuses it from anywhere.">
+    <SearchField bind:value={search} id="ks-search" label="Search" placeholder="Search" shortcut="/" />
   </Demo>
   <Demo label="Select" description="One of a list: groups, separators, search, detail beside it, rows of your own.">
     <Case label="Grouped">
@@ -302,43 +303,6 @@
       <Select value="eu" options={REGIONS} id="ks-region-5" label="Region" disabled />
     </Case>
   </Demo>
-  <Demo label="Filter bar" description="The applied filters as chips, and a button to add one." wide>
-    <Case label="Applied filters: a relative date and a list of values">
-      <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history="ks-jobs" />
-    </Case>
-    <Case label="Recent filters lead the add list (the most used first), and a boolean field flips in place">
-      <FilterBar bind:filters={recentFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history={seeded} />
-    </Case>
-    <Case label="Several values, typed keywords and a custom field (salary, with a slider)">
-      <FilterBar bind:filters={manyFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
-    </Case>
-    <Case label="Nothing filtered yet (the custom field is left out without a panel snippet)">
-      <FilterBar bind:filters={noFilters} fields={FIELDS} label="Job filters" />
-    </Case>
-  </Demo>
-  <Demo label="Filter chip" description="One filter: a field, a condition and its values." wide>
-    <Case label="A condition to choose (its list opens over it) and a list of values">
-      {#if chipGone}
-        <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>
-      {:else}
-        <FilterChip
-          field={{ label: 'Application', icon: 'paperPlane' }}
-          operator={chipOp}
-          operators={['is', 'is not']}
-          onoperator={(op) => (chipOp = op)}
-          onremove={() => (chipGone = true)}
-        >
-          {#snippet value()}<span class="num">{chipStages.length}</span> {chipStages.length === 1 ? 'stage' : 'stages'}{/snippet}
-          {#snippet panel()}<OptionList bind:value={chipStages} options={STAGES} label="Application" />{/snippet}
-        </FilterChip>
-      {/if}
-    </Case>
-    <Case label="One condition, a value with no editor">
-      <FilterChip field={{ label: 'Role', icon: 'briefcase' }} operator="is" onremove={() => {}}>
-        {#snippet value()}Frontend engineer{/snippet}
-      </FilterChip>
-    </Case>
-  </Demo>
   <Demo label="Option list" description="A list to pick from, inside a panel.">
     <Case label="Several, with icons, tones and counts">
       <div class="panel-like"><OptionList bind:value={picked} options={STAGES} label="Application" autofocus={false} /></div>
@@ -396,6 +360,85 @@
         onchange={(v) => (density = v)}
       />
     </div>
+  </Demo>
+  <Demo label="Tile group" description="Choices drawn as tiles: one, or several." span={2}>
+    <Case label="One choice: arrows move and choose">
+      <div class="full">
+        <TileGroup label="Plan" bind:value={plan} columns={3} info="Change it any time. The new price starts on the day it changes.">
+          <Tile value="hobby" title="Hobby" icon="flask">
+            <p class="price"><span class="data">€0</span> a month</p>
+            <ul class="ticks">
+              <li>One project</li>
+              <li>Community support</li>
+            </ul>
+          </Tile>
+          <Tile value="team" title="Team" icon="rocket">
+            <p class="price"><span class="data">€12</span> a seat, a month</p>
+            <ul class="ticks">
+              <li>Unlimited projects</li>
+              <li>Shared settings and roles</li>
+              <li>Support within a day</li>
+            </ul>
+          </Tile>
+          <Tile value="custom" title="Custom" icon="lock" disabled>Agreed with us first, so it can't be chosen here.</Tile>
+        </TileGroup>
+      </div>
+      <span class="small muted">Plan: {plan}</span>
+    </Case>
+    <Case label="Several: checkbox tiles, horizontal">
+      <div class="full">
+        <TileGroup label="Notify me about" multiple bind:value={topics} columns={2}>
+          <Tile horizontal value="deploys" title="Deploys" icon="rocket">When one starts, finishes or fails.</Tile>
+          <Tile horizontal value="builds" title="Builds" icon="code">Only the ones that fail.</Tile>
+          <Tile horizontal value="mentions" title="Mentions" icon="star">When someone names you in a comment.</Tile>
+          <Tile horizontal value="billing" title="Billing" icon="document">Invoices and changes to the plan.</Tile>
+        </TileGroup>
+      </div>
+      <span class="small muted">Chosen: {topics.join(', ') || 'none'}</span>
+    </Case>
+    <Case label="A checkbox tile on its own: its top row toggles it, the field under it doesn't">
+      <div class="one-tile">
+        <Tile title="Nightly backups" icon="history" bind:checked={backups}>
+          <div class="stack">
+            <p>A copy of every database at 02:00.</p>
+            {#if backups}<Select bind:value={keep} options={KEEP} id="ks-keep" label="Keep for" />{/if}
+          </div>
+        </Tile>
+      </div>
+    </Case>
+  </Demo>
+  <Demo label="Tile" description="A card that is a link or a button." span={2}>
+    <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
+      <div class="tiles">
+        <Tile title="Typography" icon="document" href="#typography" cta="See the styles">Headings, lists, quotes and code for long-form text.</Tile>
+        <Tile title="Phosphor icons" icon="star" href="https://phosphoricons.com">The icon set, in its regular weight.</Tile>
+        <Tile title="Foundations" icon="eye" href="#foundations" arrow={false}>Colours, type, radii and spacing, without an arrow.</Tile>
+      </div>
+    </Case>
+    <Case label="Buttons, holding more than a line of text">
+      <div class="tiles">
+        <Tile title="New project" icon="plus" cta="Start" onclick={() => (pressed = 'New project')}>An empty project with the defaults.</Tile>
+        <Tile title="Production" icon="cloud" onclick={() => (pressed = 'Production')}>
+          <div class="meta">
+            <span class="label-chip" data-tone="success"><span class="label-dot"></span>Healthy</span>
+            <span class="data">3 regions · 42 ms</span>
+          </div>
+        </Tile>
+        <Tile title="Import" icon="upload" disabled onclick={() => (pressed = 'Import')}>Paused while another import runs.</Tile>
+      </div>
+      <span class="small muted" role="status">Pressed: {pressed}</span>
+    </Case>
+    <Case label="Horizontal, for a list">
+      <div class="list">
+        <Tile horizontal title="Keyboard shortcuts" icon="keyboard" href="#actions">Every key the page answers to.</Tile>
+        <Tile horizontal title="Appearance" icon="monitor" arrow onclick={() => (pressed = 'Appearance')}>Theme, density and motion.</Tile>
+      </div>
+    </Case>
+    <Case label="Content only, not interactive">
+      <div class="tiles">
+        <Tile title="Storage" icon="folder"><span class="data">12.4 GB</span> of 50 GB used.</Tile>
+      </div>
+    </Case>
   </Demo>
   <Demo label="Slider" description="One value, or a range.">
     <Case label="Fine steps: no ticks">
@@ -474,50 +517,41 @@
       </div>
     </Case>
   </Demo>
-  <Demo label="Tile group" description="Choices drawn as tiles: one, or several." span={2}>
-    <Case label="One choice: arrows move and choose">
-      <div class="full">
-        <TileGroup label="Plan" bind:value={plan} columns={3} info="Change it any time. The new price starts on the day it changes.">
-          <Tile value="hobby" title="Hobby" icon="flask">
-            <p class="price"><span class="data">€0</span> a month</p>
-            <ul class="ticks">
-              <li>One project</li>
-              <li>Community support</li>
-            </ul>
-          </Tile>
-          <Tile value="team" title="Team" icon="rocket">
-            <p class="price"><span class="data">€12</span> a seat, a month</p>
-            <ul class="ticks">
-              <li>Unlimited projects</li>
-              <li>Shared settings and roles</li>
-              <li>Support within a day</li>
-            </ul>
-          </Tile>
-          <Tile value="custom" title="Custom" icon="lock" disabled>Agreed with us first, so it can't be chosen here.</Tile>
-        </TileGroup>
-      </div>
-      <span class="small muted">Plan: {plan}</span>
+  <Demo label="Filter bar" description="The applied filters as chips, and a button to add one." wide>
+    <Case label="Applied filters: a relative date and a list of values">
+      <FilterBar bind:filters fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history="ks-jobs" />
     </Case>
-    <Case label="Several: checkbox tiles, horizontal">
-      <div class="full">
-        <TileGroup label="Notify me about" multiple bind:value={topics} columns={2}>
-          <Tile horizontal value="deploys" title="Deploys" icon="rocket">When one starts, finishes or fails.</Tile>
-          <Tile horizontal value="builds" title="Builds" icon="code">Only the ones that fail.</Tile>
-          <Tile horizontal value="mentions" title="Mentions" icon="star">When someone names you in a comment.</Tile>
-          <Tile horizontal value="billing" title="Billing" icon="document">Invoices and changes to the plan.</Tile>
-        </TileGroup>
-      </div>
-      <span class="small muted">Chosen: {topics.join(', ') || 'none'}</span>
+    <Case label="Recent filters lead the add list (the most used first), and a boolean field flips in place">
+      <FilterBar bind:filters={recentFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} history={seeded} />
     </Case>
-    <Case label="A checkbox tile on its own: its top row toggles it, the field under it doesn't">
-      <div class="one-tile">
-        <Tile title="Nightly backups" icon="history" bind:checked={backups}>
-          <div class="stack">
-            <p>A copy of every database at 02:00.</p>
-            {#if backups}<Select bind:value={keep} options={KEEP} id="ks-keep" label="Keep for" />{/if}
-          </div>
-        </Tile>
-      </div>
+    <Case label="Several values, typed keywords and a custom field (salary, with a slider)">
+      <FilterBar bind:filters={manyFilters} fields={FIELDS} label="Job filters" panel={salaryPanel} summary={salarySummary} />
+    </Case>
+    <Case label="Nothing filtered yet (the custom field is left out without a panel snippet)">
+      <FilterBar bind:filters={noFilters} fields={FIELDS} label="Job filters" />
+    </Case>
+  </Demo>
+  <Demo label="Filter chip" description="One filter: a field, a condition and its values." wide>
+    <Case label="A condition to choose (its list opens over it) and a list of values">
+      {#if chipGone}
+        <Button small onclick={() => (chipGone = false)}>Bring the filter back</Button>
+      {:else}
+        <FilterChip
+          field={{ label: 'Application', icon: 'paperPlane' }}
+          operator={chipOp}
+          operators={['is', 'is not']}
+          onoperator={(op) => (chipOp = op)}
+          onremove={() => (chipGone = true)}
+        >
+          {#snippet value()}<span class="num">{chipStages.length}</span> {chipStages.length === 1 ? 'stage' : 'stages'}{/snippet}
+          {#snippet panel()}<OptionList bind:value={chipStages} options={STAGES} label="Application" />{/snippet}
+        </FilterChip>
+      {/if}
+    </Case>
+    <Case label="One condition, a value with no editor">
+      <FilterChip field={{ label: 'Role', icon: 'briefcase' }} operator="is" onremove={() => {}}>
+        {#snippet value()}Frontend engineer{/snippet}
+      </FilterChip>
     </Case>
   </Demo>
   <Demo label="Field label" description="The label, note and ⓘ for a control of your own.">
@@ -546,6 +580,23 @@
 </Section>
 
 <style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+    gap: var(--space-2);
+    width: 100%;
+  }
+  .list {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
   /* Room under a field showing its error for the bubble hanging below it (its offset and one line), so the bubble stays
      inside its Demo instead of covering the one tucked under it. Lays its fields out as a Case does. */
   .panel-like {

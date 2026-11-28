@@ -1,14 +1,11 @@
 <script>
-  /** Kitchen sink: Button in all its states, the context menu with its visible ⋯ twin, the scroll buttons, and tiles. */
+  /** Kitchen sink: Button in all its states, the context menu with its visible ⋯ twin. */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Case from './Case.svelte'
   import Button from '@xerios/design-system/components/Button.svelte'
   import ErrorMessage from '@xerios/design-system/components/ErrorMessage.svelte'
   import MenuButton from '@xerios/design-system/components/menu/MenuButton.svelte'
-  import Tile from '@xerios/design-system/components/tiles/Tile.svelte'
-  import ScrollToTop from '@xerios/design-system/components/scroll/ScrollToTop.svelte'
-  import ScrollMore from '@xerios/design-system/components/scroll/ScrollMore.svelte'
   import { contextMenu } from '@xerios/design-system/lib/menu.svelte.js'
 
   /** @param {number} ms */
@@ -21,11 +18,7 @@
   let picked = $state('nothing yet')
   let deployError = $state('')
   let pending = $state(false)
-  let pressed = $state('nothing yet')
   let compact = $state(false)
-
-  // Filler for the scroll areas: enough lines to run a few screenfuls.
-  const lines = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: a row of content to scroll through.`)
 
   const menuItems = () => [
     { label: 'Open', icon: 'eye', action: () => (picked = 'Open') },
@@ -93,96 +86,9 @@
     <MenuButton items={menuItems} label="Demo item" />
     <span class="small muted">Picked: {picked}, compact rows {compact ? 'on' : 'off'}</span>
   </Demo>
-  <Demo label="ScrollToTop" description="A way back to the top once a screenful down.">
-    <Case label="Appears a screenful down">
-      <div class="scroller">
-        {#each lines as line}<p>{line}</p>{/each}
-        <ScrollToTop />
-      </div>
-    </Case>
-  </Demo>
-  <Demo label="ScrollMore" description="Says there is more below, and goes there.">
-    <Case label="Minimal: until you scroll">
-      <div class="scroller">
-        {#each lines as line}<p>{line}</p>{/each}
-        <ScrollMore />
-      </div>
-    </Case>
-    <Case label="With text, whenever more is below; goes to the end">
-      <div class="scroller">
-        {#each lines as line}<p>{line}</p>{/each}
-        <ScrollMore showLabel label="Jump to latest" until="end" toEnd />
-      </div>
-    </Case>
-  </Demo>
-  <Demo label="Tile" description="A card that is a link or a button." span={2}>
-    <Case label="Links: a call to action, an arrow that nudges on hover, ↗ for another site">
-      <div class="tiles">
-        <Tile title="Typography" icon="document" href="#typography" cta="See the styles">Headings, lists, quotes and code for long-form text.</Tile>
-        <Tile title="Phosphor icons" icon="star" href="https://phosphoricons.com">The icon set, in its regular weight.</Tile>
-        <Tile title="Foundations" icon="eye" href="#foundations" arrow={false}>Colours, type, radii and spacing, without an arrow.</Tile>
-      </div>
-    </Case>
-    <Case label="Buttons, holding more than a line of text">
-      <div class="tiles">
-        <Tile title="New project" icon="plus" cta="Start" onclick={() => (pressed = 'New project')}>An empty project with the defaults.</Tile>
-        <Tile title="Production" icon="cloud" onclick={() => (pressed = 'Production')}>
-          <div class="meta">
-            <span class="label-chip" data-tone="success"><span class="label-dot"></span>Healthy</span>
-            <span class="data">3 regions · 42 ms</span>
-          </div>
-        </Tile>
-        <Tile title="Import" icon="upload" disabled onclick={() => (pressed = 'Import')}>Paused while another import runs.</Tile>
-      </div>
-      <span class="small muted" role="status">Pressed: {pressed}</span>
-    </Case>
-    <Case label="Horizontal, for a list">
-      <div class="list">
-        <Tile horizontal title="Keyboard shortcuts" icon="keyboard" href="#actions">Every key the page answers to.</Tile>
-        <Tile horizontal title="Appearance" icon="monitor" arrow onclick={() => (pressed = 'Appearance')}>Theme, density and motion.</Tile>
-      </div>
-    </Case>
-    <Case label="Content only, not interactive">
-      <div class="tiles">
-        <Tile title="Storage" icon="folder"><span class="data">12.4 GB</span> of 50 GB used.</Tile>
-      </div>
-    </Case>
-  </Demo>
 </Section>
 
 <style>
-  .tiles {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-    gap: var(--space-2);
-    width: 100%;
-  }
-  .list {
-    display: grid;
-    gap: var(--space-2);
-    width: 100%;
-  }
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-  }
-  .data {
-    font-family: var(--font-data);
-    font-variant-numeric: tabular-nums;
-  }
-  .scroller {
-    width: 100%;
-    height: 180px;
-    overflow: auto;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-  }
-  .scroller p {
-    margin: 0 0 var(--space-2);
-  }
   .target {
     padding: var(--space-2) var(--space-3);
     background: none;

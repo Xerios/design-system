@@ -1,5 +1,5 @@
 <script>
-  /** Kitchen sink: collapsibles, a side menu, breadcrumbs, tables, inline markdown, a resizable panel and a scroll area with faded edges. */
+  /** Kitchen sink: collapsibles, a side menu, breadcrumbs, tables, inline markdown, a resizable panel, canvases, and the scroll helpers last (faded edges, back to the top, more below). */
   import Section from './Section.svelte'
   import Demo from './Demo.svelte'
   import Collapsible from '@xerios/design-system/components/Collapsible.svelte'
@@ -15,9 +15,14 @@
   import ActionCard from '@xerios/design-system/components/action-card/index.js'
   import TextArea from '@xerios/design-system/components/inputs/TextArea.svelte'
   import Case from './Case.svelte'
+  import ScrollMore from '@xerios/design-system/components/scroll/ScrollMore.svelte'
+  import ScrollToTop from '@xerios/design-system/components/scroll/ScrollToTop.svelte'
   import Canvas from '@xerios/design-system/components/Canvas.svelte'
   import { theme } from './theme.svelte.js'
   import { scrollFade } from '@xerios/design-system/lib/scroll-fade.js'
+
+  // Filler for the scroll areas: enough lines to run a few screenfuls.
+  const lines = Array.from({ length: 24 }, (_, i) => `Line ${i + 1}: a row of content to scroll through.`)
 
   const PEOPLE = [
     { id: 1, name: 'Ada Lovelace', team: 'Engines', commits: 128, joined: '2025-03-02' },
@@ -118,6 +123,19 @@
 </script>
 
 <Section id="content" title="Content" intro="Containers and data: sections that fold, tables that sort and group, panels that resize.">
+  <Demo label="Table" description="Sortable columns, groups, and a row menu (right-click a row)." wide>
+    <div class="full">
+      <Table
+        label="People"
+        columns={COLUMNS}
+        groups={GROUPS}
+        key={(/** @type {Person} */ p) => p.id}
+        bind:sort
+        rowLabel={(/** @type {Person} */ p) => p.name}
+        rowMenu={(/** @type {Person} */ p) => [{ label: `Message ${p.name.split(' ')[0]}` }, { separator: true }, { label: 'Remove', danger: true }]}
+      />
+    </div>
+  </Demo>
   <Demo label="Collapsible" description="Bindable, with a count and an ⓘ.">
     <div class="full">
       <Collapsible title="Requirements" count={3} info="What has to be true before it ships." bind:open>
@@ -137,74 +155,6 @@
         {#snippet meta()}uploading{/snippet}
       </CollapsibleAdvanced>
       <CollapsibleAdvanced title="Smoke tests" variant="empty" expandable={false} />
-    </div>
-  </Demo>
-  <Demo label="Side menu" description="A header with a main action, a count, folding groups and rows, nested rows with and without icons, a footer.">
-    <div class="side-menu-stage">
-      <SideMenu label="Example menu">
-        {#snippet header()}<span class="brand"><Icon name="monitor" size="lg" />Workspace</span>{/snippet}
-        {#snippet actions()}
-          <Button iconOnly icon="search" label="Search" />
-          <Button iconOnly icon="plus" label="New item" />
-        {/snippet}
-        <SideMenu.Group>
-          <SideMenu.Item icon="history" label="Recent" count={3} current={picked === 'recent'} onclick={() => (picked = 'recent')} />
-          <SideMenu.Item icon="star" label="Starred" current={picked === 'starred'} onclick={() => (picked = 'starred')} />
-        </SideMenu.Group>
-        <SideMenu.Group title="Workspace">
-          <SideMenu.Item icon="calendar" label="Calendar" current={picked === 'calendar'} onclick={() => (picked = 'calendar')} />
-          <SideMenu.Item icon="monitor" label="Displays" bind:open={displaysOpen}>
-            <SideMenu.Item label="Main" current={picked === 'main'} onclick={() => (picked = 'main')} />
-            <SideMenu.Item label="Side" current={picked === 'side'} onclick={() => (picked = 'side')} />
-          </SideMenu.Item>
-          <SideMenu.Item icon="gear" label="Settings" open>
-            <SideMenu.Item icon="keyboard" label="Shortcuts" current={picked === 'keys'} onclick={() => (picked = 'keys')} />
-            <SideMenu.Item icon="eye" label="Appearance" current={picked === 'look'} onclick={() => (picked = 'look')}>
-              <SideMenu.Item label="Light" />
-              <SideMenu.Item label="Dark" />
-            </SideMenu.Item>
-          </SideMenu.Item>
-        </SideMenu.Group>
-        <SideMenu.Group title="Folded" open={false}>
-          <SideMenu.Item icon="star" label="Hidden until opened" />
-        </SideMenu.Group>
-        {#snippet footer()}<Button small icon="keyboard">Shortcuts</Button>{/snippet}
-      </SideMenu>
-    </div>
-  </Demo>
-  <Demo label="Breadcrumbs">
-    <Case label="Links, an icon on the first level, the current page last">
-      <Breadcrumbs items={PATH.slice(0, 3).concat({ label: 'Settings' })} />
-    </Case>
-    <Case label="A long path: the middle folds behind …, which shows it in place; long labels are cut short">
-      <Breadcrumbs items={PATH} max={3} />
-    </Case>
-    <Case label="Buttons instead of links, and a trail that stops at the parent (current={false})">
-      <Breadcrumbs
-        current={false}
-        items={['Settings', 'Appearance', 'Display'].map((label) => ({ label, onclick: () => (level = label) }))}
-      />
-      <p class="small muted">Picked: {level}</p>
-    </Case>
-  </Demo>
-  <Demo label="Table" description="Sortable columns, groups, and a row menu (right-click a row)." wide>
-    <div class="full">
-      <Table
-        label="People"
-        columns={COLUMNS}
-        groups={GROUPS}
-        key={(/** @type {Person} */ p) => p.id}
-        bind:sort
-        rowLabel={(/** @type {Person} */ p) => p.name}
-        rowMenu={(/** @type {Person} */ p) => [{ label: `Message ${p.name.split(' ')[0]}` }, { separator: true }, { label: 'Remove', danger: true }]}
-      />
-    </div>
-  </Demo>
-  <Demo label="Splitter" description="Drag it or use the arrow keys; a double-click resets it." wide>
-    <div class="split">
-      <div class="pane">Main</div>
-      <Splitter value={width} min={160} max={480} defaultValue={260} side="end" oninput={(w) => (width = w)} />
-      <div class="pane side" style:width="{width}px">Panel, {width}px</div>
     </div>
   </Demo>
   <Demo label="Action card" description="Actions in the corner of their content." span={2}>
@@ -279,6 +229,61 @@
       </div>
     </Case>
   </Demo>
+  <Demo label="Side menu" description="A header with a main action, a count, folding groups and rows, nested rows with and without icons, a footer.">
+    <div class="side-menu-stage">
+      <SideMenu label="Example menu">
+        {#snippet header()}<span class="brand"><Icon name="monitor" size="lg" />Workspace</span>{/snippet}
+        {#snippet actions()}
+          <Button iconOnly icon="search" label="Search" />
+          <Button iconOnly icon="plus" label="New item" />
+        {/snippet}
+        <SideMenu.Group>
+          <SideMenu.Item icon="history" label="Recent" count={3} current={picked === 'recent'} onclick={() => (picked = 'recent')} />
+          <SideMenu.Item icon="star" label="Starred" current={picked === 'starred'} onclick={() => (picked = 'starred')} />
+        </SideMenu.Group>
+        <SideMenu.Group title="Workspace">
+          <SideMenu.Item icon="calendar" label="Calendar" current={picked === 'calendar'} onclick={() => (picked = 'calendar')} />
+          <SideMenu.Item icon="monitor" label="Displays" bind:open={displaysOpen}>
+            <SideMenu.Item label="Main" current={picked === 'main'} onclick={() => (picked = 'main')} />
+            <SideMenu.Item label="Side" current={picked === 'side'} onclick={() => (picked = 'side')} />
+          </SideMenu.Item>
+          <SideMenu.Item icon="gear" label="Settings" open>
+            <SideMenu.Item icon="keyboard" label="Shortcuts" current={picked === 'keys'} onclick={() => (picked = 'keys')} />
+            <SideMenu.Item icon="eye" label="Appearance" current={picked === 'look'} onclick={() => (picked = 'look')}>
+              <SideMenu.Item label="Light" />
+              <SideMenu.Item label="Dark" />
+            </SideMenu.Item>
+          </SideMenu.Item>
+        </SideMenu.Group>
+        <SideMenu.Group title="Folded" open={false}>
+          <SideMenu.Item icon="star" label="Hidden until opened" />
+        </SideMenu.Group>
+        {#snippet footer()}<Button small icon="keyboard">Shortcuts</Button>{/snippet}
+      </SideMenu>
+    </div>
+  </Demo>
+  <Demo label="Breadcrumbs">
+    <Case label="Links, an icon on the first level, the current page last">
+      <Breadcrumbs items={PATH.slice(0, 3).concat({ label: 'Settings' })} />
+    </Case>
+    <Case label="A long path: the middle folds behind …, which shows it in place; long labels are cut short">
+      <Breadcrumbs items={PATH} max={3} />
+    </Case>
+    <Case label="Buttons instead of links, and a trail that stops at the parent (current={false})">
+      <Breadcrumbs
+        current={false}
+        items={['Settings', 'Appearance', 'Display'].map((label) => ({ label, onclick: () => (level = label) }))}
+      />
+      <p class="small muted">Picked: {level}</p>
+    </Case>
+  </Demo>
+  <Demo label="Splitter" description="Drag it or use the arrow keys; a double-click resets it." wide>
+    <div class="split">
+      <div class="pane">Main</div>
+      <Splitter value={width} min={160} max={480} defaultValue={260} side="end" oninput={(w) => (width = w)} />
+      <div class="pane side" style:width="{width}px">Panel, {width}px</div>
+    </div>
+  </Demo>
   <Demo label="Metadata" span={2}>
     <Case label="Chip buttons as values, a label that adds one (Labels), a description under it">
       <div class="full">
@@ -327,6 +332,9 @@
       </div>
     </Case>
   </Demo>
+  <Demo label="Inline markdown" description={'Rendered without {@html}.'}>
+    <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
+  </Demo>
   <Demo label="Canvas" span={2}>
     <Case label="Animated, paused off screen; running holds the frame">
       <div class="sketch"><Canvas draw={wave} running={waving} /></div>
@@ -341,17 +349,47 @@
       <Button onclick={() => intro?.restart()}>Replay</Button>
     </Case>
   </Demo>
-  <Demo label="Inline markdown" description={'Rendered without {@html}.'}>
-    <p><Md text={'**Bold**, *italic*, `code`, and [a link](https://example.com) or a bare https://example.com.'} /></p>
-  </Demo>
   <Demo label="Scroll fade" description="The edges fade where there is more to scroll.">
     <ul class="scroll full" {@attach scrollFade({ size: 24 })}>
       {#each LINES as line (line)}<li class="small">{line}</li>{/each}
     </ul>
   </Demo>
+  <Demo label="ScrollToTop" description="A way back to the top once a screenful down.">
+    <Case label="Appears a screenful down">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollToTop />
+      </div>
+    </Case>
+  </Demo>
+  <Demo label="ScrollMore" description="Says there is more below, and goes there.">
+    <Case label="Minimal: until you scroll">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollMore />
+      </div>
+    </Case>
+    <Case label="With text, whenever more is below; goes to the end">
+      <div class="scroller">
+        {#each lines as line}<p>{line}</p>{/each}
+        <ScrollMore showLabel label="Jump to latest" until="end" toEnd />
+      </div>
+    </Case>
+  </Demo>
 </Section>
 
 <style>
+  .scroller {
+    width: 100%;
+    height: 180px;
+    overflow: auto;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+  }
+  .scroller p {
+    margin: 0 0 var(--space-2);
+  }
   .side-menu-stage {
     width: 100%;
     max-width: 280px;
