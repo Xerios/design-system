@@ -7,6 +7,12 @@ patch. Breaking entries are marked **Breaking** and say what to change in an app
 
 ## [Unreleased]
 
+### Nothingburger
+
+- A GitHub Pages site with every component in its states: [xerios.github.io/design-system](https://xerios.github.io/design-system/).
+- Package metadata: `homepage` now points to the GitHub Pages site, and the repository and issue links use the
+  lowercase `xerios` owner.
+
 ## [0.3.0] - 2026-11-28
 
 ### Added
