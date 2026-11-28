@@ -13,10 +13,10 @@
   "author": "Xerios",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xerios/design-system.git"
+    "url": "git+https://github.com/Xerios/design-system.git"
   },
   "homepage": "https://xerios.github.io/design-system/",
-  "bugs": "https://github.com/xerios/design-system/issues",
+  "bugs": "https://github.com/Xerios/design-system/issues",
   "type": "module",
   "files": [
     "dist",
