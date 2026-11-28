@@ -440,8 +440,9 @@ under a fresh `[Unreleased]`, updates the compare links, checks both builds, ret
 and commits and tags `vx.y.z`. The image path is relative, so GitHub shows the one of the branch or tag being read;
 npm doesn't publish the image file, but points relative paths at the repository (its default branch), so there it
 updates once the release commit is pushed. Push with
-`git push --follow-tags`, then `pnpm publish`. `prepack` rebuilds `dist/` first, and only `dist/`, this README and the
-license are published.
+`git push --follow-tags`: the tag starts the Publish workflow (`.github/workflows/publish.yml`), which checks the tag
+matches `package.json`, builds, and publishes to npm with provenance. Only `dist/`, this README and the license are
+published.
 
 To try an unreleased build in an app, link it (`"@xerios/design-system": "link:../design-system"`) and run
 `pnpm build` here after each change, or `pnpm pack` and install the tarball.

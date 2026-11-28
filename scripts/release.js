@@ -6,7 +6,7 @@
 // `--no-shot` keeps the screenshot as it is (the kitchen sink is still built, as a check).
 // With no level it picks one from the changelog: a **Breaking** entry bumps the minor while on 0.x (the major after),
 // anything else the patch. `--dry` prints what it would do and writes nothing; `--no-git` skips the commit and tag.
-// It never pushes or publishes: it prints the commands for that at the end.
+// It never pushes: pushing the tag (the command it prints at the end) publishes to npm from CI (.github/workflows/publish.yml).
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
@@ -103,4 +103,4 @@ if (git) {
 	run(`git tag -a v${next} -m "v${next}"`)
 }
 
-console.log(`\nrelease: v${next} is ready. To ship it:\n  git push --follow-tags\n  pnpm publish`)
+console.log(`\nrelease: v${next} is ready. To ship it (CI publishes the tag to npm):\n  git push --follow-tags`)

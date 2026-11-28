@@ -134,7 +134,8 @@ The kitchen sink is a separate, private app in `kitchensink/` at the repo root (
   (kitchen sink, scripts, refactors with no visible effect) stays out.
 - Releasing: `pnpm release [patch|minor|major|x.y.z]` (scripts/release.js) bumps `version` in `package.json`, renames
   `[Unreleased]` in `CHANGELOG.md` to `[x.y.z] - YYYY-MM-DD` under a fresh empty `[Unreleased]`, updates the compare
-  links at the bottom, checks the builds, and commits and tags `vx.y.z`. Do it by hand only if the script can't.
+  links at the bottom, checks the builds, and commits and tags `vx.y.z`. Do it by hand only if the script can't. Pushing the tag
+  (`git push --follow-tags`) publishes to npm from CI (`.github/workflows/publish.yml`); never `pnpm publish` by hand.
 - Global CSS goes in the matching file (`base`, `effects`, `atoms`); component styles stay scoped in the
   `.svelte` file. Keep selectors low-specificity so apps can override them.
 - Relative imports only inside `src/` (`../lib/dom.js`), never the package name, so the built `dist/` stays
