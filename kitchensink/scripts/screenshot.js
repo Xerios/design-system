@@ -1,87 +1,74 @@
-// Takes the README's screenshot: `pnpm screenshot [--no-build] [--light]` (at the repo root).
-// Builds the kitchen sink, serves the build, opens its demo page (demo.html) in headless Chromium at 1440×900 and twice
-// the pixel density, in the dark theme with motion reduced, and writes docs/screenshot.png at the repo root (not
-// committed). The Pages workflow runs it on each release and publishes the image with the site, where the README shows
-// it from. --no-build serves the current kitchensink/dist as it is; --light takes it in the light theme instead.
-// The browser: one already on this machine, never downloaded. CHROME_PATH if set; else the newest Chromium in
-// Playwright's cache (~/.cache/ms-playwright, or PLAYWRIGHT_BROWSERS_PATH), whatever Playwright version put it there;
-// else Chrome, Chromium or Brave on the PATH.
-import { existsSync, mkdirSync, readdirSync } from 'node:fs'
-import { homedir } from 'node:os'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { chromium } from 'playwright-core'
-import { build, preview } from 'vite'
+// Takes the README's screenshot: `pnpm screenshot [out.png] [--light]` (at the repo root), after
+// `pnpm build:kitchensink`. Runs on Bun (1.4.5 or later), whose built-in WebView drives a Chromium over the DevTools
+// Protocol, so there is no npm dependency for it. Serves the built kitchen sink (kitchensink/dist), opens its demo page
+// (demo.html) at 1440×900 and twice the pixel density, in the dark theme with motion reduced, waits for the web fonts,
+// and writes the PNG to out.png (relative to where pnpm was run; kitchensink/dist/screenshot.png by default, beside the
+// site, where the Pages workflow publishes it and the README shows it from). Fails, writing nothing, if the page throws,
+// logs an error or a file is missing. --light takes it in the light theme instead.
+// The browser: one already on this machine, never downloaded, found by Bun: BUN_CHROME_PATH if set, else Chrome or
+// Chromium on the PATH (google-chrome-stable, chromium, …) or in the usual install places.
+import { resolve } from 'node:path'
 
-const args = process.argv.slice(2)
-const root = fileURLToPath(new URL('..', import.meta.url))
-const out = fileURLToPath(new URL('../../docs/screenshot.png', import.meta.url))
-const scheme = args.includes('--light') ? 'light' : 'dark'
+const dist = resolve(import.meta.dir, '../dist')
+const [arg] = Bun.argv.slice(2).filter((a) => !a.startsWith('--'))
+// pnpm runs the script in kitchensink/; INIT_CWD is where it was run from.
+const out = arg ? resolve(process.env.INIT_CWD ?? process.cwd(), arg) : `${dist}/screenshot.png`
+const scheme = Bun.argv.includes('--light') ? 'light' : 'dark'
+const [width, height] = [1440, 900]
 
-if (!args.includes('--no-build')) await build({ root, logLevel: 'warn' })
-const server = await preview({ root, logLevel: 'warn', preview: { port: 4180, open: false } })
-const url = server.resolvedUrls?.local[0]
+if (!(await Bun.file(`${dist}/demo.html`).exists())) throw new Error('no kitchensink/dist/demo.html: run `pnpm build:kitchensink` first')
 
-/** A Chromium-based browser already on this machine (see the top), or undefined. */
-function findBrowser() {
-  if (process.env.CHROME_PATH) return process.env.CHROME_PATH
-  const cache =
-    process.env.PLAYWRIGHT_BROWSERS_PATH ||
-    (process.platform === 'darwin' ? join(homedir(), 'Library/Caches/ms-playwright') : join(homedir(), '.cache/ms-playwright'))
-  // Newest revision first, the headless shell before the full browser.
-  const cached = existsSync(cache)
-    ? readdirSync(cache)
-        .map((dir) => dir.match(/^(chromium_headless_shell|chromium)-(\d+)$/))
-        .filter((m) => m !== null)
-        .sort((a, b) => Number(b[2]) - Number(a[2]) || (a[1] === 'chromium_headless_shell' ? -1 : 1))
-        .flatMap(([dir]) =>
-          [
-            'chrome-headless-shell-linux64/chrome-headless-shell',
-            'chrome-linux64/chrome',
-            'chrome-linux/headless_shell',
-            'chrome-linux/chrome',
-            'chrome-headless-shell-mac-arm64/chrome-headless-shell',
-            'chrome-headless-shell-mac-x64/chrome-headless-shell',
-            'chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-          ].map((file) => join(cache, dir, file)),
-        )
-    : []
-  const onPath = ['chromium', 'chromium-browser', 'google-chrome-stable', 'google-chrome', 'brave', 'brave-browser', 'brave-origin-beta'].flatMap(
-    (name) => (process.env.PATH ?? '').split(':').map((dir) => join(dir, name)),
-  )
-  return [...cached, ...onPath].find((file) => existsSync(file))
-}
+// Both are disposed (the browser closed, the server stopped) when the script ends, an error included.
+// The build uses relative asset URLs (base './' in vite.config.js), so it is served from the root whatever path Pages
+// puts it under. The path is used undecoded: the URL parser has already resolved any "..", so it stays inside dist/.
+using server = Bun.serve({
+  hostname: '127.0.0.1',
+  port: 0,
+  fetch: (req) => new Response(Bun.file(dist + new URL(req.url).pathname)),
+  error: () => new Response('Not found', { status: 404 }), // a missing file
+})
 
-const executablePath = findBrowser()
-let browser
-try {
-  if (!executablePath) throw new Error('no Chrome, Chromium or Brave found')
-  browser = await chromium.launch({ executablePath })
-} catch (err) {
-  await server.close()
-  console.error(`screenshot: ${String(err instanceof Error ? err.message : err).split('\n')[0]}`)
-  console.error('screenshot: set CHROME_PATH to a Chrome or Chromium binary.')
-  process.exit(1)
-}
+// What the page reported going wrong.
+const errors = []
 
-try {
-  const page = await browser.newPage({
-    viewport: { width: 1440, height: 900 },
-    deviceScaleFactor: 2,
-    colorScheme: scheme,
-    reducedMotion: 'reduce',
-  })
-  const errors = []
-  page.on('pageerror', (err) => errors.push(err.message))
-  page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()))
-  await page.goto(new URL('demo.html', url).href, { waitUntil: 'networkidle' })
-  await page.evaluate(() => document.fonts.ready)
-  await page.waitForTimeout(400)
-  if (errors.length) throw new Error(`the demo page logged errors:\n  ${errors.join('\n  ')}`)
-  mkdirSync(dirname(out), { recursive: true })
-  await page.screenshot({ path: out, animations: 'disabled' })
-  console.log(`screenshot: ${scheme} theme, written to docs/screenshot.png (with ${executablePath})`)
-} finally {
-  await browser.close()
-  await server.close()
-}
+using view = new Bun.WebView({
+  width,
+  height,
+  // Chrome on every platform (Bun would use WebKit on macOS, which has no DevTools Protocol for the settings below).
+  // Always a fresh browser, never one the user has open. No Chromium sandbox: the page is our own build, and CI
+  // runners and containers often can't give Chromium the namespaces its sandbox needs.
+  backend: { type: 'chrome', url: false, argv: ['--no-sandbox'] },
+  // The page's console.error calls: strings as they are, objects as DevTools describes them (an Error with its stack).
+  console: (type, ...args) => {
+    if (type === 'error') errors.push(args.map((a) => (typeof a === 'object' && a ? (a.description ?? '').split('\n')[0] : String(a))).join(' '))
+  },
+})
+await view.navigate('about:blank') // cdp() needs one navigation first
+
+// CDP events arrive as DOM events, their params in event.data.
+view.addEventListener('Runtime.exceptionThrown', ({ data: { exceptionDetails: d } }) =>
+  errors.push(d.exception?.description?.split('\n')[0] ?? d.text),
+)
+// The browser's own favicon request is not the page's.
+view.addEventListener('Network.responseReceived', ({ data: { response } }) => {
+  if (response.status >= 400 && !response.url.endsWith('/favicon.ico')) errors.push(`${response.status} ${response.url}`)
+})
+// Chrome sends a domain's events only once it is enabled. Bun enables Runtime itself, for the console option.
+await view.cdp('Network.enable')
+
+await view.cdp('Emulation.setEmulatedMedia', {
+  features: [
+    { name: 'prefers-color-scheme', value: scheme },
+    { name: 'prefers-reduced-motion', value: 'reduce' },
+  ],
+})
+await view.cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile: false })
+
+await view.navigate(`${server.url}demo.html`) // resolves on the load event
+// The web fonts, then two frames for the layout they cause, then a moment for anything the page does after mounting.
+await view.evaluate('document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))')
+await Bun.sleep(400)
+if (errors.length) throw new Error(`the demo page logged errors:\n  ${errors.join('\n  ')}`)
+
+await Bun.write(out, await view.screenshot()) // a PNG; Bun.write makes the folder if need be
+console.log(`screenshot: ${scheme} theme, written to ${out}`)

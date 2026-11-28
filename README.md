@@ -170,11 +170,11 @@ left out shows the missing-icon placeholder and a console error.
 
 Beside it, `demo.html` (`kitchensink/src/demo/`, linked from the kitchen sink's side menu) is one screen of a made-up
 issue tracker built only from the design system, to see the parts working together. The screenshot at the top of this
-README is taken of it, in the dark theme, by `pnpm screenshot` (`kitchensink/scripts/screenshot.js`: it builds the
-kitchen sink and opens the page in headless Chromium through `playwright-core`) and written to `docs/screenshot.png`
-(not committed). The Pages workflow takes it on each release and publishes it with the site, where the README shows
-it from. It downloads no browser: it uses `CHROME_PATH` if set, else the newest Chromium in Playwright's cache
-(`~/.cache/ms-playwright`), else Chrome, Chromium or Brave on the `PATH`.
+README is taken of it, in the dark theme, by `pnpm screenshot` (`kitchensink/scripts/screenshot.js`: it serves the
+kitchen sink's build and opens the page in headless Chromium through Bun's built-in WebView, so it needs
+[Bun](https://bun.com) 1.4.5 or later) and written beside the site, to `kitchensink/dist/screenshot.png`. The Pages
+workflow takes it on each release and publishes it with the site, where the README shows it from. It downloads no browser: Bun uses
+`BUN_CHROME_PATH` if set, else Chrome or Chromium on the `PATH`.
 
 Each release tag builds both pages and the screenshot and publishes them to
 [GitHub Pages](https://xerios.github.io/design-system/) (`.github/workflows/pages.yml`; it can also be run by hand
@@ -184,7 +184,7 @@ from the Actions tab).
 pnpm install
 pnpm dev                  # the kitchen sink, with hot reload (the demo at /demo.html)
 pnpm build:kitchensink    # a static build in kitchensink/dist
-pnpm screenshot           # docs/screenshot.png, from the demo page (--light for the light theme)
+pnpm screenshot           # kitchensink/dist/screenshot.png, from the build's demo page (--light for the light theme)
 ```
 
 It imports the library by its package name, exactly as an app does, and its Vite config resolves that name to `src/`

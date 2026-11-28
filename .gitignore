@@ -17,6 +17,3 @@ coverage
 
 # Local state: the SQLite file with the safety settings and snapshots (snapshots hold environment variables)
 /data
-
-# The README's screenshot: taken in CI and published with the site (pnpm screenshot writes it here locally)
-/docs/screenshot.png

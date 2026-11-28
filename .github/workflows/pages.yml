@@ -38,9 +38,12 @@ jobs:
       - run: pnpm build:kitchensink
         env:
           VITE_PAGES_URL: ${{ steps.pages.outputs.base_url }}/
-      # The README shows it from the site. The runner's Google Chrome takes it (scripts/screenshot.js finds it on the PATH).
-      - run: pnpm screenshot --no-build
-      - run: cp docs/screenshot.png kitchensink/dist/screenshot.png
+      # The README shows it from the site. kitchensink/scripts/screenshot.js takes it with Bun's built-in WebView, which
+      # drives the runner's Google Chrome (Bun finds it on the PATH).
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.5 # WebView is experimental: bump deliberately
+      - run: pnpm screenshot kitchensink/dist/screenshot.png
       - uses: actions/upload-pages-artifact@v5
         with:
           path: kitchensink/dist
