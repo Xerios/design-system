@@ -10,6 +10,8 @@ const page = (/** @type {string} */ file) => fileURLToPath(new URL(file, import.
 const { name } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 
 export default defineConfig({
+  // Relative asset URLs, so the build works from any path: the GitHub Pages site lives under /design-system/.
+  base: './',
   plugins: [
     svelte(),
     // The pages' titles name the package: %PACKAGE% in the HTML.

@@ -24,6 +24,7 @@
   ],
   "sideEffects": [
     "./dist/fonts.js",
+    "./src/fonts.js",
     "**/*.css",
     "**/*.svelte"
   ],

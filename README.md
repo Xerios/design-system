@@ -2,6 +2,9 @@
 
 [![npm](https://img.shields.io/npm/v/@xerios/design-system)](https://www.npmjs.com/package/@xerios/design-system)
 
+See it live: the [kitchen sink](https://xerios.github.io/design-system/) (every component in its states) and the
+[demo page](https://xerios.github.io/design-system/demo.html) (one screen built only from the design system).
+
 A note of warning: This is **designed for personal use and building local web-apps**, so no cross-browser tests have been performed.
 
 A Linear-style design system for Svelte 5 apps: theme tokens (light and dark), a global CSS layer, and generic
@@ -165,6 +168,9 @@ README is taken of it, in the dark theme, by `pnpm screenshot` (`kitchensink/scr
 kitchen sink and opens the page in headless Chromium through `playwright-core`) and written to `docs/screenshot.png`.
 It downloads no browser: it uses `CHROME_PATH` if set, else the newest Chromium in Playwright's cache
 (`~/.cache/ms-playwright`), else Chrome, Chromium or Brave on the `PATH`.
+
+Every push to `main` builds both pages and publishes them to
+[GitHub Pages](https://xerios.github.io/design-system/) (`.github/workflows/pages.yml`).
 
 ```sh
 pnpm install
